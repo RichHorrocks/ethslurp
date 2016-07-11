@@ -47,10 +47,10 @@ class CSlurp;
 class CTransaction : public CBaseNode
 {
 public:
-	SFInt32 handle;
+	SFInt32  handle;
 	SFString blockHash;
-	SFInt32 blockNumber;
-	SFInt32 confirmations;
+	SFInt32  blockNumber;
+	SFInt32  confirmations;
 	SFString contractAddress;
 	SFString cumulativeGasUsed;
 	SFString from;
@@ -59,13 +59,14 @@ public:
 	SFString gasUsed;
 	SFString hash;
 	SFString input;
-	SFBool isError;
-	SFBool isInternalTx;
+	SFBool   isError;
+	SFBool   isInternalTx;
 	SFString nonce;
-	SFInt32 timeStamp;
+	SFInt32  timeStamp;
 	SFString to;
-	SFInt32 transactionIndex;
+	SFInt32  transactionIndex;
 	SFString value;
+	SFTime   m_transDate;
 
 public:
 					CTransaction  (void);
@@ -82,7 +83,7 @@ public:
 	SFBool isFunction(const SFString& func) const;
 	// EXISTING_CODE
 
-private:
+protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CTransaction& tr);
@@ -150,7 +151,8 @@ inline void CTransaction::Init(void)
 	to = EMPTY;
 	transactionIndex = 0;
 	value = EMPTY;
-
+	m_transDate = earliestDate;
+	
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
@@ -180,6 +182,7 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	to = tr.to;
 	transactionIndex = tr.transactionIndex;
 	value = tr.value;
+	m_transDate = tr.m_transDate;
 
 	// EXISTING_CODE
 	// EXISTING_CODE

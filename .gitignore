@@ -12,7 +12,10 @@ api_key
 TODO.txt
 abis
 theData
-theHack
+voteCount.cpp
+votes.html
+prop_data.txt
+props.txt
 
 # Precompiled Headers
 *.gch

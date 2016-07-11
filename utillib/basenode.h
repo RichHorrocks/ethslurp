@@ -55,6 +55,7 @@ public:
 	virtual SFBool   isKindOf        (const ghRuntimeClass* pClass) const;
 	virtual char    *parseJson       (char *s, SFInt32& nFields);
 	virtual char    *parseCSV        (char *s, SFInt32& nFields, const SFString *fields);
+	virtual char    *parseText       (char *s, SFInt32& nFields, const SFString *fields);
 	virtual SFString defaultFormat   (void) const;
 
 	DECLARE_NODE_BASE(CBaseNode)

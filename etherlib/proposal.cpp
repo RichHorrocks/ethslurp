@@ -24,7 +24,7 @@
 #include "proposal.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CProposal, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CProposal, CTransaction, NO_SCHEMA);
 
 //---------------------------------------------------------------------------
 void CProposal::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -52,6 +52,13 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 	if (!ret.IsEmpty())
 		return ret;
 	
+	// Allow transaction to go first
+	CTransactionNotify dn((CTransaction*)pro);
+	ret = nextTransactionChunk(fieldIn, force, &dn);
+	if (!ret.IsEmpty())
+		return ret;
+	
+
 	// Now give customized code a chance to override
 	ret = nextProposalChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
@@ -59,18 +66,28 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 	
 	switch (tolower(fieldIn[0]))
 	{
+		case 'a':
+			if ( fieldIn % "amount" ) return pro->amount;
+			break;
 		case 'c':
-			if ( fieldIn % "closingDate" ) return pro->closingDate.Format(FMT_DATE);
+			if ( fieldIn % "creator" ) return pro->creator;
+			break;
+		case 'd':
+			if ( fieldIn % "data" ) return pro->data;
+			if ( fieldIn % "debatePeriod" ) return asString(pro->debatePeriod);
+			if ( fieldIn % "description" ) return pro->description;
 			break;
 		case 'h':
 			if ( fieldIn % "handle" ) return asString(pro->handle);
 			break;
-		case 'n':
-			if ( fieldIn % "nYes" ) return asString(pro->nYes);
-			if ( fieldIn % "nNo" ) return asString(pro->nNo);
+		case 'i':
+			if ( fieldIn % "isSplit" ) return asString(pro->isSplit);
 			break;
 		case 'p':
 			if ( fieldIn % "proposalID" ) return asString(pro->proposalID);
+			break;
+		case 'r':
+			if ( fieldIn % "recipient" ) return pro->recipient;
 			break;
 	}
 	
@@ -80,20 +97,33 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 //---------------------------------------------------------------------------------------------------
 SFBool CProposal::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
+	if (CTransaction::setValueByName(fieldName, fieldValue))
+		return TRUE;
+	
 	switch (tolower(fieldName[0]))
 	{
+		case 'a':
+			if ( fieldName % "amount" ) { amount = fieldValue; return TRUE; }
+			break;
 		case 'c':
-			if ( fieldName % "closingDate" ) { closingDate = snagDate(fieldValue); return TRUE; }
+			if ( fieldName % "creator" ) { creator = fieldValue; return TRUE; }
+			break;
+		case 'd':
+			if ( fieldName % "data" ) { data = fieldValue; return TRUE; }
+			if ( fieldName % "debatePeriod" ) { debatePeriod = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "description" ) { description = fieldValue; return TRUE; }
 			break;
 		case 'h':
 			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			break;
-		case 'n':
-			if ( fieldName % "nYes" ) { nYes = toLong(fieldValue); return TRUE; }
-			if ( fieldName % "nNo" ) { nNo = toLong(fieldValue); return TRUE; }
+		case 'i':
+			if ( fieldName % "isSplit" ) { isSplit = toBool(fieldValue); return TRUE; }
 			break;
 		case 'p':
 			if ( fieldName % "proposalID" ) { proposalID = toLong(fieldValue); return TRUE; }
+			break;
+		case 'r':
+			if ( fieldName % "recipient" ) { recipient = fieldValue; return TRUE; }
 			break;
 		default:
 			break;
@@ -111,24 +141,31 @@ void CProposal::finishParse()
 //---------------------------------------------------------------------------------------------------
 void CProposal::Serialize(SFArchive& archive)
 {
-	if (!SerializeHeader(archive))
-		return;
-	
+	CTransaction::Serialize(archive);
+
 	if (archive.isReading())
 	{
 		archive >> handle;
 		archive >> proposalID;
-		archive >> closingDate;
-		archive >> nYes;
-		archive >> nNo;
+		archive >> creator;
+		archive >> recipient;
+		archive >> amount;
+		archive >> data;
+		archive >> debatePeriod;
+		archive >> description;
+		archive >> isSplit;
 
 	} else
 	{
 		archive << handle;
 		archive << proposalID;
-		archive << closingDate;
-		archive << nYes;
-		archive << nNo;
+		archive << creator;
+		archive << recipient;
+		archive << amount;
+		archive << data;
+		archive << debatePeriod;
+		archive << description;
+		archive << isSplit;
 
 	}
 }
@@ -141,9 +178,13 @@ void CProposal::registerClass(void)
 	ADD_FIELD(CProposal, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CProposal, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CProposal, "proposalID", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CProposal, "closingDate", T_DATE, ++fieldNum);
-	ADD_FIELD(CProposal, "nYes", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CProposal, "nNo", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CProposal, "creator", T_TEXT, ++fieldNum);
+	ADD_FIELD(CProposal, "recipient", T_TEXT, ++fieldNum);
+	ADD_FIELD(CProposal, "amount", T_TEXT, ++fieldNum);
+	ADD_FIELD(CProposal, "data", T_TEXT, ++fieldNum);
+	ADD_FIELD(CProposal, "debatePeriod", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CProposal, "description", T_TEXT, ++fieldNum);
+	ADD_FIELD(CProposal, "isSplit", T_RADIO, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CProposal, "schema");

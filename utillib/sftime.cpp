@@ -765,3 +765,20 @@ SFString getFormatString(SFInt32 fmt, SFBool euro, SFBool mil, const SFString& d
 
 	return str;
 }
+
+SFTime dateFromTimeStamp(SFInt32 tsIn)
+{
+	time_t utc = tsIn;
+	struct tm *tm = gmtime(&utc);
+	char retStr[40];
+	strftime(retStr, sizeof(retStr), "%Y-%m-%d %H:%M:%S UTC", tm);
+	
+	SFString str = retStr;
+	SFInt32 y =  toLong(nextTokenClear(str,'-'));
+	SFInt32 m =  toLong(nextTokenClear(str,'-'));
+	SFInt32 d =  toLong(nextTokenClear(str,' '));
+	SFInt32 h =  toLong(nextTokenClear(str,':'));
+	SFInt32 mn = toLong(nextTokenClear(str,':'));
+	SFInt32 s =  toLong(nextTokenClear(str,' '));
+	return SFTime(y,m,d,h,mn,s);
+}

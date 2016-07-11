@@ -823,7 +823,7 @@ inline SFString asString(SFInt32 i, SFInt32 def=WIERD_NUM)
 {
 	if (i == def && def != WIERD_NUM)
 		return nullString;
-	char ret[50];
+	char ret[128];
 	sprintf(ret, "%ld", i);
 	return SFString(ret);
 }
@@ -832,8 +832,17 @@ inline SFString asStringU(SFUint32 i, SFUint32 def=(SFUint32)WIERD_NUM)
 {
 	if (i == def && def != (SFUint32)WIERD_NUM)
 		return nullString;
-	char ret[50];
+	char ret[128];
 	sprintf(ret, "%lu", i);
+	return SFString(ret);
+}
+
+inline SFString asStringULL(unsigned long long i, SFUint32 def=(SFUint32)WIERD_NUM)
+{
+	if (i == def && def != (SFUint32)WIERD_NUM)
+		return nullString;
+	char ret[128];
+	sprintf(ret, "%llu", i);
 	return SFString(ret);
 }
 

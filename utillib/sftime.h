@@ -254,5 +254,6 @@ inline SFString getPaddedDate(const SFTime& date)
 }
 
 extern SFString getFormatString (SFInt32 fmt, SFBool euro, SFBool mil, const SFString& dSep, const SFString& tSep);
+extern SFTime dateFromTimeStamp(SFInt32 tsIn);
 
 #endif

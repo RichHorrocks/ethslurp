@@ -206,6 +206,33 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 }
 
 //--------------------------------------------------------------------------------
+char *CBaseNode::parseText(char *s, SFInt32& nFields, const SFString *fields)
+{
+	nFields = 0;
+	char *fieldVal=s;
+	while (s && *s)
+	{
+		switch (*s)
+		{
+		case '\r':
+			break;
+		case '\t':
+			*s = '\0';
+			this->setValueByName(fields[nFields++], fieldVal);
+			fieldVal = s+1;
+			break;
+		case '\n':
+			*s = '\0';
+			this->setValueByName(fields[nFields++], fieldVal);
+			return s+1;
+		}
+		s++;
+	}
+	this->setValueByName(fields[nFields++], fieldVal);
+	return NULL;
+}
+
+//--------------------------------------------------------------------------------
 char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 {
 	typedef enum { OUTSIDE=0, IN_NAME, IN_VALUE } parseState;

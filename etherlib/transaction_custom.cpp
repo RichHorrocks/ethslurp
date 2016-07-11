@@ -34,16 +34,6 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
-		case 'd':
-			if ( fieldIn % "date" )
-			{
-				time_t utc = tra->timeStamp;
-				struct tm *tm = gmtime(&utc);
-				char retStr[40];
-				strftime(retStr, sizeof(retStr), "%Y-%m-%d %H:%M:%S UTC", tm);
-				return retStr;
-			}
-			break;
 		case 'e':
 			if ( fieldIn % "ether" )
 			{
@@ -142,6 +132,11 @@ SFBool CTransaction::isFunction(const SFString& func) const
 			}
 			else return FALSE;
 			break;
+
+		case 'p':
+			if ( func == "payOut" ) return input.startsWith( "0x0221038a" );
+			else return FALSE;
+			break;
 			
 		case 'r':
 			if ( func == "receiveEther" ) return input.startsWith( "0xa3912ec8" );
@@ -177,63 +172,84 @@ SFBool CTransaction::isFunction(const SFString& func) const
 	return FALSE;
 }
 
+#define grabPart(a,b)       StripLeading((a).Mid(64*(b),64),'0')
+#define grabBigNum(a,b)     strtoull((const char*)grabPart(a,b),NULL,16)
+#define toAddr(a,b)         "0x"+grabPart(a,b)
+#define toBigNum(a,b)       asStringULL(grabBigNum(a,b))
+#define toBigNum3(a,b)      padNum3(grabBigNum(a,b))
+#define toBool(a,b)         (grabBigNum(a,b)?"true":"false")
+#define toVote(a,b)         (grabBigNum(a,b)?"Yea":"Nay")
+#define theRest(a,b)        (a).Mid(64*(b),(a).GetLength());
+
 //---------------------------------------------------------------------------
 SFString parseParams(const SFString& which, const SFString& params)
 {
-	if (which=="vote")
-	{
-		//function vote(uint _proposalID, bool _supportsProposal)
-		SFString part1 = "0x"+Strip(params.Left(64), '0');
-		SFString part2 = Strip(params.Right(64),'0');
-		return which + "|" + padNum3(strtoul((const char*)part1, NULL, 16)) + "|" + (part2.IsEmpty()?"Nay":"Yea");
-	
-	} else if (which=="approve")
+	if (which=="approve")
 	{
 		//function approve(address _spender, uint256 _amount) returns (bool success) {  discuss
-		SFString part1 = "0x"+Strip(params.Left(64), '0');
-		SFString part2 = Strip(params.Right(64),'0');
-		return which + "|" + part1 + "|" + asString(strtoul((const char*)part2,NULL,16));
-
-	} else if (which=="newProposal")
-	{
-		//function newProposal(address _recipient, uint _amount, string _description, bytes _transactionData, uint _debatingPeriod, bool _newCurator)
-		SFString part1 = "0x"+Strip(params.Left(64), '0');
-		SFString part2 = Strip(params.Mid(64,64),'0');
-		SFString part4 = Strip(params.Right(128).Left(64), '0');
-		SFString part5 = Strip(params.Right(64),'0');
-		SFString part3 = params;
-		part3.Replace(part1,"");
-		part3.Replace(part2,"");
-		part3.ReplaceReverse(part5,"");
-		part3.ReplaceReverse(part4,"");
-		part3 = Strip(part3,'0');
-		return which + "|" + part1 + "|" + part2 + "|" + part3 + "|" + part4 + "|" + part5;
+		return which + "|" + toAddr(params,0) + "|" + toBigNum(params,1);
 
 	} else if (which=="splitDAO")
 	{
 		//function splitDAO(uint _proposalID, address _newCurator)
-		SFString part1 = "0x"+Strip(params.Left(64), '0');
-		SFString part2 = Strip(params.Right(64),'0');
-		return which + "|" + asString(strtoul((const char*)part1, NULL, 16)) + "|" + part2;
+		return which + "|" + toBigNum3(params,0) + "|" + toAddr(params,1);
 
 	} else if (which=="createTokenProxy")
 	{
-		return which + "|" + params;
+		//function createTokenProxy(address _tokenHolder)
+		return which + "|" + toAddr(params,0);
 
 	} else if (which=="transferFrom")
 	{
 		//function transferFrom(address _from, address _to, uint256 _amount)
-		SFString part1 = "0x"+Strip(params.Left(64), '0');
-		SFString part2 = "0x"+Strip(params.Mid(64,64),'0');
-		SFString part3 = Strip(params.Right(64),'0');
-		return which + "|" + part1 + "|" + part2 + "|" + asString(strtoul((const char*)part3,NULL,16));
+		return which + "|" + toAddr(params,0) + "|" + toAddr(params,1) + "|" + toBigNum(params,2);
 
 	} else if (which=="transfer")
 	{
 		//function transfer(address _to, uint256 _amount)
-		SFString part1 = "0x"+Strip(params.Left(64), '0');
-		SFString part2 = Strip(params.Right(64),'0');
-		return which + "|" + part1 + "|" + asString(strtoul((const char*)part2,NULL,16));
+		return which + "|" + toAddr(params,0) + "|" + toBigNum(params,1);
+
+	} else if (which=="getMyReward")
+	{
+		//function getMyReward()
+		return which;
+	
+	} else if (which=="payOut")
+	{
+		//function payOut(address _recipient, uint _amount)
+		return which + "|" + toAddr(params,0) + "|" + toBigNum(params,1);
+
+	} else if (which=="receiveEther")
+	{
+		//function receiveEther()
+		return which;
+	
+	} else if (which=="vote")
+	{
+		//function vote(uint _proposalID, bool _supportsProposal)
+		return which + "|" + toBigNum3(params,0) + "|" + toVote(params,1);
+	
+	} else if (which=="executeProposal")
+	{
+		//function executeProposal(uint _proposalID, bytes _transactionData)
+		return which + "|" + toBigNum3(params,0) + "|" + theRest(params,1);
+
+	} else if (which=="newProposal")
+	{
+		//function newProposal(address _recipient, uint _amount, string _description, bytes _transactionData, uint _debatingPeriod, bool _newCurator)
+		SFString recip = toAddr(params, 0);
+		SFString amt = toBigNum(params,1);
+		SFString part4 =      StripLeading(params.Right(128).Left(64), '0');
+		SFString part5 =      StripLeading(params.Right(64),'0');
+		SFString part3b = params;
+		part3b.Replace(recip,"");
+		part3b.Replace(amt,"");
+		part3b.ReplaceReverse(part5,"");
+		part3b.ReplaceReverse(part4,"");
+		part3b = StripLeading(part3b,'0');
+		SFString part3a = toAddr(part3b,0);
+		part3b.Replace(part3a.Substitute("0x",""),"");
+		return which + "|" + recip + "|" + amt + "|" + part3a + "|" + part4 + "|" + part5 + "|" + part3b;
 
 	}
 
@@ -248,7 +264,8 @@ SFString CTransaction::inputToFunction(void) const
 
 	switch (input[2])
 	{
-		case '0': if (input.startsWith( "0x095ea7b3" )) return parseParams("approve",                   input.Mid(10,input.GetLength())); break;
+		case '0': if (input.startsWith( "0x095ea7b3" )) return parseParams("approve",                   input.Mid(10,input.GetLength()));
+		     else if (input.startsWith( "0x0221038a" )) return parseParams("payOut",                    input.Mid(10,input.GetLength())); break;
 
 		case '2': if (input.startsWith( "0x237e9492" )) return parseParams("executeProposal",           input.Mid(10,input.GetLength()));
 		     else if (input.startsWith( "0x23b872dd" )) return parseParams("transferFrom",              input.Mid(10,input.GetLength()));

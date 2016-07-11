@@ -8,6 +8,9 @@ src= \
 ethslurp.cpp \
 options.cpp
 
+#src= \
+#voteCount.cpp
+
 #-------------------------------------------------
 # probably don't have to change below this line
 
@@ -21,17 +24,14 @@ all:
 	@make $(product)
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-hack: all
-	@cd theHack; make; cd ..
-	@make -B back
-
 test: all
-	@cd theData/tests; make; cd ..
-	@cd theData/data; make; cd ..
-	@cd theData/funcs; make; cd ..
-	@cd theData/ghc; make; cd ..
-	@cd theData/otherContracts; make; cd ..
-	@cd theData/whales; make; cd ..
+	@cd theData/tests; make; cd -
+	@cd theData/theDAO; make; cd -
+	@cd theData/funcs; make; cd -
+	@cd theData/ghc; make; cd -
+	@cd theData/otherContracts; make; cd -
+#	@cd theData/whales; make; cd -
+	@cd theData/hack; make; cd -
 	@make -B back
 
 back:

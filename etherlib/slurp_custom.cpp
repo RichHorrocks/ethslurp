@@ -129,7 +129,7 @@ extern SFString configPath(const SFString& part);
 	SFString abiFilename = 	configPath("abis/"+addr+".json");
 	if (!SFos::fileExists(abiFilename))
 		return;
-	
+
 	outErr << "\tLoading abi file: " << abiFilename << "...\n";
 	SFString contents = asciiFileToString(abiFilename);
 	ASSERT(!contents.IsEmpty());
@@ -142,7 +142,10 @@ extern SFString configPath(const SFString& part);
 		if (nFields)
 		{
 			SFString ethabi = "/usr/local/bin/ethabi";
-			if (SFos::fileExists(ethabi) && func.type == "function")
+			if (!SFos::fileExists(ethabi))
+			{
+				outErr << "/usr/local/bin/ethabi command not found. Cannot parse functions.\n";
+			} else if (func.type == "function")
 			{
 				SFString cmd = ethabi + " encode function \"" + abiFilename + "\" " + func.name;
 				SFString result = SFos::doCommand(cmd);

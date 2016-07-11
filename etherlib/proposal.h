@@ -24,6 +24,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "transaction.h"
 
 //--------------------------------------------------------------------------
 class CProposal;
@@ -42,14 +43,17 @@ extern int isDuplicateProposal (const void *rr1, const void *rr2);
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CProposal : public CBaseNode
+class CProposal : public CTransaction
 {
 public:
-	SFInt32 handle;
 	SFInt32 proposalID;
-	SFTime closingDate;
-	SFInt32 nYes;
-	SFInt32 nNo;
+	SFString creator;
+	SFString recipient;
+	SFString amount;
+	SFString data;
+	SFInt32 debatePeriod;
+	SFString description;
+	SFBool isSplit;
 
 public:
 					CProposal  (void);
@@ -108,13 +112,17 @@ inline void CProposal::Clear(void)
 //--------------------------------------------------------------------------
 inline void CProposal::Init(void)
 {
-	CBaseNode::Init();
+	CTransaction::Init();
 
 	handle = 0;
 	proposalID = 0;
-	closingDate = earliestDate;
-	nYes = 0;
-	nNo = 0;
+	creator = EMPTY;
+	recipient = EMPTY;
+	amount = EMPTY;
+	data = EMPTY;
+	debatePeriod = 0;
+	description = EMPTY;
+	isSplit = 0;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -125,12 +133,16 @@ inline void CProposal::Copy(const CProposal& pr)
 {
 	Clear();
 
-	CBaseNode::Copy(pr);
+	CTransaction::Copy(pr);
 	handle = pr.handle;
 	proposalID = pr.proposalID;
-	closingDate = pr.closingDate;
-	nYes = pr.nYes;
-	nNo = pr.nNo;
+	creator = pr.creator;
+	recipient = pr.recipient;
+	amount = pr.amount;
+	data = pr.data;
+	debatePeriod = pr.debatePeriod;
+	description = pr.description;
+	isSplit = pr.isSplit;
 
 	// EXISTING_CODE
 	// EXISTING_CODE

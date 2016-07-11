@@ -68,6 +68,8 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "contractAddress" ) return tra->contractAddress;
 			if ( fieldIn % "cumulativeGasUsed" ) return tra->cumulativeGasUsed;
 			break;
+		case 'd':
+			if (fieldIn % "date") return tra->m_transDate.Format("%Y-%m-%d %H:%M:%S UTC");
 		case 'f':
 			if ( fieldIn % "from" ) return tra->from;
 			break;
@@ -136,7 +138,7 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 			if ( fieldName % "nonce" ) { nonce = fieldValue; return TRUE; }
 			break;
 		case 't':
-			if ( fieldName % "timeStamp" ) { timeStamp = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "timeStamp" ) { timeStamp = toLong(fieldValue); m_transDate = dateFromTimeStamp(timeStamp); return TRUE; }
 			if ( fieldName % "to" ) { to = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "transactionIndex" ) { transactionIndex = toLong(fieldValue); return TRUE; }
 			break;
@@ -183,6 +185,7 @@ void CTransaction::Serialize(SFArchive& archive)
 		archive >> to;
 		archive >> transactionIndex;
 		archive >> value;
+		m_transDate = dateFromTimeStamp(timeStamp);
 
 	} else
 	{
@@ -205,6 +208,7 @@ void CTransaction::Serialize(SFArchive& archive)
 		archive << to;
 		archive << transactionIndex;
 		archive << value;
+		// do not store m_transDate because we build it on the fly
 
 	}
 }
@@ -234,6 +238,7 @@ void CTransaction::registerClass(void)
 	ADD_FIELD(CTransaction, "to", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "transactionIndex", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "value", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "date", T_DATE, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CTransaction, "schema");
@@ -241,7 +246,6 @@ void CTransaction::registerClass(void)
 	HIDE_FIELD(CTransaction, "handle");
 
 	// EXISTING_CODE
-	ADD_FIELD(CTransaction, "date", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "ether", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "hitLimit", T_RADIO, ++fieldNum);
 	ADD_FIELD(CTransaction, "inputLen", T_NUMBER, ++fieldNum);

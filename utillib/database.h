@@ -182,8 +182,8 @@ public:
 		}
 
 public:
-	SFInt32  Read          (long&         val);
 	SFInt32  Read          (char&         val);
+	SFInt32  Read          (long&         val);
 	SFInt32  Read          (float&        val);
 	SFInt32  Read          (double&       val);
 	SFInt32  Read          (SFString&     val);

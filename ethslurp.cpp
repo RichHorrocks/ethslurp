@@ -396,7 +396,7 @@ SFBool CSlurperApp::Filter(COptions& options, SFString& message)
 		// The -blocks and -dates filters are mutually exclusive, -dates predominates.
 		if (options.firstDate != earliestDate || options.lastDate != latestDate)
 		{
-			SFTime date = trans->getDate();
+			SFTime date = trans->m_transDate;
 			SFBool isVisible = (date >= options.firstDate && date <= options.lastDate);
 			trans->setShowing(isVisible);
 
@@ -646,6 +646,7 @@ SFBool establishFolders(CConfig& config, const SFString& vers)
 	return SFos::fileExists(config.getFilename());
 }
 
+extern SFBool isTesting;
 //---------------------------------------------------------------------------------------------------
 SFString configPath(const SFString& part)
 {
