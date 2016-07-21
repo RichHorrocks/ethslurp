@@ -21,6 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts inside 
+ * of 'EXISTING_CODE' tags.
+ */
 #include "parameter.h"
 
 //---------------------------------------------------------------------------
@@ -32,7 +36,7 @@ void CParameter::Format(CExportContext& ctx, const SFString& fmtIn, void *data) 
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn); //.Substitute("\n","\t");
+	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -47,22 +51,13 @@ SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *
 	CParameterNotify *pa = (CParameterNotify*)data;
 	const CParameter *par = pa->getDataPtr();
 
-	// Give common (edit, delete, etc.) code a chance to override
-	SFString ret = nextChunk_common(fieldIn, getString("cmd"), par);
-	if (!ret.IsEmpty())
-		return ret;
-	
 	// Now give customized code a chance to override
-	ret = nextParameterChunk_custom(fieldIn, force, data);
+	SFString ret = nextParameterChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 	
 	switch (tolower(fieldIn[0]))
 	{
-		case 'f':
-			return EMPTY;
-//			if ( fieldIn % "func" ) return par->func;
-			break;
 		case 'h':
 			if ( fieldIn % "handle" ) return asString(par->handle);
 			break;
@@ -74,18 +69,22 @@ SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *
 			break;
 	}
 	
+	// Finally, give the parent class a chance
+	ret = nextBasenodeChunk(fieldIn, force, par);
+	if (!ret.IsEmpty())
+		return ret;
+	
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
 //---------------------------------------------------------------------------------------------------
 SFBool CParameter::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	switch (tolower(fieldName[0]))
 	{
-		case 'f':
-			return TRUE;
-//			if ( fieldName % "func" ) { func = fieldValue; return TRUE; }
-			break;
 		case 'h':
 			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			break;
@@ -113,20 +112,18 @@ void CParameter::Serialize(SFArchive& archive)
 {
 	if (!SerializeHeader(archive))
 		return;
-	
+
 	if (archive.isReading())
 	{
 		archive >> handle;
 		archive >> name;
 		archive >> type;
-//		archive >> func;
-
+		finishParse();
 	} else
 	{
 		archive << handle;
 		archive << name;
 		archive << type;
-//		archive << func;
 
 	}
 }
@@ -134,13 +131,16 @@ void CParameter::Serialize(SFArchive& archive)
 //---------------------------------------------------------------------------
 void CParameter::registerClass(void)
 {
+	static bool been_here=false;
+	if (been_here) return;
+	been_here=true;
+
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CParameter, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CParameter, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CParameter, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CParameter, "name", T_TEXT, ++fieldNum);
 	ADD_FIELD(CParameter, "type", T_TEXT, ++fieldNum);
-	ADD_FIELD(CParameter, "func", T_NONE, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CParameter, "schema");
@@ -169,3 +169,34 @@ int sortParameter(const SFString& f1, const SFString& f2, const void *rr1, const
 }
 int sortParameterByName(const void *rr1, const void *rr2) { return sortParameter("pa_Name", "", rr1, rr2); }
 int sortParameterByID  (const void *rr1, const void *rr2) { return sortParameter("parameterID", "", rr1, rr2); }
+
+//---------------------------------------------------------------------------
+SFString nextParameterChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+{
+	CParameterNotify *pa = (CParameterNotify*)data;
+	const CParameter *par = pa->getDataPtr();
+	switch (tolower(fieldIn[0]))
+	{
+		// EXISTING_CODE
+		// EXISTING_CODE
+		default:
+			break;
+	}
+	
+#pragma unused(pa)
+#pragma unused(par)
+
+	return EMPTY;
+}
+
+//---------------------------------------------------------------------------
+SFBool CParameter::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+{
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+// EXISTING_CODE
+// EXISTING_CODE

@@ -1,5 +1,5 @@
-#ifndef _PARAMETER_H_
-#define _PARAMETER_H_
+#ifndef _FUNCTION_H_
+#define _FUNCTION_H_
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -24,55 +24,61 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "parameter.h"
 
 //--------------------------------------------------------------------------
-class CParameter;
-typedef SFArrayBase<CParameter>         CParameterArray;
-typedef SFList<CParameter*>             CParameterList;
-typedef CNotifyClass<const CParameter*> CParameterNotify;
-typedef SFUniqueList<CParameter*>       CParameterListU;
+class CFunction;
+typedef SFArrayBase<CFunction>         CFunctionArray;
+typedef SFList<CFunction*>             CFunctionList;
+typedef CNotifyClass<const CFunction*> CFunctionNotify;
+typedef SFUniqueList<CFunction*>       CFunctionListU;
 
 //---------------------------------------------------------------------------
-extern int sortParameter        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
-extern int sortParameterByName  (const void *rr1, const void *rr2);
-extern int sortParameterByID    (const void *rr1, const void *rr2);
-extern int isDuplicateParameter (const void *rr1, const void *rr2);
+extern int sortFunction        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
+extern int sortFunctionByName  (const void *rr1, const void *rr2);
+extern int sortFunctionByID    (const void *rr1, const void *rr2);
+extern int isDuplicateFunction (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
-class CFunction;
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CParameter : public CBaseNode
+class CFunction : public CBaseNode
 {
 public:
 	SFInt32 handle;
 	SFString name;
 	SFString type;
-	CFunction *func;
+	SFBool indexed;
+	SFBool anonymous;
+	SFBool constant;
+	SFString encoding;
+	CParameterArray inputs;
+	CParameterArray outputs;
 
 public:
-					CParameter  (void);
-					CParameter  (const CParameter& pa);
-				   ~CParameter  (void);
-	CParameter&	operator= 		(const CParameter& pa);
+					CFunction  (void);
+					CFunction  (const CFunction& fu);
+				   ~CFunction  (void);
+	CFunction&	operator= 		(const CFunction& fu);
 
-	DECLARE_NODE (CParameter);
+	DECLARE_NODE (CFunction);
 
 	// EXISTING_CODE
+	void parseParams(SFBool input, const SFString& value);
 	// EXISTING_CODE
 
-private:
+protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CParameter& pa);
+	void			Copy      		(const CFunction& fu);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 };
 
 //--------------------------------------------------------------------------
-inline CParameter::CParameter(void)
+inline CFunction::CFunction(void)
 {
 	Init();
 	// EXISTING_CODE
@@ -80,18 +86,18 @@ inline CParameter::CParameter(void)
 }
 
 //--------------------------------------------------------------------------
-inline CParameter::CParameter(const CParameter& pa)
+inline CFunction::CFunction(const CFunction& fu)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(pa);
+	Copy(fu);
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-inline CParameter::~CParameter(void)
+inline CFunction::~CFunction(void)
 {
 	Clear();
 	// EXISTING_CODE
@@ -99,53 +105,62 @@ inline CParameter::~CParameter(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CParameter::Clear(void)
+inline void CFunction::Clear(void)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CParameter::Init(void)
+inline void CFunction::Init(void)
 {
 	CBaseNode::Init();
 
 	handle = 0;
 	name = EMPTY;
 	type = EMPTY;
-	func = NULL;
+	indexed = 0;
+	anonymous = 0;
+	constant = 0;
+	encoding = EMPTY;
+//	inputs = ??; /* unknown type: CParameterArray */
+//	outputs = ??; /* unknown type: CParameterArray */
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CParameter::Copy(const CParameter& pa)
+inline void CFunction::Copy(const CFunction& fu)
 {
 	Clear();
 
-	CBaseNode::Copy(pa);
-	handle = pa.handle;
-	name = pa.name;
-	type = pa.type;
-//	if (func)
-//		*func = *pa.func;
+	CBaseNode::Copy(fu);
+	handle = fu.handle;
+	name = fu.name;
+	type = fu.type;
+	indexed = fu.indexed;
+	anonymous = fu.anonymous;
+	constant = fu.constant;
+	encoding = fu.encoding;
+	inputs = fu.inputs;
+	outputs = fu.outputs;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CParameter& CParameter::operator=(const CParameter& pa)
+inline CFunction& CFunction::operator=(const CFunction& fu)
 {
-	Copy(pa);
+	Copy(fu);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
 }
 
 //---------------------------------------------------------------------------
-inline SFString CParameter::getValueByName(const SFString& fieldName) const
+inline SFString CFunction::getValueByName(const SFString& fieldName) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -153,7 +168,7 @@ inline SFString CParameter::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CParameter::getHandle(void) const
+inline SFInt32 CFunction::getHandle(void) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -161,15 +176,16 @@ inline SFInt32 CParameter::getHandle(void) const
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
-IMPLEMENT_ARCHIVE_ARRAY(CParameterArray);
-IMPLEMENT_ARCHIVE_LIST(CParameterList);
+IMPLEMENT_ARCHIVE_ARRAY(CFunctionArray);
+IMPLEMENT_ARCHIVE_LIST(CFunctionList);
 
 //---------------------------------------------------------------------------
-#include "parameter_custom.h"
+extern SFString nextFunctionChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
 // EXISTING_CODE
 

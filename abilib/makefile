@@ -1,16 +1,10 @@
-cflags=-Wall -O2 -DLINUX -I../utillib -I../abilib -I../ -I./
+cflags=-Wall -O2 -DLINUX -I../utillib -I../ -I./
 
-product=etherlib.a
+product=abilib.a
 
 src= \
-account.cpp \
-slurp.cpp \
-transaction.cpp \
-proposal.cpp \
-vote.cpp \
-createtokenproxy.cpp \
-dapp.cpp \
-webapi.cpp
+function.cpp \
+parameter.cpp
 
 #-------------------------------------------------
 # probably don't have to change below this line

@@ -24,6 +24,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "abilib.h"
 #include "transaction.h"
 
 //--------------------------------------------------------------------------
@@ -66,7 +67,7 @@ public:
 	// EXISTING_CODE
 	// EXISTING_CODE
 
-private:
+protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CProposal& pr);
@@ -114,7 +115,6 @@ inline void CProposal::Init(void)
 {
 	CTransaction::Init();
 
-	handle = 0;
 	proposalID = 0;
 	creator = EMPTY;
 	recipient = EMPTY;
@@ -134,7 +134,6 @@ inline void CProposal::Copy(const CProposal& pr)
 	Clear();
 
 	CTransaction::Copy(pr);
-	handle = pr.handle;
 	proposalID = pr.proposalID;
 	creator = pr.creator;
 	recipient = pr.recipient;
@@ -181,8 +180,9 @@ IMPLEMENT_ARCHIVE_ARRAY(CProposalArray);
 IMPLEMENT_ARCHIVE_LIST(CProposalList);
 
 //---------------------------------------------------------------------------
-#include "proposal_custom.h"
+extern SFString nextProposalChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
 // EXISTING_CODE
 

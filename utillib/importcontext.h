@@ -31,7 +31,7 @@ SOFTWARE.
 class CImportContext
 {
 public:
-	         CImportContext(void);
+	         CImportContext(void *input=NULL);
 	virtual ~CImportContext(void) { }
 
 	virtual CImportContext& operator>>(char& c);
@@ -55,10 +55,10 @@ public:
 	SFString  m_buffer;
 	FILE     *m_input;
 
-	CFileImportContext(void)
-		{
-			m_input = NULL;
-		}
+        CFileImportContext(void *input=NULL)
+                {
+                        m_input = ((input == NULL) ? stdin : (FILE*)input);
+                }
 
 	CFileImportContext(const SFString& filename, const SFString& mode)
 		{

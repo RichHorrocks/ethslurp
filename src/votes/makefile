@@ -6,6 +6,10 @@ src= \
 ethslurp.cpp \
 slurp_options.cpp
 
+#product=voteCount
+#src= \
+#voteCount.cpp
+
 #-------------------------------------------------
 # probably don't have to change below this line
 

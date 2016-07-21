@@ -1,5 +1,5 @@
-#ifndef _VOTE_H_
-#define _VOTE_H_
+#ifndef _DAPP_H_
+#define _DAPP_H_
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -24,40 +24,46 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
-#include "abilib.h"
-#include "transaction.h"
 
 //--------------------------------------------------------------------------
-class CVote;
-typedef SFArrayBase<CVote>         CVoteArray;
-typedef SFList<CVote*>             CVoteList;
-typedef CNotifyClass<const CVote*> CVoteNotify;
-typedef SFUniqueList<CVote*>       CVoteListU;
+class CDapp;
+typedef SFArrayBase<CDapp>         CDappArray;
+typedef SFList<CDapp*>             CDappList;
+typedef CNotifyClass<const CDapp*> CDappNotify;
+typedef SFUniqueList<CDapp*>       CDappListU;
 
 //---------------------------------------------------------------------------
-extern int sortVote        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
-extern int sortVoteByName  (const void *rr1, const void *rr2);
-extern int sortVoteByID    (const void *rr1, const void *rr2);
-extern int isDuplicateVote (const void *rr1, const void *rr2);
+extern int sortDapp        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
+extern int sortDappByName  (const void *rr1, const void *rr2);
+extern int sortDappByID    (const void *rr1, const void *rr2);
+extern int isDuplicateDapp (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CVote : public CTransaction
+class CDapp : public CBaseNode
 {
 public:
-	SFString voter;
-	SFInt32 proposalID;
-	SFBool votedYes;
+	SFInt32 handle;
+	SFString dappName;
+	SFString description;
+	SFString site;
+	SFString gitHub;
+	SFString reddit;
+	SFString people;
+	SFString tags;
+	SFString license;
+	SFString status;
+	SFString last_update;
 
 public:
-					CVote  (void);
-					CVote  (const CVote& vo);
-				   ~CVote  (void);
-	CVote&	operator= 		(const CVote& vo);
+					CDapp  (void);
+					CDapp  (const CDapp& da);
+				   ~CDapp  (void);
+	CDapp&	operator= 		(const CDapp& da);
 
-	DECLARE_NODE (CVote);
+	DECLARE_NODE (CDapp);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -65,14 +71,14 @@ public:
 protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CVote& vo);
+	void			Copy      		(const CDapp& da);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 };
 
 //--------------------------------------------------------------------------
-inline CVote::CVote(void)
+inline CDapp::CDapp(void)
 {
 	Init();
 	// EXISTING_CODE
@@ -80,18 +86,18 @@ inline CVote::CVote(void)
 }
 
 //--------------------------------------------------------------------------
-inline CVote::CVote(const CVote& vo)
+inline CDapp::CDapp(const CDapp& da)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(vo);
+	Copy(da);
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-inline CVote::~CVote(void)
+inline CDapp::~CDapp(void)
 {
 	Clear();
 	// EXISTING_CODE
@@ -99,50 +105,66 @@ inline CVote::~CVote(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CVote::Clear(void)
+inline void CDapp::Clear(void)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CVote::Init(void)
+inline void CDapp::Init(void)
 {
-	CTransaction::Init();
+	CBaseNode::Init();
 
-	voter = EMPTY;
-	proposalID = 0;
-	votedYes = 0;
+	handle = 0;
+	dappName = EMPTY;
+	description = EMPTY;
+	site = EMPTY;
+	gitHub = EMPTY;
+	reddit = EMPTY;
+	people = EMPTY;
+	tags = EMPTY;
+	license = EMPTY;
+	status = EMPTY;
+	last_update = EMPTY;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CVote::Copy(const CVote& vo)
+inline void CDapp::Copy(const CDapp& da)
 {
 	Clear();
 
-	CTransaction::Copy(vo);
-	voter = vo.voter;
-	proposalID = vo.proposalID;
-	votedYes = vo.votedYes;
+	CBaseNode::Copy(da);
+	handle = da.handle;
+	dappName = da.dappName;
+	description = da.description;
+	site = da.site;
+	gitHub = da.gitHub;
+	reddit = da.reddit;
+	people = da.people;
+	tags = da.tags;
+	license = da.license;
+	status = da.status;
+	last_update = da.last_update;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CVote& CVote::operator=(const CVote& vo)
+inline CDapp& CDapp::operator=(const CDapp& da)
 {
-	Copy(vo);
+	Copy(da);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
 }
 
 //---------------------------------------------------------------------------
-inline SFString CVote::getValueByName(const SFString& fieldName) const
+inline SFString CDapp::getValueByName(const SFString& fieldName) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -150,7 +172,7 @@ inline SFString CVote::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CVote::getHandle(void) const
+inline SFInt32 CDapp::getHandle(void) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -158,14 +180,14 @@ inline SFInt32 CVote::getHandle(void) const
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextVoteChunk(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextDappChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
-IMPLEMENT_ARCHIVE_ARRAY(CVoteArray);
-IMPLEMENT_ARCHIVE_LIST(CVoteList);
+IMPLEMENT_ARCHIVE_ARRAY(CDappArray);
+IMPLEMENT_ARCHIVE_LIST(CDappList);
 
 //---------------------------------------------------------------------------
-extern SFString nextVoteChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextDappChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE

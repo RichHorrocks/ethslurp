@@ -161,7 +161,7 @@ CBuiltIn::CBuiltIn(ghRuntimeClass *pClass, const SFString& className, SFInt32 si
 
 #include "basenode.h"
 //--------------------------------------------------------------------------------
-SFString nextChunk_common(const SFString& fieldIn, const SFString& cmd, const CBaseNode *node)
+SFString nextBasenodeChunk(const SFString& fieldIn, SFBool force, const CBaseNode *node)
 {
 	SFString className = node->getRuntimeClass()->getClassNamePtr();
 	switch (tolower(fieldIn[0]))

@@ -29,8 +29,7 @@ SOFTWARE.
 #include "account.h"
 #include "proposal.h"
 #include "vote.h"
-
-#define REP_FREQ   11
-#define REP_INFREQ 563
+#include "createtokenproxy.h"
+#include "dapp.h"
 
 #endif

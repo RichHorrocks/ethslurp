@@ -24,6 +24,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "abilib.h"
 
 //--------------------------------------------------------------------------
 class CTransaction;
@@ -39,7 +40,6 @@ extern int sortTransactionByID    (const void *rr1, const void *rr2);
 extern int isDuplicateTransaction (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
-extern int sortTransactionsForWrite(const void *rr1, const void *rr2);
 class CSlurp;
 // EXISTING_CODE
 
@@ -47,10 +47,10 @@ class CSlurp;
 class CTransaction : public CBaseNode
 {
 public:
-	SFInt32  handle;
+	SFInt32 handle;
 	SFString blockHash;
-	SFInt32  blockNumber;
-	SFInt32  confirmations;
+	SFInt32 blockNumber;
+	SFInt32 confirmations;
 	SFString contractAddress;
 	SFString cumulativeGasUsed;
 	SFString from;
@@ -59,14 +59,13 @@ public:
 	SFString gasUsed;
 	SFString hash;
 	SFString input;
-	SFBool   isError;
-	SFBool   isInternalTx;
+	SFBool isError;
+	SFBool isInternalTx;
 	SFString nonce;
-	SFInt32  timeStamp;
+	SFInt32 timeStamp;
 	SFString to;
-	SFInt32  transactionIndex;
+	SFInt32 transactionIndex;
 	SFString value;
-	SFTime   m_transDate;
 
 public:
 					CTransaction  (void);
@@ -77,10 +76,10 @@ public:
 	DECLARE_NODE (CTransaction);
 
 	// EXISTING_CODE
-	SFTime  getDate(void) const;
 	SFString inputToFunction(void) const;
 	CSlurp *slurp;
 	SFBool isFunction(const SFString& func) const;
+	SFTime   m_transDate;
 	// EXISTING_CODE
 
 protected:
@@ -151,9 +150,9 @@ inline void CTransaction::Init(void)
 	to = EMPTY;
 	transactionIndex = 0;
 	value = EMPTY;
-	m_transDate = earliestDate;
-	
+
 	// EXISTING_CODE
+	m_transDate = earliestDate;
 	// EXISTING_CODE
 }
 
@@ -182,9 +181,9 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	to = tr.to;
 	transactionIndex = tr.transactionIndex;
 	value = tr.value;
-	m_transDate = tr.m_transDate;
 
 	// EXISTING_CODE
+	m_transDate = tr.m_transDate;
 	// EXISTING_CODE
 }
 
@@ -221,9 +220,11 @@ IMPLEMENT_ARCHIVE_ARRAY(CTransactionArray);
 IMPLEMENT_ARCHIVE_LIST(CTransactionList);
 
 //---------------------------------------------------------------------------
-#include "transaction_custom.h"
+extern SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
+extern int sortTransactionsForWrite(const void *rr1, const void *rr2);
 // EXISTING_CODE
 
 #endif

@@ -16,6 +16,9 @@ voteCount.cpp
 votes.html
 prop_data.txt
 props.txt
+balances
+withdraw_watch
+curator_watch
 
 # Precompiled Headers
 *.gch

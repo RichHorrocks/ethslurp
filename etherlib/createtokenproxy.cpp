@@ -25,13 +25,13 @@
  * This file was generated with makeClass. Edit only those parts inside 
  * of 'EXISTING_CODE' tags.
  */
-#include "vote.h"
+#include "createtokenproxy.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CVote, CTransaction, NO_SCHEMA);
+IMPLEMENT_NODE(CCreateTokenProxy, CTransaction, NO_SCHEMA);
 
 //---------------------------------------------------------------------------
-void CVote::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
+void CCreateTokenProxy::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	if (!isShowing())
 		return;
@@ -40,35 +40,31 @@ void CVote::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
-	CVoteNotify dn(this);
+	CCreateTokenProxyNotify dn(this);
 	while (!fmt.IsEmpty())
-		ctx << getNextChunk(fmt, nextVoteChunk, &dn);
+		ctx << getNextChunk(fmt, nextCreatetokenproxyChunk, &dn);
 }
 
 //---------------------------------------------------------------------------
-SFString nextVoteChunk(const SFString& fieldIn, SFBool& force, const void *data)
+SFString nextCreatetokenproxyChunk(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CVoteNotify *vo = (CVoteNotify*)data;
-	const CVote *vot = vo->getDataPtr();
+	CCreateTokenProxyNotify *cr = (CCreateTokenProxyNotify*)data;
+	const CCreateTokenProxy *cre = cr->getDataPtr();
 
 	// Now give customized code a chance to override
-	SFString ret = nextVoteChunk_custom(fieldIn, force, data);
+	SFString ret = nextCreatetokenproxyChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 	
 	switch (tolower(fieldIn[0]))
 	{
-		case 'p':
-			if ( fieldIn % "proposalID" ) return padNum3(vot->proposalID);
-			break;
-		case 'v':
-			if ( fieldIn % "voter" ) return vot->voter;
-			if ( fieldIn % "votedYes" ) return asString(vot->votedYes);
+		case 't':
+			if ( fieldIn % "tokenHolder" ) return cre->tokenHolder;
 			break;
 	}
 	
 	// Finally, give the parent class a chance
-	CTransactionNotify dn(vot);
+	CTransactionNotify dn(cre);
 	ret = nextTransactionChunk(fieldIn, force, &dn);
 	if (!ret.IsEmpty())
 		return ret;
@@ -77,19 +73,9 @@ SFString nextVoteChunk(const SFString& fieldIn, SFBool& force, const void *data)
 }
 
 //---------------------------------------------------------------------------------------------------
-SFBool CVote::setValueByName(const SFString& fieldName, const SFString& fieldValue)
+SFBool CCreateTokenProxy::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
-	if ( fieldName % "function" )
-	{
-		SFString val = fieldValue;
-		SFString func = nextTokenClear(val,'|'); // skip
-		SFString prop = nextTokenClear(val,'|');
-		SFString vote = nextTokenClear(val,'|');
-		setValueByName("proposalID", prop);
-		setValueByName("votedYes",   vote == "Yea" ? "1" : "0");
-		return TRUE;
-	}
 	// EXISTING_CODE
 
 	if (CTransaction::setValueByName(fieldName, fieldValue))
@@ -97,12 +83,8 @@ SFBool CVote::setValueByName(const SFString& fieldName, const SFString& fieldVal
 
 	switch (tolower(fieldName[0]))
 	{
-		case 'p':
-			if ( fieldName % "proposalID" ) { proposalID = toLong(fieldValue); return TRUE; }
-			break;
-		case 'v':
-			if ( fieldName % "voter" ) { voter = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "votedYes" ) { votedYes = toBool(fieldValue); return TRUE; }
+		case 't':
+			if ( fieldName % "tokenHolder" ) { tokenHolder = toLower(fieldValue); return TRUE; }
 			break;
 		default:
 			break;
@@ -111,34 +93,30 @@ SFBool CVote::setValueByName(const SFString& fieldName, const SFString& fieldVal
 }
 
 //---------------------------------------------------------------------------------------------------
-void CVote::finishParse()
+void CCreateTokenProxy::finishParse()
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //---------------------------------------------------------------------------------------------------
-void CVote::Serialize(SFArchive& archive)
+void CCreateTokenProxy::Serialize(SFArchive& archive)
 {
 	CTransaction::Serialize(archive);
 
 	if (archive.isReading())
 	{
-		archive >> voter;
-		archive >> proposalID;
-		archive >> votedYes;
+		archive >> tokenHolder;
 		finishParse();
 	} else
 	{
-		archive << voter;
-		archive << proposalID;
-		archive << votedYes;
+		archive << tokenHolder;
 
 	}
 }
 
 //---------------------------------------------------------------------------
-void CVote::registerClass(void)
+void CCreateTokenProxy::registerClass(void)
 {
 	static bool been_here=false;
 	if (been_here) return;
@@ -147,27 +125,25 @@ void CVote::registerClass(void)
 	CTransaction::registerClass();
 
 	SFInt32 fieldNum=1000;
-	ADD_FIELD(CVote, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CVote, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CVote, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CVote, "voter", T_TEXT, ++fieldNum);
-	ADD_FIELD(CVote, "proposalID", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CVote, "votedYes", T_RADIO, ++fieldNum);
+	ADD_FIELD(CCreateTokenProxy, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
+	ADD_FIELD(CCreateTokenProxy, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CCreateTokenProxy, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CCreateTokenProxy, "tokenHolder", T_TEXT, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
-	HIDE_FIELD(CVote, "schema");
-	HIDE_FIELD(CVote, "deleted");
-	HIDE_FIELD(CVote, "handle");
+	HIDE_FIELD(CCreateTokenProxy, "schema");
+	HIDE_FIELD(CCreateTokenProxy, "deleted");
+	HIDE_FIELD(CCreateTokenProxy, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //---------------------------------------------------------------------------
-int sortVote(const SFString& f1, const SFString& f2, const void *rr1, const void *rr2)
+int sortCreatetokenproxy(const SFString& f1, const SFString& f2, const void *rr1, const void *rr2)
 {
-	CVote *g1 = (CVote*)rr1;
-	CVote *g2 = (CVote*)rr2;
+	CCreateTokenProxy *g1 = (CCreateTokenProxy*)rr1;
+	CCreateTokenProxy *g2 = (CCreateTokenProxy*)rr2;
 
 	SFString v1 = g1->getValueByName(f1);
 	SFString v2 = g2->getValueByName(f1);
@@ -179,14 +155,14 @@ int sortVote(const SFString& f1, const SFString& f2, const void *rr1, const void
 	v2 = g2->getValueByName(f2);
 	return (int)v1.Compare(v2);
 }
-int sortVoteByName(const void *rr1, const void *rr2) { return sortVote("vo_Name", "", rr1, rr2); }
-int sortVoteByID  (const void *rr1, const void *rr2) { return sortVote("voteID", "", rr1, rr2); }
+int sortCreatetokenproxyByName(const void *rr1, const void *rr2) { return sortCreatetokenproxy("cr_Name", "", rr1, rr2); }
+int sortCreatetokenproxyByID  (const void *rr1, const void *rr2) { return sortCreatetokenproxy("createtokenproxyID", "", rr1, rr2); }
 
 //---------------------------------------------------------------------------
-SFString nextVoteChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+SFString nextCreatetokenproxyChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CVoteNotify *vo = (CVoteNotify*)data;
-	const CVote *vot = vo->getDataPtr();
+	CCreateTokenProxyNotify *cr = (CCreateTokenProxyNotify*)data;
+	const CCreateTokenProxy *cre = cr->getDataPtr();
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
@@ -195,14 +171,14 @@ SFString nextVoteChunk_custom(const SFString& fieldIn, SFBool& force, const void
 			break;
 	}
 	
-#pragma unused(vo)
-#pragma unused(vot)
+#pragma unused(cr)
+#pragma unused(cre)
 
 	return EMPTY;
 }
 
 //---------------------------------------------------------------------------
-SFBool CVote::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+SFBool CCreateTokenProxy::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE

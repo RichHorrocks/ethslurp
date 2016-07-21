@@ -24,8 +24,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
-#include "vote.h"
-#include "proposal.h"
+#include "abilib.h"
 #include "transaction.h"
 
 //--------------------------------------------------------------------------
@@ -50,10 +49,8 @@ class CAccount : public CBaseNode
 public:
 	SFInt32 handle;
 	SFString addr;
-	SFInt32 nVotes;
-	CVote *votes;
-	SFInt32 nProposals;
-	CProposal *proposals;
+	SFString name;
+	SFString source;
 	SFInt32 nTransactions;
 	CTransaction *transactions;
 
@@ -66,9 +63,10 @@ public:
 	DECLARE_NODE (CAccount);
 
 	// EXISTING_CODE
+        SFBool Match(const SFString& s1, const SFString& s2, const SFString& s3, SFBool matchCase, SFBool all);
 	// EXISTING_CODE
 
-private:
+protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CAccount& ac);
@@ -118,10 +116,8 @@ inline void CAccount::Init(void)
 
 	handle = 0;
 	addr = EMPTY;
-	nVotes = 0;
-	votes = NULL;
-	nProposals = 0;
-	proposals = NULL;
+	name = EMPTY;
+	source = EMPTY;
 	nTransactions = 0;
 	transactions = NULL;
 
@@ -137,12 +133,8 @@ inline void CAccount::Copy(const CAccount& ac)
 	CBaseNode::Copy(ac);
 	handle = ac.handle;
 	addr = ac.addr;
-	nVotes = ac.nVotes;
-	if (votes)
-		*votes = *ac.votes;
-	nProposals = ac.nProposals;
-	if (proposals)
-		*proposals = *ac.proposals;
+	name = ac.name;
+	source = ac.source;
 	nTransactions = ac.nTransactions;
 	if (transactions)
 		*transactions = *ac.transactions;
@@ -184,8 +176,9 @@ IMPLEMENT_ARCHIVE_ARRAY(CAccountArray);
 IMPLEMENT_ARCHIVE_LIST(CAccountList);
 
 //---------------------------------------------------------------------------
-#include "account_custom.h"
+extern SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
 // EXISTING_CODE
 

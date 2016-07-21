@@ -1,5 +1,5 @@
-#ifndef _ETHSLURP_H_
-#define _ETHSLURP_H_
+#ifndef _ABI_LIB_
+#define _ABI_LIB_
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -23,38 +23,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "etherlib.h"
-#include "slurp_options.h"
-
-//---------------------------------------------------------------------------------------------------
-class CSlurperApp
-{
-private:
-	CVersion  version;
-	CConfig   config;
-	CWebAPI   api;
-
-public:
-	CSlurp    theAccount;
-
-              CSlurperApp (void) : config(NULL) { };
-             ~CSlurperApp (void) {  }
-
-	SFBool    Initialize  (CSlurpOptions& options, SFString& message);
-	SFBool    Slurp       (CSlurpOptions& options, SFString& message);
-	SFBool    Filter      (CSlurpOptions& options, SFString& message);
-	SFBool    Display     (CSlurpOptions& options, SFString& message);
-
-private:
-	void      buildDisplayStrings (CSlurpOptions& options);
-	SFString  getFormatString     (CSlurpOptions& options, const SFString& name);
-};
-
-//--------------------------------------------------------------------------------
-extern SFString getHomeFolder(void);
-
-//---------------------------------------------------------------------------------------------------
-extern SFBool establishFolders(CConfig& config, const SFString& vers);
-extern void   findBlockRange  (const SFString& contents, SFInt32& minBlock, SFInt32& maxBlock);
+#include "utillib.h"
+#include "function.h"
+#include "parameter.h"
 
 #endif

@@ -173,7 +173,7 @@ inline SFArchive& operator>>(SFArchive& archive, LIST_CLASS& array) \
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextChunk_common(const SFString& fieldIn, const SFString& cmd, const CBaseNode *node);
+extern SFString nextBasenodeChunk(const SFString& fieldIn, SFBool force, const CBaseNode *node);
 extern SFString addIcon(ghRuntimeClass *pClass);
 
 #endif

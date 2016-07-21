@@ -1,5 +1,5 @@
-#ifndef _ETHSLURP_H_
-#define _ETHSLURP_H_
+#ifndef _SLURP_OPTIONS_H
+#define _SLURP_OPTIONS_H
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -23,38 +23,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "etherlib.h"
-#include "slurp_options.h"
-
-//---------------------------------------------------------------------------------------------------
-class CSlurperApp
+#if 0
+class CNameOptions : public COptions
 {
-private:
-	CVersion  version;
-	CConfig   config;
-	CWebAPI   api;
-
 public:
-	CSlurp    theAccount;
+	SFString addr;
+	SFString name;
+	SFString source;
+	SFBool all;
+	SFBool count;
+	SFBool matchCase;
+	SFBool open;
+	SFBool write;
 
-              CSlurperApp (void) : config(NULL) { };
-             ~CSlurperApp (void) {  }
-
-	SFBool    Initialize  (CSlurpOptions& options, SFString& message);
-	SFBool    Slurp       (CSlurpOptions& options, SFString& message);
-	SFBool    Filter      (CSlurpOptions& options, SFString& message);
-	SFBool    Display     (CSlurpOptions& options, SFString& message);
-
-private:
-	void      buildDisplayStrings (CSlurpOptions& options);
-	SFString  getFormatString     (CSlurpOptions& options, const SFString& name);
+	       CNameOptions   (void);
+	      ~CNameOptions   (void) {};
+	SFBool parseArguments (SFString& command);
+	void Init(void);
 };
+#endif
 
-//--------------------------------------------------------------------------------
-extern SFString getHomeFolder(void);
-
-//---------------------------------------------------------------------------------------------------
-extern SFBool establishFolders(CConfig& config, const SFString& vers);
-extern void   findBlockRange  (const SFString& contents, SFInt32& minBlock, SFInt32& maxBlock);
+#define DATA_FILE getHomeFolder()+".ethslurp/configs/dapps.txt"
 
 #endif
+

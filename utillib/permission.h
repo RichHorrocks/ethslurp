@@ -7,6 +7,7 @@
  *
  *------------------------------------------------------------------------*/
 
+#if 0
 #define PRM_APPARENT 0
 #define PRM_DEFAULT  1
 #define PRM_SPECIAL  2
@@ -82,5 +83,6 @@ private:
 			m_permission = data.m_permission;
 		}
 };
+#endif
 
 #endif

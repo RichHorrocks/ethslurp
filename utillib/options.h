@@ -1,4 +1,3 @@
-#if 1
 #ifndef _OPTIONS_H_
 #define _OPTIONS_H_
 /*--------------------------------------------------------------------------------
@@ -27,30 +26,20 @@ SOFTWARE.
 class COptions
 {
 public:
-	SFBool   slurp;
-	SFBool   prettyPrint;
-	SFBool   rerun;
-	SFBool   incomeOnly;
-	SFBool   expenseOnly;
-	SFInt32  firstBlock2Read;
-	SFInt32  lastBlock2Read;
-	SFTime   firstDate;
-	SFString funcFilter;
-	SFTime   lastDate;
-	SFBool   openFile;
-	SFBool   cmdFile;
-	SFString addr;
-	SFInt32  maxTransactions;
-	SFInt32  pageSize;
-	SFString exportFormat;
-	SFString name;
-	SFString archiveFile;
-	SFBool   wantsArchive;
-	FILE    *output; // for use when -a is on
+	static SFString msg;
+	static SFBool useVerbose;
+	static SFBool useTesting;
 
-	        COptions       (void);
-	       ~COptions       (void);
-	SFInt32 parseArguments (SFInt32 nArgs, const SFString *args);
+	SFString commandList;
+	SFBool   fromFile;
+
+	               COptions        (void) { fromFile = FALSE; }
+	    virtual   ~COptions        (void) { }
+		SFBool prepareArguments(int argc, const char *argv[]);
+	virtual SFBool parseArguments  (SFString& command) = 0;
+
+protected:
+	virtual void Init (void) = 0;
 };
 
 //--------------------------------------------------------------------------------
@@ -64,7 +53,7 @@ public:
 };
 
 //--------------------------------------------------------------------------------
-extern int      usage        (const SFString& errMsg=nullString);
+extern int      usage       (const SFString& errMsg=nullString);
 extern SFString options     (void);
 extern SFString descriptions(void);
 extern SFString purpose     (void);
@@ -77,42 +66,16 @@ extern SFString expandOption(SFString& arg);
 extern CParams params[];
 extern SFInt32 nParams;
 
-#endif
-#else
-#ifndef _OPTIONS_H_
-#define _OPTIONS_H_
-class COptions
-{
-public:
-	SFBool   count;
-	SFBool   sum;
-	SFString file;
-
-	        COptions       (void);
-	       ~COptions       (void);
-	SFInt32 parseArguments (SFInt32 nArgs, const SFString *args);
-};
+//--------------------------------------------------------------------------------
+extern SFBool verbose;
+extern SFBool isTesting;
 
 //--------------------------------------------------------------------------------
-class CParams
-{
-public:
-	SFString  shortName;
-	SFString  longName;
-	SFString  description;
-	CParams( const SFString& name, const SFString& descr );
-};
+extern CFileExportContext   outScreen;
+extern CFileExportContext&  outErr;
 
 //--------------------------------------------------------------------------------
-extern int      usage        (const SFString& errMsg=nullString);
-extern SFString options     (void);
-extern SFString descriptions(void);
-extern SFString purpose     (void);
-
-//--------------------------------------------------------------------------------
-extern CParams params[];
-extern SFInt32 nParams;
+extern SFString cachePath (const SFString& part=EMPTY);
+extern SFString configPath(const SFString& part=EMPTY);
 
 #endif
-#endif
-

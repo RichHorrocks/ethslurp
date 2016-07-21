@@ -21,6 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts inside 
+ * of 'EXISTING_CODE' tags.
+ */
 #include "function.h"
 
 //---------------------------------------------------------------------------
@@ -32,7 +36,7 @@ void CFunction::Format(CExportContext& ctx, const SFString& fmtIn, void *data) c
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn); //.Substitute("\n","\t");
+	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -47,13 +51,8 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 	CFunctionNotify *fu = (CFunctionNotify*)data;
 	const CFunction *fun = fu->getDataPtr();
 
-	// Give common (edit, delete, etc.) code a chance to override
-	SFString ret = nextChunk_common(fieldIn, getString("cmd"), fun);
-	if (!ret.IsEmpty())
-		return ret;
-	
 	// Now give customized code a chance to override
-	ret = nextFunctionChunk_custom(fieldIn, force, data);
+	SFString ret = nextFunctionChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 	
@@ -98,12 +97,22 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 			break;
 	}
 	
+	// Finally, give the parent class a chance
+	ret = nextBasenodeChunk(fieldIn, force, fun);
+	if (!ret.IsEmpty())
+		return ret;
+	
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
 //---------------------------------------------------------------------------------------------------
 SFBool CFunction::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
+	// EXISTING_CODE
+	if ( fieldName % "inputs" ) { parseParams(TRUE, fieldValue); return TRUE; }
+	if ( fieldName % "outputs" ) { parseParams(FALSE, fieldValue); return TRUE; }
+	// EXISTING_CODE
+
 	switch (tolower(fieldName[0]))
 	{
 		case 'a':
@@ -120,13 +129,13 @@ SFBool CFunction::setValueByName(const SFString& fieldName, const SFString& fiel
 			break;
 		case 'i':
 			if ( fieldName % "indexed" ) { indexed = toBool(fieldValue); return TRUE; }
-			if ( fieldName % "inputs" ) parseParams(TRUE, fieldValue); return TRUE;
+			if ( fieldName % "inputs" ) return TRUE;
 			break;
 		case 'n':
 			if ( fieldName % "name" ) { name = fieldValue; return TRUE; }
 			break;
 		case 'o':
-			if ( fieldName % "outputs" ) parseParams(FALSE, fieldValue); return TRUE;
+			if ( fieldName % "outputs" ) return TRUE;
 			break;
 		case 't':
 			if ( fieldName % "type" ) { type = fieldValue; return TRUE; }
@@ -141,8 +150,6 @@ SFBool CFunction::setValueByName(const SFString& fieldName, const SFString& fiel
 void CFunction::finishParse()
 {
 	// EXISTING_CODE
-	HIDE_FIELD(CFunction, "indexed");
-	HIDE_FIELD(CFunction, "anonymous");
 	// EXISTING_CODE
 }
 
@@ -151,7 +158,7 @@ void CFunction::Serialize(SFArchive& archive)
 {
 	if (!SerializeHeader(archive))
 		return;
-	
+
 	if (archive.isReading())
 	{
 		archive >> handle;
@@ -163,7 +170,7 @@ void CFunction::Serialize(SFArchive& archive)
 		archive >> encoding;
 		archive >> inputs;
 		archive >> outputs;
-
+		finishParse();
 	} else
 	{
 		archive << handle;
@@ -182,6 +189,10 @@ void CFunction::Serialize(SFArchive& archive)
 //---------------------------------------------------------------------------
 void CFunction::registerClass(void)
 {
+	static bool been_here=false;
+	if (been_here) return;
+	been_here=true;
+
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CFunction, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CFunction, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
@@ -224,3 +235,50 @@ int sortFunction(const SFString& f1, const SFString& f2, const void *rr1, const 
 }
 int sortFunctionByName(const void *rr1, const void *rr2) { return sortFunction("fu_Name", "", rr1, rr2); }
 int sortFunctionByID  (const void *rr1, const void *rr2) { return sortFunction("functionID", "", rr1, rr2); }
+
+//---------------------------------------------------------------------------
+SFString nextFunctionChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+{
+	CFunctionNotify *fu = (CFunctionNotify*)data;
+	const CFunction *fun = fu->getDataPtr();
+	switch (tolower(fieldIn[0]))
+	{
+		// EXISTING_CODE
+		// EXISTING_CODE
+		default:
+			break;
+	}
+	
+#pragma unused(fu)
+#pragma unused(fun)
+
+	return EMPTY;
+}
+
+//---------------------------------------------------------------------------
+SFBool CFunction::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+{
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+// EXISTING_CODE
+void CFunction::parseParams(SFBool input, const SFString& contents)
+{
+	char *p = (char *)(const char*)contents;
+	while (p && *p)
+	{
+		CParameter param;SFInt32 nFields=0;
+		p = param.parseJson(p,nFields);
+		if (nFields)
+		{
+			if (input)
+				inputs[inputs.getCount()+1] = param;
+			else
+				outputs[outputs.getCount()+1] = param;
+		}
+	}
+}
+// EXISTING_CODE

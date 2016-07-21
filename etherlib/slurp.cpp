@@ -21,6 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts inside 
+ * of 'EXISTING_CODE' tags.
+ */
 #include "slurp.h"
 
 //---------------------------------------------------------------------------
@@ -32,7 +36,7 @@ void CSlurp::Format(CExportContext& ctx, const SFString& fmtIn, void *data) cons
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn); //.Substitute("\n","\t");
+	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -47,13 +51,8 @@ SFString nextSlurpChunk(const SFString& fieldIn, SFBool& force, const void *data
 	CSlurpNotify *sl = (CSlurpNotify*)data;
 	const CSlurp *slu = sl->getDataPtr();
 
-	// Give common (edit, delete, etc.) code a chance to override
-	SFString ret = nextChunk_common(fieldIn, getString("cmd"), slu);
-	if (!ret.IsEmpty())
-		return ret;
-	
 	// Now give customized code a chance to override
-	ret = nextSlurpChunk_custom(fieldIn, force, data);
+	SFString ret = nextSlurpChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 	
@@ -90,12 +89,20 @@ SFString nextSlurpChunk(const SFString& fieldIn, SFBool& force, const void *data
 			break;
 	}
 	
+	// Finally, give the parent class a chance
+	ret = nextBasenodeChunk(fieldIn, force, slu);
+	if (!ret.IsEmpty())
+		return ret;
+	
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
 //---------------------------------------------------------------------------------------------------
 SFBool CSlurp::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	switch (tolower(fieldName[0]))
 	{
 		case 'a':
@@ -139,7 +146,7 @@ void CSlurp::Serialize(SFArchive& archive)
 {
 	if (!SerializeHeader(archive))
 		return;
-	
+
 	if (archive.isReading())
 	{
 		archive >> handle;
@@ -149,9 +156,9 @@ void CSlurp::Serialize(SFArchive& archive)
 		archive >> pageSize;
 		archive >> lastPage;
 		archive >> lastBlock;
-//		archive >> nVisible;
+		archive >> nVisible;
 		archive >> transactions;
-
+		finishParse();
 	} else
 	{
 		archive << handle;
@@ -161,7 +168,7 @@ void CSlurp::Serialize(SFArchive& archive)
 		archive << pageSize;
 		archive << lastPage;
 		archive << lastBlock;
-//		archive << nVisible;
+		archive << nVisible;
 		archive << transactions;
 
 	}
@@ -170,6 +177,10 @@ void CSlurp::Serialize(SFArchive& archive)
 //---------------------------------------------------------------------------
 void CSlurp::registerClass(void)
 {
+	static bool been_here=false;
+	if (been_here) return;
+	been_here=true;
+
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CSlurp, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CSlurp, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
@@ -210,3 +221,141 @@ int sortSlurp(const SFString& f1, const SFString& f2, const void *rr1, const voi
 }
 int sortSlurpByName(const void *rr1, const void *rr2) { return sortSlurp("sl_Name", "", rr1, rr2); }
 int sortSlurpByID  (const void *rr1, const void *rr2) { return sortSlurp("slurpID", "", rr1, rr2); }
+
+//---------------------------------------------------------------------------
+SFString nextSlurpChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+{
+	CSlurpNotify *sl = (CSlurpNotify*)data;
+	const CSlurp *slu = sl->getDataPtr();
+	switch (tolower(fieldIn[0]))
+	{
+		// EXISTING_CODE
+		case 'n':
+			if ( fieldIn % "now" ) return (isTesting ? "TESTING_TIME" : Now().Format(FMT_DEFAULT));
+			break;
+		case 'r':
+			if ( fieldIn % "records" ) return (slu->transactions.getCount() == 0 ? "No records" : "");
+			break;
+		// EXISTING_CODE
+		default:
+			break;
+	}
+	
+#pragma unused(sl)
+#pragma unused(slu)
+
+	return EMPTY;
+}
+
+//---------------------------------------------------------------------------
+SFBool CSlurp::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+{
+	// EXISTING_CODE
+	// Split the format string into three parts: pre, post and records.
+	// If no records, just process as normal. We do this because it's so slow
+	// copying the records into a string, so we write it directly to the
+	// export context. If there is no {RECORDS}, then just send handle it like normal
+	if (!fmtIn.Contains("{RECORDS}") || transactions.getCount()==0)
+	{
+		SFString fmt = fmtIn;
+
+		CSlurpNotify dn(this);
+		while (!fmt.IsEmpty())
+			ctx << getNextChunk(fmt, nextSlurpChunk, &dn);
+	} else
+	{
+		SFString postFmt = fmtIn;
+		postFmt.Replace("{RECORDS}","|");
+		SFString preFmt = nextTokenClear(postFmt,'|');
+
+		// We assume here that the token was properly formed. For the pre-text we
+		// have to clear out the start '[', and for the post text we clear out the ']'
+		preFmt.ReplaceReverse("[","");
+		postFmt.Replace("]","");
+
+		// We handle the display in three parts: pre, records, and post so as
+		// to avoid building the entire record list into an ever-growing and
+		// ever-slowing string
+		CSlurpNotify dn(this);
+		while (!preFmt.IsEmpty())
+			ctx << getNextChunk(preFmt, nextSlurpChunk, &dn);
+		SFInt32 cnt=0;
+		for (int i=0;i<transactions.getCount();i++)
+		{
+			cnt += transactions[i].isShowing();
+			if (cnt && !(cnt%REP_INFREQ))
+			{
+				outErr << "\tExporting record " << cnt << " of " << nVisible;
+				outErr << (transactions.getCount()!=nVisible?" visible":"") << " records" << (isTesting?"\n":"\r"); outErr.Flush();
+			}
+			SFInt32 save = transactions[i].handle;
+			((CSlurp*)this)->transactions[i].handle = transactions.getCount() - i;
+			ctx << transactions[i].Format(displayString);
+			((CSlurp*)this)->transactions[i].handle = save;
+			if (cnt>=nVisible)
+				break; // no need to keep spinning if we've shown them all
+		}
+		ctx << "\n";
+		while (!postFmt.IsEmpty())
+			ctx << getNextChunk(postFmt, nextSlurpChunk, &dn);
+	}
+	return TRUE;
+	// EXISTING_CODE
+	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+// EXISTING_CODE
+#define MAX_FUNCS 200
+CFunction funcTable[MAX_FUNCS];
+SFInt32 nFunctions=0;
+//---------------------------------------------------------------------------
+int sortFuncTable(const void *ob1, const void *ob2)
+{
+	CFunction *p1 = (CFunction*)ob1;
+	CFunction *p2 = (CFunction*)ob2;
+	return (int)p2->encoding.Compare(p1->encoding);
+}
+
+//---------------------------------------------------------------------------
+void CSlurp::loadABI(void)
+{
+	// Already loaded?
+	if (nFunctions)
+		return;
+
+extern SFString configPath(const SFString& part);
+	SFString abiFilename = 	configPath("abis/"+addr+".json");
+	if (!SFos::fileExists(abiFilename))
+		return;
+
+	outErr << "\tLoading abi file: " << abiFilename << "...\n";
+	SFString contents = asciiFileToString(abiFilename);
+	ASSERT(!contents.IsEmpty());
+
+	char *p = cleanUpJson((char *)(const char*)contents);
+	while (p && *p)
+	{
+		CFunction func;SFInt32 nFields=0;
+		p = func.parseJson(p,nFields);
+		if (nFields)
+		{
+			SFString ethabi = "/usr/local/bin/ethabi";
+			if (!SFos::fileExists(ethabi))
+			{
+				outErr << "/usr/local/bin/ethabi command not found. Cannot parse functions.\n";
+			} else if (func.type == "function")
+			{
+				SFString cmd = ethabi + " encode function \"" + abiFilename + "\" " + func.name;
+				SFString result = SFos::doCommand(cmd);
+				func.encoding = result;
+				funcTable[nFunctions++] = func;
+			}
+		}
+	}
+	qsort(funcTable, nFunctions, sizeof(CFunction), sortFuncTable);
+	for (int i=0;i<nFunctions;i++)
+		if (funcTable[i].type == "function" && verbose)
+			outErr << funcTable[i].Format().Substitute("\n"," ") << "\n";
+}
+// EXISTING_CODE

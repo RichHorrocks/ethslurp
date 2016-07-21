@@ -24,8 +24,8 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "abilib.h"
 #include "transaction.h"
-#include "function.h"
 
 //--------------------------------------------------------------------------
 class CSlurp;
@@ -71,7 +71,7 @@ public:
 	void    loadABI      (void);
 	// EXISTING_CODE
 
-private:
+protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CSlurp& sl);
@@ -186,9 +186,15 @@ IMPLEMENT_ARCHIVE_ARRAY(CSlurpArray);
 IMPLEMENT_ARCHIVE_LIST(CSlurpList);
 
 //---------------------------------------------------------------------------
-#include "slurp_custom.h"
+extern SFString nextSlurpChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
+extern SFBool verbose;
+extern SFBool isTesting;
+extern CFileExportContext& outErr;
+#define REP_FREQ   11
+#define REP_INFREQ 563
 // EXISTING_CODE
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _FUNCTION_H_
-#define _FUNCTION_H_
+#ifndef _CREATETOKENPROXY_H_
+#define _CREATETOKENPROXY_H_
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -24,61 +24,53 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
-#include "parameter.h"
+#include "abilib.h"
+#include "transaction.h"
 
 //--------------------------------------------------------------------------
-class CFunction;
-typedef SFArrayBase<CFunction>         CFunctionArray;
-typedef SFList<CFunction*>             CFunctionList;
-typedef CNotifyClass<const CFunction*> CFunctionNotify;
-typedef SFUniqueList<CFunction*>       CFunctionListU;
+class CCreateTokenProxy;
+typedef SFArrayBase<CCreateTokenProxy>         CCreateTokenProxyArray;
+typedef SFList<CCreateTokenProxy*>             CCreateTokenProxyList;
+typedef CNotifyClass<const CCreateTokenProxy*> CCreateTokenProxyNotify;
+typedef SFUniqueList<CCreateTokenProxy*>       CCreateTokenProxyListU;
 
 //---------------------------------------------------------------------------
-extern int sortFunction        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
-extern int sortFunctionByName  (const void *rr1, const void *rr2);
-extern int sortFunctionByID    (const void *rr1, const void *rr2);
-extern int isDuplicateFunction (const void *rr1, const void *rr2);
+extern int sortCreatetokenproxy        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
+extern int sortCreatetokenproxyByName  (const void *rr1, const void *rr2);
+extern int sortCreatetokenproxyByID    (const void *rr1, const void *rr2);
+extern int isDuplicateCreatetokenproxy (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CFunction : public CBaseNode
+class CCreateTokenProxy : public CTransaction
 {
 public:
-	SFInt32 handle;
-	SFString name;
-	SFString type;
-	SFBool indexed;
-	SFBool anonymous;
-	SFBool constant;
-	SFString encoding;
-	CParameterArray inputs;
-	CParameterArray outputs;
+	SFString tokenHolder;
 
 public:
-					CFunction  (void);
-					CFunction  (const CFunction& fu);
-				   ~CFunction  (void);
-	CFunction&	operator= 		(const CFunction& fu);
+					CCreateTokenProxy  (void);
+					CCreateTokenProxy  (const CCreateTokenProxy& cr);
+				   ~CCreateTokenProxy  (void);
+	CCreateTokenProxy&	operator= 		(const CCreateTokenProxy& cr);
 
-	DECLARE_NODE (CFunction);
+	DECLARE_NODE (CCreateTokenProxy);
 
 	// EXISTING_CODE
-	void parseParams(SFBool input, const SFString& value);
 	// EXISTING_CODE
 
-private:
+protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CFunction& fu);
+	void			Copy      		(const CCreateTokenProxy& cr);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 };
 
 //--------------------------------------------------------------------------
-inline CFunction::CFunction(void)
+inline CCreateTokenProxy::CCreateTokenProxy(void)
 {
 	Init();
 	// EXISTING_CODE
@@ -86,18 +78,18 @@ inline CFunction::CFunction(void)
 }
 
 //--------------------------------------------------------------------------
-inline CFunction::CFunction(const CFunction& fu)
+inline CCreateTokenProxy::CCreateTokenProxy(const CCreateTokenProxy& cr)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(fu);
+	Copy(cr);
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-inline CFunction::~CFunction(void)
+inline CCreateTokenProxy::~CCreateTokenProxy(void)
 {
 	Clear();
 	// EXISTING_CODE
@@ -105,62 +97,46 @@ inline CFunction::~CFunction(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CFunction::Clear(void)
+inline void CCreateTokenProxy::Clear(void)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CFunction::Init(void)
+inline void CCreateTokenProxy::Init(void)
 {
-	CBaseNode::Init();
+	CTransaction::Init();
 
-	handle = 0;
-	name = EMPTY;
-	type = EMPTY;
-	indexed = 0;
-	anonymous = 0;
-	constant = 0;
-	encoding = EMPTY;
-//	inputs = ??; /* unknown type: CParameterArray */
-//	outputs = ??; /* unknown type: CParameterArray */
+	tokenHolder = EMPTY;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CFunction::Copy(const CFunction& fu)
+inline void CCreateTokenProxy::Copy(const CCreateTokenProxy& cr)
 {
 	Clear();
 
-	CBaseNode::Copy(fu);
-	handle = fu.handle;
-	name = fu.name;
-	type = fu.type;
-	indexed = fu.indexed;
-	anonymous = fu.anonymous;
-	constant = fu.constant;
-	encoding = fu.encoding;
-	inputs = fu.inputs;
-	outputs = fu.outputs;
+	CTransaction::Copy(cr);
+	tokenHolder = cr.tokenHolder;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CFunction& CFunction::operator=(const CFunction& fu)
+inline CCreateTokenProxy& CCreateTokenProxy::operator=(const CCreateTokenProxy& cr)
 {
-	Copy(fu);
+	Copy(cr);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
 }
 
 //---------------------------------------------------------------------------
-inline SFString CFunction::getValueByName(const SFString& fieldName) const
+inline SFString CCreateTokenProxy::getValueByName(const SFString& fieldName) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -168,7 +144,7 @@ inline SFString CFunction::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CFunction::getHandle(void) const
+inline SFInt32 CCreateTokenProxy::getHandle(void) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -176,15 +152,16 @@ inline SFInt32 CFunction::getHandle(void) const
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextCreatetokenproxyChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
-IMPLEMENT_ARCHIVE_ARRAY(CFunctionArray);
-IMPLEMENT_ARCHIVE_LIST(CFunctionList);
+IMPLEMENT_ARCHIVE_ARRAY(CCreateTokenProxyArray);
+IMPLEMENT_ARCHIVE_LIST(CCreateTokenProxyList);
 
 //---------------------------------------------------------------------------
-#include "function_custom.h"
+extern SFString nextCreatetokenproxyChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
 // EXISTING_CODE
 

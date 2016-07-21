@@ -21,7 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "ethslurp.h"
+#include "etherlib.h"
+#include "slurp_options.h"
 
 //---------------------------------------------------------------------------------------------------
 CParams params[] =
@@ -40,18 +41,20 @@ CParams params[] =
 	CParams("-open",	"open the configuration file for editing" ),
 	CParams("-list",	"list previously slurped addresses in cache" ),
 	CParams("@--sleep",	"sleep for :x seconds" ),
+	CParams("@--func",	"display only --func:functionName records" ),
+	CParams("@--errFilt",	"display only non-error transactions" ),
+	CParams("@--reverse",	"display results sorted in reverse chronological order (chronological by default)" ),
 	CParams("-clear",	"clear all previously cached slurps" ),
 	CParams( "",		"Fetches data off the Ethereum blockchain for an arbitrary account or smart contract. Optionally formats the output to your specification.\n" ),
 };
 SFInt32 nParams = sizeof(params) / sizeof(CParams);
 
 //---------------------------------------------------------------------------------------------------
-SFInt32 COptions::parseArguments(SFInt32 nArgs, const SFString *args)
+SFInt32 CSlurpOptions::parseArguments(SFString& command)
 {
-	outScreen.setOutput(stdout); // so we know where it is at the start of each run
-	for (int i=0;i<nArgs;i++)
-	{
-		SFString arg = args[i];
+        while (!command.IsEmpty())
+        {
+                SFString arg = nextTokenClear(command,' ');
 		if (arg == "-i" || arg == "-income")
 		{
 			if (expenseOnly)
@@ -82,6 +85,14 @@ SFInt32 COptions::parseArguments(SFInt32 nArgs, const SFString *args)
 		} else if (arg.startsWith("--func"))
 		{
 			funcFilter = arg.Substitute("--func:",EMPTY);
+
+		} else if (arg.startsWith("--errFilt"))
+		{
+			errFilt = TRUE;
+
+		} else if (arg.startsWith("--reverse"))
+		{
+			reverseSort = TRUE;
 
 		} else if (arg == "-l" || arg == "-list")
 		{
@@ -193,7 +204,7 @@ SFInt32 COptions::parseArguments(SFInt32 nArgs, const SFString *args)
 			if (isTesting)
 				outScreen << "Testing only for open command:\n" << asciiFileToString(configPath("ethslurp.conf")) << "\n";
 			else
-				system("open ~/.ethslurp/ethslurp.conf");
+				system("pico ~/.ethslurp/ethslurp.conf");
 			exit(0);
 
 		} else if (arg == "-c" || arg == "-clear")
@@ -226,16 +237,17 @@ SFInt32 COptions::parseArguments(SFInt32 nArgs, const SFString *args)
 }
 
 //---------------------------------------------------------------------------------------------------
-COptions::COptions(void)
+void CSlurpOptions::Init(void)
 {
 	slurp           = FALSE;
 	prettyPrint     = FALSE;
 	rerun           = FALSE;
 	incomeOnly      = FALSE;
 	expenseOnly     = FALSE;
-	cmdFile         = FALSE;
 	openFile        = FALSE;
 	funcFilter      = EMPTY;
+	errFilt         = FALSE;
+	reverseSort     = FALSE;
 	firstBlock2Read = 0;
 	lastBlock2Read  = LONG_MAX;
 	firstDate       = earliestDate;
@@ -245,185 +257,22 @@ COptions::COptions(void)
 	exportFormat    = "json";
 	archiveFile     = EMPTY;
 	wantsArchive    = FALSE;
-	output          = NULL;
 	//addr;
+
+	outScreen.setOutput(stdout); // so we know where it is at the start of each run
+	output          = NULL;
+}
+
+//---------------------------------------------------------------------------------------------------
+CSlurpOptions::CSlurpOptions(void)
+{
+	Init();
+	msg = "  Portions of this software are Powered by Etherscan.io APIs\n\n";
 }
 
 //--------------------------------------------------------------------------------
-COptions::~COptions(void)
+CSlurpOptions::~CSlurpOptions(void)
 {
 	outScreen.setOutput(stdout); // flushes and clears archive file if any
 	output=NULL;
 }
-
-//--------------------------------------------------------------------------------
-int usage(const SFString& errMsg)
-{
-	SFString cmd = "ethslurp";
-	//		qsort(cmdFunc->params, cmdFunc->nParams, sizeof(CParams), sortParams);
-	outErr << "\n" << (!errMsg.IsEmpty() ? "  " + errMsg + "\n\n" : "");
-	outErr << "  Usage:   " + cmd + " " << options() << "\n";
-	outErr << purpose();
-	outErr << descriptions() << "\n";
-	outErr << "  Portions of this software are Powered by Etherscan.io APIs\n\n";
-	return FALSE;
-}
-
-//--------------------------------------------------------------------------------
-CParams::CParams( const SFString& nameIn, const SFString& descr )
-{
-	SFString name = nameIn;
-
-	description = descr;
-	if (!name.IsEmpty())
-	{
-		shortName   = name.Left(2);
-		if (name.GetLength()>2)
-			longName  = name;
-		if (name.Contains("{"))
-		{
-			name.Replace("{","|{");
-			nextTokenClear(name,'|');
-			shortName += name;
-
-		} else if (name.Contains(":"))
-		{
-			nextTokenClear(name,':');
-			shortName += name[0];
-			longName = "-" + name;
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------
-SFString options(void)
-{
-	SFString required;
-
-	CStringExportContext ctx;
-	ctx << "[";
-	for (int i=0;i<nParams;i++)
-	{
-		if (params[i].shortName.startsWith('~'))
-		{
-			required += (" " + params[i].longName.Mid(1));
-
-		} else if (params[i].shortName.startsWith('@'))
-		{
-			// invisible option
-			
-		} else if (!params[i].shortName.IsEmpty())
-		{
-			ctx << params[i].shortName << "|";
-		}
-	}
-	ctx << "-t|-v|-h]";
-	ctx << required;
-
-	return ctx.str;
-}
-
-//--------------------------------------------------------------------------------
-SFString purpose(void)
-{
-	SFString purpose;
-	for (int i=0;i<nParams;i++)
-		if (params[i].shortName.IsEmpty())
-			purpose += ("\n           " + params[i].description);
-
-	CStringExportContext ctx;
-	if (!purpose.IsEmpty())
-	{
-		purpose.Replace("\n           ",EMPTY);
-		ctx << "  Purpose: " << purpose.Substitute("\n","\n           ") << "\n";
-	}
-	ctx << "  Where:\n";
-	return ctx.str;
-}
-
-//--------------------------------------------------------------------------------
-SFString descriptions(void)
-{
-	SFString required;
-
-	SFBool usesT = FALSE;
-	CStringExportContext ctx;
-	for (int i=0;i<nParams;i++)
-	{
-		if (params[i].shortName.startsWith('~'))
-		{
-			required += ("\t" + padRight(params[i].longName,22) + params[i].description).Substitute("~",EMPTY) + " (required)\n";
-
-		} else if (params[i].shortName.startsWith('@'))
-		{
-			// invisible option
-
-		} else if (!params[i].shortName.IsEmpty())
-		{
-			ctx << "\t" << padRight(params[i].shortName,3) << padRight((params[i].longName.IsEmpty() ? "" : " (or "+params[i].longName+")"),18) << params[i].description << "\n";
-		}
-		if (params[i].shortName.startsWith("-t"))
-			usesT = TRUE;
-	}
-	ctx.str = (required + ctx.str);
-	if (!usesT)
-		ctx << "\t" << "-t  (or -test)       generate intermediary files but do not execute the commands\n";
-	ctx << "\t" << "-v  (or -verbose)    set verbose level. Follow with a number to set level (-v0 for silent)\n";
-	ctx << "\t" << "-h  (or -help)       display this help screen\n";
-	return ctx.str;
-}
-
-//--------------------------------------------------------------------------------
-SFString expandOption(SFString& arg)
-{
-	SFString ret = arg;
-
-	// Not an option
-	if (!arg.startsWith('-'))
-	{
-		arg=EMPTY;
-		return ret;
-	}
-
-	// Single option
-	if (arg.GetLength()==2)
-	{
-		arg=EMPTY;
-		return ret;
-	}
-
-	// One of the range commands. These must be alone on
-	// the line (this is a bug for -rf:txt for example)
-	if (arg.Contains(":"))
-	{
-		arg=EMPTY;
-		return ret;
-	}
-
-	// This is a ganged-up option. We need to pull it apart by returning
-	// the first two chars, and saving the rest for later.
-	ret = arg.Left(2);
-	arg = "-"+arg.Mid(2,1000);
-	return ret;
-}
-
-//--------------------------------------------------------------------------------
-int sortParams(const void *c1, const void *c2)
-{
-	CParams *p1 = (CParams*)c1;
-	CParams *p2 = (CParams*)c2;
-	if (p1->shortName=="-h")
-		return 1;
-	else if (p2->shortName=="-h")
-		return -1;
-	return (int)p1->shortName.Compare(p2->shortName);
-}
-
-//--------------------------------------------------------------------------------
-SFBool verbose  = FALSE;
-SFBool isTesting = FALSE;
-
-//--------------------------------------------------------------------------------
-CFileExportContext   outScreen;
-CErrorExportContext  outErr_internal;
-CFileExportContext&  outErr = outErr_internal;

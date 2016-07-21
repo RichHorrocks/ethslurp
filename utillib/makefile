@@ -16,6 +16,7 @@ importcontext.cpp \
 fielddata.cpp \
 fieldlist.cpp \
 point.cpp \
+options.cpp \
 rect.cpp \
 runtimeclass.cpp \
 sfarchive.cpp \
@@ -41,7 +42,7 @@ all:
 
 $(product): $(objects)
 	-@$(RM) -f $*.a
-	@ar qc $*.a $(objects)
+	ar qc $*.a $(objects)
 #	@chown jrush.jrush $(product)
 
 $(objects): | objs

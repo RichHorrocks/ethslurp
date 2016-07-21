@@ -1,0 +1,3 @@
+{"addr": "0xda4a4626d3e16e094de3225a751aab7128e96526", "name": "CuratorMultiSig", "source": "The Dao" }
+{"addr": "0xf8c35f1cf2dc4dbeaeeb2ecb298a80b506a5781d", "name": "Daosecurity_Slockitdaosec", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0xda4a4626d3e16e094de3225a751aab7128e96526", "name": "Wallet_Thedaocurator", "source": "EtherScan.ioVerifiedContracts" }

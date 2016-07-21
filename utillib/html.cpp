@@ -16,6 +16,7 @@ SFString _aligns[] = { "left", "middle", "right", "top", "bottom" };
 #define ADDMOUSEATTRIB()
 #else
 #define onMouseWheel SFString("return false;")
+#define isMSIE() FALSE
 #define ADDMOUSEATTRIB() if (isMSIE()) { ADDATTRIB("onMouseWheel", onMouseWheel); }
 #endif
 

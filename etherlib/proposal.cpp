@@ -21,6 +21,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts inside 
+ * of 'EXISTING_CODE' tags.
+ */
 #include "proposal.h"
 
 //---------------------------------------------------------------------------
@@ -32,7 +36,7 @@ void CProposal::Format(CExportContext& ctx, const SFString& fmtIn, void *data) c
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn); //.Substitute("\n","\t");
+	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -47,20 +51,8 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 	CProposalNotify *pr = (CProposalNotify*)data;
 	const CProposal *pro = pr->getDataPtr();
 
-	// Give common (edit, delete, etc.) code a chance to override
-	SFString ret = nextChunk_common(fieldIn, getString("cmd"), pro);
-	if (!ret.IsEmpty())
-		return ret;
-	
-	// Allow transaction to go first
-	CTransactionNotify dn((CTransaction*)pro);
-	ret = nextTransactionChunk(fieldIn, force, &dn);
-	if (!ret.IsEmpty())
-		return ret;
-	
-
 	// Now give customized code a chance to override
-	ret = nextProposalChunk_custom(fieldIn, force, data);
+	SFString ret = nextProposalChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 	
@@ -77,19 +69,22 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 			if ( fieldIn % "debatePeriod" ) return asString(pro->debatePeriod);
 			if ( fieldIn % "description" ) return pro->description;
 			break;
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(pro->handle);
-			break;
 		case 'i':
 			if ( fieldIn % "isSplit" ) return asString(pro->isSplit);
 			break;
 		case 'p':
-			if ( fieldIn % "proposalID" ) return asString(pro->proposalID);
+			if ( fieldIn % "proposalID" ) return padNum3(pro->proposalID);
 			break;
 		case 'r':
 			if ( fieldIn % "recipient" ) return pro->recipient;
 			break;
 	}
+	
+	// Finally, give the parent class a chance
+	CTransactionNotify dn(pro);
+	ret = nextTransactionChunk(fieldIn, force, &dn);
+	if (!ret.IsEmpty())
+		return ret;
 	
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
@@ -97,24 +92,24 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 //---------------------------------------------------------------------------------------------------
 SFBool CProposal::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	if (CTransaction::setValueByName(fieldName, fieldValue))
 		return TRUE;
-	
+
 	switch (tolower(fieldName[0]))
 	{
 		case 'a':
 			if ( fieldName % "amount" ) { amount = fieldValue; return TRUE; }
 			break;
 		case 'c':
-			if ( fieldName % "creator" ) { creator = fieldValue; return TRUE; }
+			if ( fieldName % "creator" ) { creator = toLower(fieldValue); return TRUE; }
 			break;
 		case 'd':
 			if ( fieldName % "data" ) { data = fieldValue; return TRUE; }
 			if ( fieldName % "debatePeriod" ) { debatePeriod = toLong(fieldValue); return TRUE; }
 			if ( fieldName % "description" ) { description = fieldValue; return TRUE; }
-			break;
-		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			break;
 		case 'i':
 			if ( fieldName % "isSplit" ) { isSplit = toBool(fieldValue); return TRUE; }
@@ -123,7 +118,7 @@ SFBool CProposal::setValueByName(const SFString& fieldName, const SFString& fiel
 			if ( fieldName % "proposalID" ) { proposalID = toLong(fieldValue); return TRUE; }
 			break;
 		case 'r':
-			if ( fieldName % "recipient" ) { recipient = fieldValue; return TRUE; }
+			if ( fieldName % "recipient" ) { recipient = toLower(fieldValue); return TRUE; }
 			break;
 		default:
 			break;
@@ -145,7 +140,6 @@ void CProposal::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> proposalID;
 		archive >> creator;
 		archive >> recipient;
@@ -154,10 +148,9 @@ void CProposal::Serialize(SFArchive& archive)
 		archive >> debatePeriod;
 		archive >> description;
 		archive >> isSplit;
-
+		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << proposalID;
 		archive << creator;
 		archive << recipient;
@@ -173,6 +166,12 @@ void CProposal::Serialize(SFArchive& archive)
 //---------------------------------------------------------------------------
 void CProposal::registerClass(void)
 {
+	static bool been_here=false;
+	if (been_here) return;
+	been_here=true;
+
+	CTransaction::registerClass();
+
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CProposal, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CProposal, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
@@ -213,3 +212,34 @@ int sortProposal(const SFString& f1, const SFString& f2, const void *rr1, const 
 }
 int sortProposalByName(const void *rr1, const void *rr2) { return sortProposal("pr_Name", "", rr1, rr2); }
 int sortProposalByID  (const void *rr1, const void *rr2) { return sortProposal("proposalID", "", rr1, rr2); }
+
+//---------------------------------------------------------------------------
+SFString nextProposalChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+{
+	CProposalNotify *pr = (CProposalNotify*)data;
+	const CProposal *pro = pr->getDataPtr();
+	switch (tolower(fieldIn[0]))
+	{
+		// EXISTING_CODE
+		// EXISTING_CODE
+		default:
+			break;
+	}
+	
+#pragma unused(pr)
+#pragma unused(pro)
+
+	return EMPTY;
+}
+
+//---------------------------------------------------------------------------
+SFBool CProposal::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+{
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+// EXISTING_CODE
+// EXISTING_CODE

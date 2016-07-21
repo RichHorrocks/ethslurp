@@ -1,0 +1,17 @@
+echo "ethname 0x1"
+ethname 0x1 >tests/test1.txt
+
+echo "ethname 0x1 rob"
+ethname 0x1 rob >tests/test2.txt
+
+echo "ethname 0x1 rob steem"
+ethname 0x1 rob steem >tests/test3.txt
+
+echo "ethname 0xbf4ed7b27f1d666546e30d74d50d173d20bca754"
+ethname 0xbf4ed7b27f1d666546e30d74d50d173d20bca754 >tests/test4.txt
+
+echo "ethname cur"
+ethname cur >tests/test5.txt
+
+echo "ethname cur -a"
+ethname cur -a >tests/test6.txt

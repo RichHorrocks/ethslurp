@@ -27,7 +27,7 @@ SOFTWARE.
 #define DEF_DELIMITER ((char)0x5)
 
 // Note: This code does nothing interesting
-CImportContext::CImportContext(void)
+CImportContext::CImportContext(void *input)
 {
 }
 

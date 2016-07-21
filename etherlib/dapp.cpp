@@ -25,13 +25,13 @@
  * This file was generated with makeClass. Edit only those parts inside 
  * of 'EXISTING_CODE' tags.
  */
-#include "account.h"
+#include "dapp.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CAccount, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CDapp, CBaseNode, NO_SCHEMA);
 
 //---------------------------------------------------------------------------
-void CAccount::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
+void CDapp::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	if (!isShowing())
 		return;
@@ -40,45 +40,55 @@ void CAccount::Format(CExportContext& ctx, const SFString& fmtIn, void *data) co
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
-	CAccountNotify dn(this);
+	CDappNotify dn(this);
 	while (!fmt.IsEmpty())
-		ctx << getNextChunk(fmt, nextAccountChunk, &dn);
+		ctx << getNextChunk(fmt, nextDappChunk, &dn);
 }
 
 //---------------------------------------------------------------------------
-SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *data)
+SFString nextDappChunk(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAccountNotify *ac = (CAccountNotify*)data;
-	const CAccount *acc = ac->getDataPtr();
+	CDappNotify *da = (CDappNotify*)data;
+	const CDapp *dap = da->getDataPtr();
 
 	// Now give customized code a chance to override
-	SFString ret = nextAccountChunk_custom(fieldIn, force, data);
+	SFString ret = nextDappChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 	
 	switch (tolower(fieldIn[0]))
 	{
-		case 'a':
-			if ( fieldIn % "addr" ) return acc->addr;
+		case 'd':
+			if ( fieldIn % "dappName" ) return dap->dappName;
+			if ( fieldIn % "description" ) return dap->description;
+			break;
+		case 'g':
+			if ( fieldIn % "gitHub" ) return dap->gitHub;
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(acc->handle);
+			if ( fieldIn % "handle" ) return asString(dap->handle);
 			break;
-		case 'n':
-			if ( fieldIn % "name" ) return acc->name;
-			if ( fieldIn % "nTransactions" ) return asString(acc->nTransactions);
+		case 'l':
+			if ( fieldIn % "license" ) return dap->license;
+			if ( fieldIn % "last_update" ) return dap->last_update;
+			break;
+		case 'p':
+			if ( fieldIn % "people" ) return dap->people;
+			break;
+		case 'r':
+			if ( fieldIn % "reddit" ) return dap->reddit;
 			break;
 		case 's':
-			if ( fieldIn % "source" ) return acc->source;
+			if ( fieldIn % "site" ) return dap->site;
+			if ( fieldIn % "status" ) return dap->status;
 			break;
 		case 't':
-			return EMPTY;
-//			if ( fieldIn % "transactions" ) return acc->transactions;
+			if ( fieldIn % "tags" ) return dap->tags;
 			break;
 	}
 	
 	// Finally, give the parent class a chance
-	ret = nextBasenodeChunk(fieldIn, force, acc);
+	ret = nextBasenodeChunk(fieldIn, force, dap);
 	if (!ret.IsEmpty())
 		return ret;
 	
@@ -86,29 +96,39 @@ SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *da
 }
 
 //---------------------------------------------------------------------------------------------------
-SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& fieldValue)
+SFBool CDapp::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 
 	switch (tolower(fieldName[0]))
 	{
-		case 'a':
-			if ( fieldName % "addr" ) { addr = fieldValue; return TRUE; }
+		case 'd':
+			if ( fieldName % "dappName" ) { dappName = fieldValue; return TRUE; }
+			if ( fieldName % "description" ) { description = fieldValue; return TRUE; }
+			break;
+		case 'g':
+			if ( fieldName % "gitHub" ) { gitHub = fieldValue; return TRUE; }
 			break;
 		case 'h':
 			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			break;
-		case 'n':
-			if ( fieldName % "name" ) { name = fieldValue; return TRUE; }
-			if ( fieldName % "nTransactions" ) { nTransactions = toLong(fieldValue); return TRUE; }
+		case 'l':
+			if ( fieldName % "license" ) { license = fieldValue; return TRUE; }
+			if ( fieldName % "last_update" ) { last_update = fieldValue; return TRUE; }
+			break;
+		case 'p':
+			if ( fieldName % "people" ) { people = fieldValue; return TRUE; }
+			break;
+		case 'r':
+			if ( fieldName % "reddit" ) { reddit = fieldValue; return TRUE; }
 			break;
 		case 's':
-			if ( fieldName % "source" ) { source = fieldValue; return TRUE; }
+			if ( fieldName % "site" ) { site = fieldValue; return TRUE; }
+			if ( fieldName % "status" ) { status = fieldValue; return TRUE; }
 			break;
 		case 't':
-			return TRUE;
-//			if ( fieldName % "transactions" ) { transactions = fieldValue; return TRUE; }
+			if ( fieldName % "tags" ) { tags = fieldValue; return TRUE; }
 			break;
 		default:
 			break;
@@ -117,14 +137,14 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 }
 
 //---------------------------------------------------------------------------------------------------
-void CAccount::finishParse()
+void CDapp::finishParse()
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //---------------------------------------------------------------------------------------------------
-void CAccount::Serialize(SFArchive& archive)
+void CDapp::Serialize(SFArchive& archive)
 {
 	if (!SerializeHeader(archive))
 		return;
@@ -132,55 +152,70 @@ void CAccount::Serialize(SFArchive& archive)
 	if (archive.isReading())
 	{
 		archive >> handle;
-		archive >> addr;
-		archive >> name;
-		archive >> source;
-		archive >> nTransactions;
-//		archive >> transactions;
+		archive >> dappName;
+		archive >> description;
+		archive >> site;
+		archive >> gitHub;
+		archive >> reddit;
+		archive >> people;
+		archive >> tags;
+		archive >> license;
+		archive >> status;
+		archive >> last_update;
 		finishParse();
 	} else
 	{
 		archive << handle;
-		archive << addr;
-		archive << name;
-		archive << source;
-		archive << nTransactions;
-//		archive << transactions;
+		archive << dappName;
+		archive << description;
+		archive << site;
+		archive << gitHub;
+		archive << reddit;
+		archive << people;
+		archive << tags;
+		archive << license;
+		archive << status;
+		archive << last_update;
 
 	}
 }
 
 //---------------------------------------------------------------------------
-void CAccount::registerClass(void)
+void CDapp::registerClass(void)
 {
 	static bool been_here=false;
 	if (been_here) return;
 	been_here=true;
 
 	SFInt32 fieldNum=1000;
-	ADD_FIELD(CAccount, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CAccount, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CAccount, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CAccount, "addr", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "name", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "source", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "nTransactions", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CAccount, "transactions", T_NONE, ++fieldNum);
+	ADD_FIELD(CDapp, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
+	ADD_FIELD(CDapp, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CDapp, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CDapp, "dappName", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "description", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "site", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "gitHub", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "reddit", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "people", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "tags", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "license", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "status", T_TEXT, ++fieldNum);
+	ADD_FIELD(CDapp, "last_update", T_TEXT, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
-	HIDE_FIELD(CAccount, "schema");
-	HIDE_FIELD(CAccount, "deleted");
-	HIDE_FIELD(CAccount, "handle");
+	HIDE_FIELD(CDapp, "schema");
+	HIDE_FIELD(CDapp, "deleted");
+	HIDE_FIELD(CDapp, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //---------------------------------------------------------------------------
-int sortAccount(const SFString& f1, const SFString& f2, const void *rr1, const void *rr2)
+int sortDapp(const SFString& f1, const SFString& f2, const void *rr1, const void *rr2)
 {
-	CAccount *g1 = (CAccount*)rr1;
-	CAccount *g2 = (CAccount*)rr2;
+	CDapp *g1 = (CDapp*)rr1;
+	CDapp *g2 = (CDapp*)rr2;
 
 	SFString v1 = g1->getValueByName(f1);
 	SFString v2 = g2->getValueByName(f1);
@@ -192,14 +227,14 @@ int sortAccount(const SFString& f1, const SFString& f2, const void *rr1, const v
 	v2 = g2->getValueByName(f2);
 	return (int)v1.Compare(v2);
 }
-int sortAccountByName(const void *rr1, const void *rr2) { return sortAccount("ac_Name", "", rr1, rr2); }
-int sortAccountByID  (const void *rr1, const void *rr2) { return sortAccount("accountID", "", rr1, rr2); }
+int sortDappByName(const void *rr1, const void *rr2) { return sortDapp("da_Name", "", rr1, rr2); }
+int sortDappByID  (const void *rr1, const void *rr2) { return sortDapp("dappID", "", rr1, rr2); }
 
 //---------------------------------------------------------------------------
-SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+SFString nextDappChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAccountNotify *ac = (CAccountNotify*)data;
-	const CAccount *acc = ac->getDataPtr();
+	CDappNotify *da = (CDappNotify*)data;
+	const CDapp *dap = da->getDataPtr();
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
@@ -208,14 +243,14 @@ SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const v
 			break;
 	}
 	
-#pragma unused(ac)
-#pragma unused(acc)
+#pragma unused(da)
+#pragma unused(dap)
 
 	return EMPTY;
 }
 
 //---------------------------------------------------------------------------
-SFBool CAccount::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+SFBool CDapp::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -224,25 +259,4 @@ SFBool CAccount::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, 
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE
-//---------------------------------------------------------------------------
-SFBool CAccount::Match(const SFString& s1, const SFString& s2, const SFString& s3, SFBool matchCase, SFBool all)
-{
-	SFBool m11 = ( matchCase ?   addr.Contains(s1) :   addr.ContainsI(s1) );
-	SFBool m12 = ( matchCase ?   name.Contains(s1) :   name.ContainsI(s1) );
-	SFBool m13 = ( matchCase ? source.Contains(s1) : source.ContainsI(s1) );
-	SFBool m2  = ( matchCase ?   name.Contains(s2) :   name.ContainsI(s2) );
-	SFBool m3  = ( matchCase ? source.Contains(s3) : source.ContainsI(s3) );
-
-	if (!s1.IsEmpty() && !s2.IsEmpty() && !s3.IsEmpty())
-		return m11 && m2 && m3; // all three must match
-	
-	if (!s1.IsEmpty() && !s2.IsEmpty())
-		return m11 && m2; // addr and name must both match
-
-	if (s1.IsEmpty())
-		return FALSE; // nothing matches
-
-	// We have only s1
-	return (all ? m11 || m12 || m13 : m11 || m12);
-}
 // EXISTING_CODE

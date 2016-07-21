@@ -46,5 +46,6 @@ SOFTWARE.
 #include "sfarchive.h"
 #include "performance.h"
 #include "sffile.h"
+#include "options.h"
 
 #endif

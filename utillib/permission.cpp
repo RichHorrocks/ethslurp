@@ -8,6 +8,7 @@
 
 #include "permission.h"
 
+#if 0
 //-------------------------------------------------------------------------
 //
 //-------------------------------------------------------------------------
@@ -38,3 +39,4 @@ SFString CPermission::getPermissionStrLong(SFBool perm)
 	return permsPrompts[perm];
 }
 
+#endif

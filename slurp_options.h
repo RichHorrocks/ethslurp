@@ -1,5 +1,5 @@
-#ifndef _ETHSLURP_H_
-#define _ETHSLURP_H_
+#ifndef _SLURP_OPTIONS_H
+#define _SLURP_OPTIONS_H
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -23,38 +23,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "etherlib.h"
-#include "slurp_options.h"
-
-//---------------------------------------------------------------------------------------------------
-class CSlurperApp
+class CSlurpOptions : public COptions
 {
-private:
-	CVersion  version;
-	CConfig   config;
-	CWebAPI   api;
-
 public:
-	CSlurp    theAccount;
+	SFBool   slurp;
+	SFBool   prettyPrint;
+	SFBool   rerun;
+	SFBool   incomeOnly;
+	SFBool   expenseOnly;
+	SFInt32  firstBlock2Read;
+	SFInt32  lastBlock2Read;
+	SFTime   firstDate;
+	SFString funcFilter;
+	SFBool   errFilt;
+	SFBool   reverseSort;
+	SFTime   lastDate;
+	SFBool   openFile;
+	SFString addr;
+	SFInt32  maxTransactions;
+	SFInt32  pageSize;
+	SFString exportFormat;
+	SFString name;
+	SFString archiveFile;
+	SFBool   wantsArchive;
+	FILE    *output; // for use when -a is on
 
-              CSlurperApp (void) : config(NULL) { };
-             ~CSlurperApp (void) {  }
+	        CSlurpOptions  (void);
+	       ~CSlurpOptions  (void);
+	SFInt32 parseArguments (SFString& command);
 
-	SFBool    Initialize  (CSlurpOptions& options, SFString& message);
-	SFBool    Slurp       (CSlurpOptions& options, SFString& message);
-	SFBool    Filter      (CSlurpOptions& options, SFString& message);
-	SFBool    Display     (CSlurpOptions& options, SFString& message);
-
-private:
-	void      buildDisplayStrings (CSlurpOptions& options);
-	SFString  getFormatString     (CSlurpOptions& options, const SFString& name);
+	void Init (void);
 };
-
-//--------------------------------------------------------------------------------
-extern SFString getHomeFolder(void);
-
-//---------------------------------------------------------------------------------------------------
-extern SFBool establishFolders(CConfig& config, const SFString& vers);
-extern void   findBlockRange  (const SFString& contents, SFInt32& minBlock, SFInt32& maxBlock);
 
 #endif

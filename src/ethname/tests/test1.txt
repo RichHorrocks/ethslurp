@@ -1,0 +1,45 @@
+{"addr": "0x1a060b0604883a99809eb3f798df71bef6c358f1", "name": "KNOWN_MINERS_001", "source": "Ether Camp" }
+{"addr": "0x16b22e53f64f585ae5a6f8ea20254a017b90b577", "name": "Early_Partners_007", "source": "Ether Camp" }
+{"addr": "0x1342a001544b8b7ae4a5d374e33114c66d78bd5f", "name": "GateCoin_Hack_1", "source": "Ether Camp" }
+{"addr": "0x1179f203046b9d57e211da9e125973dd8d9f0d5e", "name": "DAO_WHALE_44", "source": "WhaleWatch.io" }
+{"addr": "0x17ef4acc1bf147e326749d10e677dcffd76f9e06", "name": "DAO_WHALE_23", "source": "WhaleWatch.io" }
+{"addr": "0x198ef1ec325a96cc354c7266a038be8b5c558f67", "name": "DAO_WHALE_01", "source": "WhaleWatch.io" }
+{"addr": "0x1d29edb6997993a16c5086733cfd735d01df787c", "name": "TheDAO-DAOrewardAccount", "source": "The Dao" }
+{"addr": "0x1c027ff8998698c8722d725de2303f8ed75bc753", "name": "OtherContract1", "source": "WhaleWatch.io" }
+{"addr": "0x1c68f4f35ac5239650333d291e6ce7f841149937", "name": "PiperMerriam-USD-Oracle", "source": "PiperMerriam" }
+{"addr": "0x10ed2372778da1b9d96782c894b752d8a647deb8", "name": "NatesWallet2", "source": "WhaleWatch.io" }
+{"addr": "0x1db3439a222c519ab44bb1144fc28167b4fa6ee6", "name": "Vitalik Buterin", "source": "DAO_Curator" }
+{"addr": "0x127ac03acfad15f7a49dd037e52d5507260e1425", "name": "Vlad Zamfir", "source": "DAO_Curator" }
+{"addr": "0x1e2520bdcc56c78ac1c60ae9710656dbbdf6d5c9", "name": "@acidsun", "source": "Steem" }
+{"addr": "0x1088f2cb8324a270c8d7e71083449a0722820d99", "name": "@spaninv", "source": "Steem" }
+{"addr": "0x11dba7d844cdaa106a9747a8512b6359eb612320", "name": "@chang7", "source": "Steem" }
+{"addr": "0x1736303b570247313eb445d803185455779b91c7", "name": "@robrigo", "source": "Steem" }
+{"addr": "0x120a270bbc009644e35f0bb6ab13f95b8199c4ad", "name": "Shapeshift 1", "source": "CarbonVote" }
+{"addr": "0x1a88c052fc7a8401e00b2f76f96ac62a19427731", "name": "EtherIDTipJar", "source": "Their Website" }
+{"addr": "0x1695f4bf231688057ffe247e29bc033cb31d7e60", "name": "Bal_Ret_3_800000000000000002", "source": "Balance Retriever for Maker" }
+{"addr": "0x131ce849aadf6624e73b06dd7b7ba7e3c98a6a9b", "name": "Bal_Ret_31_460952381000", "source": "Balance Retriever for Maker" }
+{"addr": "0x154a7453cec1d76ea38e630c9f852a96e2a97ac5", "name": "Bal_Ret_39_850000000000000000", "source": "Balance Retriever for Maker" }
+{"addr": "0x154a7453cec1d76ea38e630c9f852a96e2a97ac5", "name": "SimpleMarket_eth_7_3020000000000000000", "source": "Balance Retriever for Maker" }
+{"addr": "0x1d11e5eae3112dbd44f99266872ff1d07c77dce8", "name": "Oraclizeaddrresolver", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x19a6067538c90973ef5dc31ded5fa567f3d09059", "name": "Fastrealisticpyramid", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1213c29b5e1a6f33e0d044f850a57b665e3cde21", "name": "Littlecactus", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x144bf2bbc61a5ae867d7e1fd603015df7f6d4fb6", "name": "Coinfliplotto", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x16a4ff536001405f2b0d7ddafc79f6a10d024640", "name": "Plusoneponzi", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x160fc84c8c5d46561b01d38eb7d44671f3eed4ca", "name": "Consulting", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1afd952269873fe009c7bdff5f07fd91605a7227", "name": "Smallponzi", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1368e088682b3ea455c4856297365542ca6828d8", "name": "Resetponzi", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1ff3f56609d0771abb49566600febade0e708beb", "name": "Ethventures", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1492cdd605d91658f228eab14d8444b60e6da8df", "name": "Thewhalegame", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1bb6123913d0b48948de38c3b75fd3eb3b4fe7e3", "name": "Etherads", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1f0b9db5bb0f2a60f8c8824cec738c15805dbdec", "name": "Nexium", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1c94f41ab9cd8faa8af45ae7827bf5a8f891f4cd", "name": "Store", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x155999f23ba40f22b24863d9c21cd8b9ab192cc9", "name": "Crypted_Rps", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1f36f2249ec89266ad4ee4351538148aaebc72e8", "name": "Euroteambet", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1b4fb4d0bcb3e80d9314b866aaf15c84eb0f1234", "name": "Dthpool_Dthpool", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1d9e61248f88dc60889bb269fcf2244827f3a682", "name": "Dethereumlotterynet", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x110c11de11cce962604c28bb05bbc399cbaa7bda", "name": "Dice", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1e9d5e4ed8ef31cfece10b4c92c9057f991f36bc", "name": "Ethervote_Stake-Voice", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x15e745a2e3b677ec6421291b212d3917b3738dee", "name": "Multisend", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x193ff455560318fc749e2ffbb0e6472e5192e427", "name": "Dice", "source": "EtherScan.ioVerifiedContracts" }
+{"addr": "0x1728039ce0d18a799c081c5c7fa2090dd365a8d0", "name": "Digx_Presale_Whale_03", "source": "SlackNation" }
+{"addr": "0x198ef1ec325a96cc354c7266a038be8b5c558f67", "name": "Digx_Presale_Whale_04", "source": "SlackNation" }

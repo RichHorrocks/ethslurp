@@ -1,5 +1,5 @@
-#ifndef _VOTE_H_
-#define _VOTE_H_
+#ifndef _PARAMETER_H_
+#define _PARAMETER_H_
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -24,40 +24,39 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
-#include "abilib.h"
-#include "transaction.h"
 
 //--------------------------------------------------------------------------
-class CVote;
-typedef SFArrayBase<CVote>         CVoteArray;
-typedef SFList<CVote*>             CVoteList;
-typedef CNotifyClass<const CVote*> CVoteNotify;
-typedef SFUniqueList<CVote*>       CVoteListU;
+class CParameter;
+typedef SFArrayBase<CParameter>         CParameterArray;
+typedef SFList<CParameter*>             CParameterList;
+typedef CNotifyClass<const CParameter*> CParameterNotify;
+typedef SFUniqueList<CParameter*>       CParameterListU;
 
 //---------------------------------------------------------------------------
-extern int sortVote        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
-extern int sortVoteByName  (const void *rr1, const void *rr2);
-extern int sortVoteByID    (const void *rr1, const void *rr2);
-extern int isDuplicateVote (const void *rr1, const void *rr2);
+extern int sortParameter        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
+extern int sortParameterByName  (const void *rr1, const void *rr2);
+extern int sortParameterByID    (const void *rr1, const void *rr2);
+extern int isDuplicateParameter (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
+class CFunction;
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CVote : public CTransaction
+class CParameter : public CBaseNode
 {
 public:
-	SFString voter;
-	SFInt32 proposalID;
-	SFBool votedYes;
+	SFInt32 handle;
+	SFString name;
+	SFString type;
 
 public:
-					CVote  (void);
-					CVote  (const CVote& vo);
-				   ~CVote  (void);
-	CVote&	operator= 		(const CVote& vo);
+					CParameter  (void);
+					CParameter  (const CParameter& pa);
+				   ~CParameter  (void);
+	CParameter&	operator= 		(const CParameter& pa);
 
-	DECLARE_NODE (CVote);
+	DECLARE_NODE (CParameter);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -65,14 +64,14 @@ public:
 protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CVote& vo);
+	void			Copy      		(const CParameter& pa);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 };
 
 //--------------------------------------------------------------------------
-inline CVote::CVote(void)
+inline CParameter::CParameter(void)
 {
 	Init();
 	// EXISTING_CODE
@@ -80,18 +79,18 @@ inline CVote::CVote(void)
 }
 
 //--------------------------------------------------------------------------
-inline CVote::CVote(const CVote& vo)
+inline CParameter::CParameter(const CParameter& pa)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(vo);
+	Copy(pa);
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-inline CVote::~CVote(void)
+inline CParameter::~CParameter(void)
 {
 	Clear();
 	// EXISTING_CODE
@@ -99,50 +98,50 @@ inline CVote::~CVote(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CVote::Clear(void)
+inline void CParameter::Clear(void)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CVote::Init(void)
+inline void CParameter::Init(void)
 {
-	CTransaction::Init();
+	CBaseNode::Init();
 
-	voter = EMPTY;
-	proposalID = 0;
-	votedYes = 0;
+	handle = 0;
+	name = EMPTY;
+	type = EMPTY;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CVote::Copy(const CVote& vo)
+inline void CParameter::Copy(const CParameter& pa)
 {
 	Clear();
 
-	CTransaction::Copy(vo);
-	voter = vo.voter;
-	proposalID = vo.proposalID;
-	votedYes = vo.votedYes;
+	CBaseNode::Copy(pa);
+	handle = pa.handle;
+	name = pa.name;
+	type = pa.type;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CVote& CVote::operator=(const CVote& vo)
+inline CParameter& CParameter::operator=(const CParameter& pa)
 {
-	Copy(vo);
+	Copy(pa);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
 }
 
 //---------------------------------------------------------------------------
-inline SFString CVote::getValueByName(const SFString& fieldName) const
+inline SFString CParameter::getValueByName(const SFString& fieldName) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -150,7 +149,7 @@ inline SFString CVote::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CVote::getHandle(void) const
+inline SFInt32 CParameter::getHandle(void) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -158,14 +157,14 @@ inline SFInt32 CVote::getHandle(void) const
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextVoteChunk(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
-IMPLEMENT_ARCHIVE_ARRAY(CVoteArray);
-IMPLEMENT_ARCHIVE_LIST(CVoteList);
+IMPLEMENT_ARCHIVE_ARRAY(CParameterArray);
+IMPLEMENT_ARCHIVE_LIST(CParameterList);
 
 //---------------------------------------------------------------------------
-extern SFString nextVoteChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextParameterChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE

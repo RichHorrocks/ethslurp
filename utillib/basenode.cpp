@@ -180,6 +180,7 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 					
 				} else if (*s=='\n')
 				{
+					finishParse();
 					return (s+1);
 				}
 				s++;
@@ -202,6 +203,7 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 				break;
 		}
 	}
+	finishParse();
 	return NULL;
 }
 
@@ -224,11 +226,13 @@ char *CBaseNode::parseText(char *s, SFInt32& nFields, const SFString *fields)
 		case '\n':
 			*s = '\0';
 			this->setValueByName(fields[nFields++], fieldVal);
+			finishParse();
 			return s+1;
 		}
 		s++;
 	}
 	this->setValueByName(fields[nFields++], fieldVal);
+	finishParse();
 	return NULL;
 }
 
