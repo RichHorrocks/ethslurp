@@ -38,6 +38,7 @@ private:
 	SFBool  m_showing;
 
 public:
+	const CBaseNode *pParent;
 
 	                 CBaseNode       (void);
 	virtual         ~CBaseNode       (void);

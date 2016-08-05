@@ -260,6 +260,5 @@ extern void     listItems       (SFInt32& nItems, SFString *items, const SFStrin
 extern SFBool   isFileOlder     (const SFString& file1, const SFString& file2);
 extern SFBool   isFileNewer     (const SFString& file1, const SFString& file2);
 extern void     checkFolderDate (const SFString& folderIn, const SFString& fileIn);
-extern SFString hex2String      (const SFString& inHex);
 
 #endif

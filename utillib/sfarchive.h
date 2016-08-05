@@ -27,6 +27,8 @@ SOFTWARE.
 #include "importcontext.h"
 #include "database.h"
 
+class CBaseNode;
+
 //-----------------------------------------------------------------------------------------
 class SFArchive : public CSharedResource
 {
@@ -34,12 +36,14 @@ public:
 	SFBool              m_writeDeleted;
 	SFInt32             m_schema;
 	SFBool              m_isReading;
+	const CBaseNode    *pParent;
 
 	SFArchive(SFBool isReading, SFInt32 schema, SFBool writeDeleted=TRUE)
 		{
 			m_isReading    = isReading;
 			m_schema       = schema;
 			m_writeDeleted = writeDeleted;
+			pParent        = NULL;
 		}
 	SFBool  writeDeleted(void) const
 		{

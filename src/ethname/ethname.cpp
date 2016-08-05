@@ -83,3 +83,25 @@ SFInt32 nNames=0;
 //-----------------------------------------------------------------------
 CFileExportContext out;
 
+//---------------------------------------------------------------------------
+SFBool CAccountName::Match(const SFString& s1, const SFString& s2, const SFString& s3, SFBool matchCase, SFBool all)
+{
+	SFBool m11 = ( matchCase ?   addr.Contains(s1) :   addr.ContainsI(s1) );
+	SFBool m12 = ( matchCase ?   name.Contains(s1) :   name.ContainsI(s1) );
+	SFBool m13 = ( matchCase ? source.Contains(s1) : source.ContainsI(s1) );
+	SFBool m2  = ( matchCase ?   name.Contains(s2) :   name.ContainsI(s2) );
+	SFBool m3  = ( matchCase ? source.Contains(s3) : source.ContainsI(s3) );
+
+	if (!s1.IsEmpty() && !s2.IsEmpty() && !s3.IsEmpty())
+		return m11 && m2 && m3; // all three must match
+	
+	if (!s1.IsEmpty() && !s2.IsEmpty())
+		return m11 && m2; // addr and name must both match
+
+	if (s1.IsEmpty())
+		return FALSE; // nothing matches
+
+	// We have only s1
+	return (all ? m11 || m12 || m13 : m11 || m12);
+}
+

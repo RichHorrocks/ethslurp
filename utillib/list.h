@@ -53,7 +53,7 @@ public:
 	      SFInt32 getSize       (void) const  { return m_nSize;   }
 
 		  void    Sort          (SORTINGFUNC func) { qsort(&m_Values[0], m_nValues, sizeof(TYPE), func); }
-	TYPE    Find          (TYPE key, SEARCHFUNC func) { return (TYPE)bsearch(key, &m_Values[0], m_nValues, sizeof(TYPE), func); }
+	TYPE    *Find          (TYPE *key, SEARCHFUNC func) { return (TYPE*)bsearch(key, &m_Values[0], m_nValues, sizeof(TYPE), func); }
 
 	      void    Clear         (void);
 

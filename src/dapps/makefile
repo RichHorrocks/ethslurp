@@ -1,4 +1,4 @@
-cflags=-Wall -O2 -DLINUX -I. -I../../abilib -I../../etherlib -I../../utillib 
+cflags=-Wall -O2 -DLINUX -I. -I../../etherlib -I../../daolib -I../../utillib 
 libs=../../*/*.a /usr/lib/libcurl.dylib
 
 exec=dapps
@@ -38,14 +38,14 @@ test:
 
 libs:
 	@cd ../../utillib ;  make ; cd -
+	@cd ../../daolib ; make ; cd -
 	@cd ../../etherlib ; make ; cd -
-	@cd ../../abilib ; make ; cd -
 
 cleanall:
 	@cd ../../utillib ; make clean ; cd -
+	@cd ../../daolib ; make clean ; cd -
 	@cd ../../etherlib ; make clean ; cd -
-	@cd ../../abilib ; make clean ; cd -
 	@make clean
 
 clean:
-	-@$(RM) -f $(dest) $(product) $(objects) 2> /dev/null
+	-@$(RM) -f $(dest) $(product) objs/* 2> /dev/null

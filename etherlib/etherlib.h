@@ -1,5 +1,5 @@
-#ifndef _ETH_LIB_
-#define _ETH_LIB_
+#ifndef _ETHER_LIB_
+#define _ETHER_LIB_
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -23,13 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "webapi.h"
-#include "slurp.h"
+#include "parameter.h"
+#include "function.h"
+#include "abi.h"
 #include "transaction.h"
 #include "account.h"
-#include "proposal.h"
-#include "vote.h"
-#include "createtokenproxy.h"
+#include "webapi.h"
 #include "dapp.h"
 
 #endif

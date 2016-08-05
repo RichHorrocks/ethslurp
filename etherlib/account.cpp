@@ -48,40 +48,52 @@ void CAccount::Format(CExportContext& ctx, const SFString& fmtIn, void *data) co
 //---------------------------------------------------------------------------
 SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAccountNotify *ac = (CAccountNotify*)data;
-	const CAccount *acc = ac->getDataPtr();
+	CAccountNotify *sl = (CAccountNotify*)data;
+	const CAccount *slu = sl->getDataPtr();
 
 	// Now give customized code a chance to override
 	SFString ret = nextAccountChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'a':
-			if ( fieldIn % "addr" ) return acc->addr;
+			if ( fieldIn % "addr" ) return slu->addr;
+			break;
+		case 'd':
+			if ( fieldIn % "displayString" ) return slu->displayString;
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(acc->handle);
+			if ( fieldIn % "handle" ) return asString(slu->handle);
+			if ( fieldIn % "header" ) return slu->header;
+			break;
+		case 'l':
+			if ( fieldIn % "lastPage" ) return asString(slu->lastPage);
+			if ( fieldIn % "lastBlock" ) return asString(slu->lastBlock);
 			break;
 		case 'n':
-			if ( fieldIn % "name" ) return acc->name;
-			if ( fieldIn % "nTransactions" ) return asString(acc->nTransactions);
+			if ( fieldIn % "nVisible" ) return asString(slu->nVisible);
 			break;
-		case 's':
-			if ( fieldIn % "source" ) return acc->source;
+		case 'p':
+			if ( fieldIn % "pageSize" ) return asString(slu->pageSize);
 			break;
 		case 't':
-			return EMPTY;
-//			if ( fieldIn % "transactions" ) return acc->transactions;
+			if ( fieldIn % "transactions" )
+			{
+				SFString ret = "\n";
+				for (int i=0;i<slu->transactions.getCount();i++)
+					ret += slu->transactions[i].Format();
+				return ret;
+			}
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
-	ret = nextBasenodeChunk(fieldIn, force, acc);
+	ret = nextBasenodeChunk(fieldIn, force, slu);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -96,19 +108,25 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 		case 'a':
 			if ( fieldName % "addr" ) { addr = fieldValue; return TRUE; }
 			break;
+		case 'd':
+			if ( fieldName % "displayString" ) { displayString = fieldValue; return TRUE; }
+			break;
 		case 'h':
 			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "header" ) { header = fieldValue; return TRUE; }
+			break;
+		case 'l':
+			if ( fieldName % "lastPage" ) { lastPage = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "lastBlock" ) { lastBlock = toLong(fieldValue); return TRUE; }
 			break;
 		case 'n':
-			if ( fieldName % "name" ) { name = fieldValue; return TRUE; }
-			if ( fieldName % "nTransactions" ) { nTransactions = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "nVisible" ) { nVisible = toLong(fieldValue); return TRUE; }
 			break;
-		case 's':
-			if ( fieldName % "source" ) { source = fieldValue; return TRUE; }
+		case 'p':
+			if ( fieldName % "pageSize" ) { pageSize = toBool(fieldValue); return TRUE; }
 			break;
 		case 't':
-			return TRUE;
-//			if ( fieldName % "transactions" ) { transactions = fieldValue; return TRUE; }
+			if ( fieldName % "transactions" ) return TRUE;
 			break;
 		default:
 			break;
@@ -120,6 +138,8 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 void CAccount::finishParse()
 {
 	// EXISTING_CODE
+	for (int i=0;i<transactions.getCount();i++)
+		transactions[i].funcPtr = abi.findFunctionByEncoding(transactions[i].input.Mid(2,8));
 	// EXISTING_CODE
 }
 
@@ -133,19 +153,25 @@ void CAccount::Serialize(SFArchive& archive)
 	{
 		archive >> handle;
 		archive >> addr;
-		archive >> name;
-		archive >> source;
-		archive >> nTransactions;
-//		archive >> transactions;
+		archive >> header;
+		archive >> displayString;
+		archive >> pageSize;
+		archive >> lastPage;
+		archive >> lastBlock;
+		archive >> nVisible;
+		archive >> transactions;
 		finishParse();
 	} else
 	{
 		archive << handle;
 		archive << addr;
-		archive << name;
-		archive << source;
-		archive << nTransactions;
-//		archive << transactions;
+		archive << header;
+		archive << displayString;
+		archive << pageSize;
+		archive << lastPage;
+		archive << lastBlock;
+		archive << nVisible;
+		archive << transactions;
 
 	}
 }
@@ -162,10 +188,13 @@ void CAccount::registerClass(void)
 	ADD_FIELD(CAccount, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAccount, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAccount, "addr", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "name", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "source", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "nTransactions", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CAccount, "transactions", T_NONE, ++fieldNum);
+	ADD_FIELD(CAccount, "header", T_TEXT, ++fieldNum);
+	ADD_FIELD(CAccount, "displayString", T_TEXT, ++fieldNum);
+	ADD_FIELD(CAccount, "pageSize", T_RADIO, ++fieldNum);
+	ADD_FIELD(CAccount, "lastPage", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CAccount, "lastBlock", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CAccount, "nVisible", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CAccount, "transactions", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CAccount, "schema");
@@ -192,24 +221,30 @@ int sortAccount(const SFString& f1, const SFString& f2, const void *rr1, const v
 	v2 = g2->getValueByName(f2);
 	return (int)v1.Compare(v2);
 }
-int sortAccountByName(const void *rr1, const void *rr2) { return sortAccount("ac_Name", "", rr1, rr2); }
+int sortAccountByName(const void *rr1, const void *rr2) { return sortAccount("sl_Name", "", rr1, rr2); }
 int sortAccountByID  (const void *rr1, const void *rr2) { return sortAccount("accountID", "", rr1, rr2); }
 
 //---------------------------------------------------------------------------
 SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAccountNotify *ac = (CAccountNotify*)data;
-	const CAccount *acc = ac->getDataPtr();
+	CAccountNotify *sl = (CAccountNotify*)data;
+	const CAccount *slu = sl->getDataPtr();
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
+		case 'n':
+			if ( fieldIn % "now" ) return (isTesting ? "TESTING_TIME" : Now().Format(FMT_DEFAULT));
+			break;
+		case 'r':
+			if ( fieldIn % "records" ) return (slu->transactions.getCount() == 0 ? "No records" : "");
+			break;
 		// EXISTING_CODE
 		default:
 			break;
 	}
 	
-#pragma unused(ac)
-#pragma unused(acc)
+#pragma unused(sl)
+#pragma unused(slu)
 
 	return EMPTY;
 }
@@ -218,31 +253,58 @@ SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const v
 SFBool CAccount::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	// EXISTING_CODE
+	// Split the format string into three parts: pre, post and records.
+	// If no records, just process as normal. We do this because it's so slow
+	// copying the records into a string, so we write it directly to the
+	// export context. If there is no {RECORDS}, then just send handle it like normal
+	if (!fmtIn.Contains("{RECORDS}") || transactions.getCount()==0)
+	{
+		SFString fmt = fmtIn;
+
+		CAccountNotify dn(this);
+		while (!fmt.IsEmpty())
+			ctx << getNextChunk(fmt, nextAccountChunk, &dn);
+	} else
+	{
+		SFString postFmt = fmtIn;
+		postFmt.Replace("{RECORDS}","|");
+		SFString preFmt = nextTokenClear(postFmt,'|');
+
+		// We assume here that the token was properly formed. For the pre-text we
+		// have to clear out the start '[', and for the post text we clear out the ']'
+		preFmt.ReplaceReverse("[","");
+		postFmt.Replace("]","");
+
+		// We handle the display in three parts: pre, records, and post so as
+		// to avoid building the entire record list into an ever-growing and
+		// ever-slowing string
+		CAccountNotify dn(this);
+		while (!preFmt.IsEmpty())
+			ctx << getNextChunk(preFmt, nextAccountChunk, &dn);
+		SFInt32 cnt=0;
+		for (int i=0;i<transactions.getCount();i++)
+		{
+			cnt += transactions[i].isShowing();
+			if (cnt && !(cnt%REP_INFREQ))
+			{
+				outErr << "\tExporting record " << cnt << " of " << nVisible;
+				outErr << (transactions.getCount()!=nVisible?" visible":"") << " records" << (isTesting?"\n":"\r"); outErr.Flush();
+			}
+
+			((CAccount*)this)->handle = transactions.getCount() - i;
+			((CTransaction*)&transactions[i])->pParent = this;
+			ctx << transactions[i].Format(displayString);
+			if (cnt>=nVisible)
+				break; // no need to keep spinning if we've shown them all
+		}
+		ctx << "\n";
+		while (!postFmt.IsEmpty())
+			ctx << getNextChunk(postFmt, nextAccountChunk, &dn);
+	}
+	return TRUE;
 	// EXISTING_CODE
 	return FALSE;
 }
 
-//---------------------------------------------------------------------------
 // EXISTING_CODE
-//---------------------------------------------------------------------------
-SFBool CAccount::Match(const SFString& s1, const SFString& s2, const SFString& s3, SFBool matchCase, SFBool all)
-{
-	SFBool m11 = ( matchCase ?   addr.Contains(s1) :   addr.ContainsI(s1) );
-	SFBool m12 = ( matchCase ?   name.Contains(s1) :   name.ContainsI(s1) );
-	SFBool m13 = ( matchCase ? source.Contains(s1) : source.ContainsI(s1) );
-	SFBool m2  = ( matchCase ?   name.Contains(s2) :   name.ContainsI(s2) );
-	SFBool m3  = ( matchCase ? source.Contains(s3) : source.ContainsI(s3) );
-
-	if (!s1.IsEmpty() && !s2.IsEmpty() && !s3.IsEmpty())
-		return m11 && m2 && m3; // all three must match
-	
-	if (!s1.IsEmpty() && !s2.IsEmpty())
-		return m11 && m2; // addr and name must both match
-
-	if (s1.IsEmpty())
-		return FALSE; // nothing matches
-
-	// We have only s1
-	return (all ? m11 || m12 || m13 : m11 || m12);
-}
 // EXISTING_CODE

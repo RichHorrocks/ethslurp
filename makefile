@@ -1,4 +1,4 @@
-cflags=-Wall -O2 -DLINUX -I. -I./utillib -I./abilib -I./etherlib
+cflags=-Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
 libs=*/*.a /usr/lib/libcurl.dylib
 
 product=ethslurp
@@ -13,8 +13,8 @@ objects = $(patsubst %.cpp,objs/%.o,$(src))
 
 all:
 	@cd utillib; make; cd ..
-	@cd abilib; make; cd ..
 	@cd etherlib; make; cd ..
+	@cd daolib; make; cd ..
 	@cd src/ethname; make; cd ../..
 	@echo "$(product) build started"
 	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -28,7 +28,7 @@ test: all
 	@cd theData/funcs; make; cd -
 	@cd theData/ghc; make; cd -
 	@cd theData/otherContracts; make; cd -
-#	@cd theData/whales; make; cd -
+	@cd theData/whales; make; cd -
 	@cd theData/hack; make; cd -
 	@make -B back
 
@@ -54,7 +54,7 @@ cleanall:
 
 clean:
 	@cd utillib; make clean; cd ..
-	@cd abilib; make clean; cd ..
 	@cd etherlib; make clean; cd ..
+	@cd daolib; make clean; cd ..
 	@cd src/ethname; make clean; cd ../..
-	-@$(RM) -f $(product) $(objects) 2> /dev/null
+	-@$(RM) -f $(product) $(objs)/*.o $(objs)/*.a 2> /dev/null

@@ -24,7 +24,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
-#include "abilib.h"
+#include "function.h"
 
 //--------------------------------------------------------------------------
 class CTransaction;
@@ -40,7 +40,6 @@ extern int sortTransactionByID    (const void *rr1, const void *rr2);
 extern int isDuplicateTransaction (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
-class CSlurp;
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
@@ -77,9 +76,11 @@ public:
 
 	// EXISTING_CODE
 	SFString inputToFunction(void) const;
-	CSlurp *slurp;
-	SFBool isFunction(const SFString& func) const;
+	SFBool   isFunction(const SFString& func) const;
 	SFTime   m_transDate;
+	SFString getAddrList(char delim='\t') const;
+	SFString getAddrsFromInput(char delim='\t') const;
+	CFunction *funcPtr;
 	// EXISTING_CODE
 
 protected:
@@ -153,6 +154,7 @@ inline void CTransaction::Init(void)
 
 	// EXISTING_CODE
 	m_transDate = earliestDate;
+	funcPtr = NULL;
 	// EXISTING_CODE
 }
 
@@ -184,6 +186,7 @@ inline void CTransaction::Copy(const CTransaction& tr)
 
 	// EXISTING_CODE
 	m_transDate = tr.m_transDate;
+	funcPtr = tr.funcPtr;
 	// EXISTING_CODE
 }
 
@@ -225,6 +228,11 @@ extern SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& for
 //---------------------------------------------------------------------------
 // EXISTING_CODE
 extern int sortTransactionsForWrite(const void *rr1, const void *rr2);
+//---------------------------------------------------------------------------
+inline SFString fmtAddress(const SFString& addr)
+{
+        return addr.Left(8)+"..."+addr.Right(6);
+}
 // EXISTING_CODE
 
 #endif

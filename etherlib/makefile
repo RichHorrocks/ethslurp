@@ -1,15 +1,14 @@
-cflags=-Wall -O2 -DLINUX -I../utillib -I../abilib -I../ -I./
+cflags=-Wall -O2 -DLINUX -I../utillib -I../ -I./
 
 product=etherlib.a
 
 src= \
+abi.cpp \
 account.cpp \
-slurp.cpp \
-transaction.cpp \
-proposal.cpp \
-vote.cpp \
-createtokenproxy.cpp \
 dapp.cpp \
+function.cpp \
+parameter.cpp \
+transaction.cpp \
 webapi.cpp
 
 #-------------------------------------------------
@@ -37,4 +36,4 @@ objs/%.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(cflags) -c $< -o $@
 
 clean:
-	-@$(RM) -f $(product) $(objects) 2> /dev/null
+	-@$(RM) -f $(dest) $(product) objs/* 2> /dev/null

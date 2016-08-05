@@ -32,12 +32,12 @@ SFString programName;
 //--------------------------------------------------------------------------------
 SFBool COptions::prepareArguments(int argc, const char *argv[])
 {
-	SFInt32 nArgs=0;
-	SFString args[40]; // safe enough
-
 	programName = SFFile(argv[0]).getFilename();
 	if (argc==1)
 		return usage();
+
+	SFInt32 nArgs=0;
+	SFString *args = new SFString[argc+2];
 
 	SFBool hasStdIn = FALSE;
 	for (int i=1;i<argc;i++)
@@ -76,10 +76,14 @@ SFBool COptions::prepareArguments(int argc, const char *argv[])
 			cmdFileName = arg.Substitute("--file:",EMPTY);
 			cmdFileName.Replace("~/",getHomeFolder());
 			if (!SFos::fileExists(cmdFileName))
+			{
+				if (args) delete [] args;
 				return usage("--file: '" + cmdFileName + "' not found. Quitting.");
+			}
 
 		} else if (arg == "-h" || arg == "-help" || arg == "--help")
 		{
+			if (args) delete [] args;
 			return usage();
 
 		} else if (arg.startsWith("-v") || arg.startsWith("-verbose"))
@@ -113,8 +117,8 @@ SFBool COptions::prepareArguments(int argc, const char *argv[])
 	{
 		fromFile = TRUE;
 		SFString contents =  asciiFileToString(cmdFileName).Substitute("\t"," ").
-									Substitute("-v","").Substitute("-h","" ).
-									Substitute("-t","").Substitute("  "," ");
+								    Substitute("-v","").Substitute("-h","" ).
+								    Substitute("-t","").Substitute("  "," ");
 		while (!contents.IsEmpty())
 		{
 			SFString command = StripAny(nextTokenClear(contents, '\n'),"\t\r\n ");
@@ -125,6 +129,7 @@ SFBool COptions::prepareArguments(int argc, const char *argv[])
 	commandList += stdInCmds;
 	commandList.ReplaceAll(" \n","\n");
 
+	if (args) delete [] args;
 	return 1;
 }
 

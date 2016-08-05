@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "etherlib.h"
+#include "daolib.h"
 #include "slurp_options.h"
 
 //---------------------------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ CParams params[] =
 	CParams("-max",		"maximum transactions to slurp (:250000)" ),
 	CParams("-name",	"name this address" ),
 	CParams("-rerun",	"re-run the most recent slurp" ),
-	CParams("-slurp",	"force EthSlurp to take a slurp (ignore cached data)" ),
 	CParams("-fmt",		"pretty print, optionally add ':txt,' ':csv,' or ':html'" ),
 	CParams("-income",	"include income transactions only" ),
 	CParams("-expense",	"include expenditures only" ),
@@ -42,7 +41,7 @@ CParams params[] =
 	CParams("-list",	"list previously slurped addresses in cache" ),
 	CParams("@--sleep",	"sleep for :x seconds" ),
 	CParams("@--func",	"display only --func:functionName records" ),
-	CParams("@--errFilt",	"display only non-error transactions" ),
+	CParams("@--errFilt",	"display only non-error transactions or :errsOnly" ),
 	CParams("@--reverse",	"display results sorted in reverse chronological order (chronological by default)" ),
 	CParams("-clear",	"clear all previously cached slurps" ),
 	CParams( "",		"Fetches data off the Ethereum blockchain for an arbitrary account or smart contract. Optionally formats the output to your specification.\n" ),
@@ -88,7 +87,7 @@ SFInt32 CSlurpOptions::parseArguments(SFString& command)
 
 		} else if (arg.startsWith("--errFilt"))
 		{
-			errFilt = TRUE;
+			errFilt = TRUE + arg.Contains(":errOnly");
 
 		} else if (arg.startsWith("--reverse"))
 		{
@@ -176,10 +175,6 @@ SFInt32 CSlurpOptions::parseArguments(SFString& command)
 				return usage("Unknown parameter: " + arg);
 			name = val;
 
-		} else if (arg == "-s" || arg == "-slurp")
-		{
-			slurp = TRUE;
-
 		} else if (arg.startsWith("-a"))
 		{
 			SFString fileName = arg.Substitute("-a:",EMPTY).Substitute("-archive:",EMPTY);
@@ -239,7 +234,6 @@ SFInt32 CSlurpOptions::parseArguments(SFString& command)
 //---------------------------------------------------------------------------------------------------
 void CSlurpOptions::Init(void)
 {
-	slurp           = FALSE;
 	prettyPrint     = FALSE;
 	rerun           = FALSE;
 	incomeOnly      = FALSE;

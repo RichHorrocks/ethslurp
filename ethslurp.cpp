@@ -1,3 +1,112 @@
+#if 0
+#include "etherlib.h"
+
+#define MAX_RECORDS 250000
+//---------------------------------------------------------------------------------------------------
+class CBalance
+{
+public:
+	SFString addr;
+	CTransaction *ptr;
+	CBalance(const SFString& addr, CTransaction *p) { ptr = p; }
+	CBalance(void) {}
+private:
+};
+CBalance balances[MAX_RECORDS];
+SFInt32 nBalances=0;
+
+//---------------------------------------------------------------------------------------------------
+extern SFBool changesBalance (const CTransaction *t);
+extern void   loadData       (CAccount& acct);
+extern CFileExportContext out;
+extern int    sortByAccount  (const void *d1, const void *d2);
+
+//---------------------------------------------------------------------------------------------------
+int main(int argc, char *argv[])
+{
+	CAccount theAccount;
+	loadData(theAccount);
+	
+	for (int i=0;i<theAccount.transactions.getCount();i++)
+	{
+		CTransaction *t = &theAccount.transactions[i];
+		t->pParent = &theAccount;
+		if (!t->isError && changesBalance(t))
+		{
+			SFString accts = t->getAddrList();
+			while (!accts.IsEmpty())
+			{
+				SFString addr = nextTokenClear(accts,'\t');
+				if (addr != theAccount.addr && nBalances<MAX_RECORDS)
+				{
+					balances[ nBalances   ].addr = addr;
+					balances[ nBalances++ ].ptr  = t;
+				}
+			}
+		}
+	}
+	
+	qsort(balances, nBalances, sizeof(CBalance), sortByAccount);
+	SFString lastAddr;
+	for (int i=0;i<nBalances;i++)
+	{
+		if (balances[i].addr != lastAddr)
+		{
+			if (!lastAddr.IsEmpty())
+				out << SFString('-',80) << "\n";
+			lastAddr = balances[i].addr;
+			getchar();
+		}
+		out << i << ". " << balances[i].addr << ": " << balances[i].ptr->Format("[{DATE}\t][{FROM}\t][{FUNCTION}]") << "\n";
+	}
+}
+
+//---------------------------------------------------------------------------------------------------
+int sortByAccount(const void *d1, const void *d2)
+{
+	CBalance *b1 = (CBalance*)d1;
+	CBalance *b2 = (CBalance*)d2;
+	SFInt32 ret;
+	ret = b1->addr.Compare(b2->addr); if (ret) return ret;
+	return sortTransactionsForWrite(b1->ptr,b2->ptr);
+}
+
+//---------------------------------------------------------------------------------------------------
+void loadData(CAccount& acct)
+{
+	extern SFString programName;
+	programName = "ethslurp";
+	CTransaction::registerClass();
+	
+	acct.abi.loadABI("0xbb9bc244d798123fde783fcc1c72d3bb8c189413");
+	SFArchive archive(TRUE, NO_SCHEMA);
+	if (archive.Lock("/Users/jrush/.ethslurp/slurps/0xbb9bc244d798123fde783fcc1c72d3bb8c189413.bin", binaryReadOnly, LOCK_NOWAIT))
+	{
+		acct.Serialize(archive);
+		archive.Close(); // already sorted
+	}
+}
+
+//---------------------------------------------------------------------------------------------------
+SFBool changesBalance(const CTransaction *t)
+{
+	SFString in = t->Format("[{FUNCTION}]");
+	return (
+			in == " " ||
+			in.Contains("createTokenProxy") ||
+			in.Contains("splitDAO") ||
+			in.Contains("transfer|") ||
+			in.Contains("transferFrom|"));
+}
+
+//---------------------------------------------------------------------------------------------------
+CFileExportContext out;
+
+//---------------------------------------------------------------------------------------------------
+//CParams params[]={};
+//SFInt32 nParams = sizeof(params) / sizeof(CParams);
+#else
+
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -72,7 +181,7 @@ SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 	// This allows us to spin through these classes' list of fields
 	CFunction::registerClass();
 	CParameter::registerClass();
-	CSlurp::registerClass();
+	CAccount::registerClass();
 	CTransaction::registerClass();
 	
 	// If this is the first time we've ever run, build the config file
@@ -150,13 +259,12 @@ SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 	if (!options.rerun)
 	{
 		theAccount.transactions.Clear();
-		theAccount = CSlurp();
-		nFunctions=0;
+		theAccount = CAccount();
 	}
 	
 	// We are ready to slurp
 	theAccount.addr = addr;
-	theAccount.loadABI();
+	theAccount.abi.loadABI(theAccount.addr);
 	
 	outErr << "\t" << "Slurping " << theAccount.addr << "\n";
 	
@@ -164,10 +272,16 @@ SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 	return TRUE;
 }
 
+//#define NEW_CODE
+
 //--------------------------------------------------------------------------------
 SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 {
+#ifdef NEW_CODE
+	START_TIMER();
+#else
 	double start = vrNow();
+#endif
 	
 	// Do we have the data for this address cached?
 	SFString cacheFilename = cachePath(theAccount.addr+".bin");
@@ -195,7 +309,7 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 	// If the user tells us he/she wants to update the cache, or the cache
 	// hasn't been updated in five minutes, then update it
 	SFInt32 nSeconds = MAX(60,config.GetProfileIntGH("SETTINGS", "update_freq", 300));
-	if (options.slurp || (now - fileTime) > SFTimeSpan(0,0,0,nSeconds))
+	if ((now - fileTime) > SFTimeSpan(0,0,0,nSeconds))
 	{
 		// This is how many records we currently have
 		SFInt32 origCount  = theAccount.transactions.getCount();
@@ -307,8 +421,12 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 	
 	if (!isTesting)
 	{
+#ifdef NEW_CODE
+		STOP_TIMER("slurp");
+#else
 		double stop = vrNow();
 		double timeSpent = stop-start;
+#endif
 		fprintf(stderr, "\tLoaded %ld total records in %f seconds\n", theAccount.transactions.getCount(), timeSpent);
 		fflush(stderr);
 	}
@@ -319,7 +437,11 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 //--------------------------------------------------------------------------------
 SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 {
+#ifdef NEW_CODE
+	START_TIMER();
+#else
 	double start = vrNow();
+#endif
 	
 	SFInt32 nFuncFilts=0;
 	SFString funcFilts[20];
@@ -331,6 +453,7 @@ SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 	for (int i=0;i<theAccount.transactions.getCount();i++)
 	{
 		CTransaction *trans = &theAccount.transactions[i];
+		trans->pParent = &theAccount;
 		
 		// Turn every transaction on and then turning them off if they match the filter.
 		trans->setShowing(TRUE);
@@ -372,10 +495,13 @@ SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 			trans->setShowing(show);
 		}
 
-		if (options.errFilt)
+		// We only apply this if another filter has not already hidden the transaction
+		if (trans->isShowing() && options.errFilt)
 		{
-			if (toLong(trans->Format("[{ISERROR}]")))
-				trans->setShowing(FALSE);
+			// The filter is either equal to '2' (errOnly) in which case
+			// we show only errors. Otherwise, show only non-errors.
+			SFBool isError = toLong(trans->Format("[{ISERROR}]"));
+			trans->setShowing(options.errFilt==2 ? isError : !isError);
 		}
 		
 		theAccount.nVisible += trans->isShowing();
@@ -385,8 +511,12 @@ SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 	
 	if (!isTesting)
 	{
+#ifdef NEW_CODE
+		STOP_TIMER("filter");
+#else
 		double stop = vrNow();
 		double timeSpent = stop-start;
+#endif
 		fprintf(stderr, "\tFilter passed %ld visible records of %ld in %f seconds\n", theAccount.nVisible, theAccount.transactions.getCount(), timeSpent);
 		fflush(stderr);
 	}
@@ -397,16 +527,24 @@ SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 //---------------------------------------------------------------------------------------------------
 SFBool CSlurperApp::Display(CSlurpOptions& options, SFString& message)
 {
+#ifdef NEW_CODE
+	START_TIMER();
+#else
 	double start = vrNow();
+#endif
 	
 	if (options.reverseSort)
 		theAccount.transactions.Sort(sortReverseChron);
-	theAccount.Format(outScreen, getFormatString(options, "file"));
-	
+	theAccount.Format(outScreen, getFormatString(options, "file", FALSE));
+
 	if (!isTesting)
 	{
+#ifdef NEW_CODE
+		STOP_TIMER("display");
+#else
 		double stop = vrNow();
 		double timeSpent = stop-start;
+#endif
 		fprintf(stderr, "\tExported %ld records in %f seconds             \n\n", theAccount.nVisible, timeSpent);
 		fflush(stderr);
 	}
@@ -414,7 +552,7 @@ SFBool CSlurperApp::Display(CSlurpOptions& options, SFString& message)
 }
 
 //--------------------------------------------------------------------------------
-SFString CSlurperApp::getFormatString(CSlurpOptions& options, const SFString& which)
+SFString CSlurperApp::getFormatString(CSlurpOptions& options, const SFString& which, SFBool ignoreBlank)
 {
 	if (which == "file")
 		buildDisplayStrings(options);
@@ -445,7 +583,7 @@ SFString CSlurperApp::getFormatString(CSlurpOptions& options, const SFString& wh
 	{
 		errMsg = SFString("Mismatched brackets in display string '") + formatName + "': '" + ret + "'. Quiting...\n";
 		
-	} else if (ret.IsEmpty())
+	} else if (ret.IsEmpty() && !ignoreBlank)
 	{
 		errMsg = SFString("Empty display string '") + formatName + "'. Quiting...\n";
 	}
@@ -466,7 +604,12 @@ void CSlurperApp::buildDisplayStrings(CSlurpOptions& options)
 	if (options.exportFormat.IsEmpty())
 		options.exportFormat = "json";
 	
-	const SFString fmtForFields  = getFormatString(options, "field");
+	// This is what we're really after...
+	const SFString fmtForRecords = getFormatString(options, "record", FALSE);
+	ASSERT(!fmtForRecords.IsEmpty());
+	
+	// ...we may need this to build it.
+	const SFString fmtForFields  = getFormatString(options, "field", !fmtForRecords.Contains("{FIELDS}"));
 	ASSERT(!fmtForFields.IsEmpty());
 	
 	SFString defList = config.GetProfileStringGH("DISPLAY_STR", "fmt_fieldList", EMPTY);
@@ -501,11 +644,8 @@ void CSlurperApp::buildDisplayStrings(CSlurpOptions& options)
 	theAccount.displayString = StripAny(theAccount.displayString, "\t ");
 	theAccount.header = StripAny(theAccount.header, "\t ");
 	
-	// This is what we're really after
-	const SFString fmtForRecords = getFormatString(options, "record");
-	ASSERT(!fmtForRecords.IsEmpty());
-	
 	theAccount.displayString = Strip(fmtForRecords.Substitute("[{FIELDS}]", theAccount.displayString), '\t');
+	theAccount.displayString.ReplaceAll("[{NAME}]", options.archiveFile);
 	if (options.exportFormat=="json")
 	{
 		// One little hack to make raw json more readable
@@ -606,3 +746,16 @@ int sortReverseChron(const void *rr1, const void *rr2)
         ret = tr2->timeStamp - tr1->timeStamp;         if (ret!=0) return (int)ret;
         return sortTransactionsForWrite(rr1,rr2);
 }
+
+#ifdef NEW_CODE
+void reportTimes(const SFString& func, double start, double stop, double timeSpent)
+{
+	SFString file = "/Users/jrush/src.GitHub/ethslurp/theData/performance/perf.txt";
+	SFTime now = Now();
+	CStringExportContext ctx;
+	ctx << asciiFileToString(file);
+	ctx << func << "\t" << now.Format(FMT_SORTALL) << "\t" << start << "\t" << stop << "\t" << timeSpent << "\n";
+	stringToAsciiFile(file, ctx.str);
+}
+#endif
+#endif

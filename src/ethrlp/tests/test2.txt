@@ -1,0 +1,12 @@
+02. ethrlp -h (show help)
+
+  Usage:   ethrlp [-d|-e|-t|-h] input
+  Purpose: Convert ascii to hex and visa versa.
+           
+  Where:
+	input                the input to convert (by default will be converted to hex) (required)
+	-d  (or -decode)     assumes input is hex and converts to ascii
+	-e  (or -encode)     assumes input is ascii and converts to hex (the defaul)
+	-t  (or -test)       generate intermediary files but do not execute the commands
+	-h  (or -help)       display this help screen
+

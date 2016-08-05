@@ -1,13 +1,15 @@
 #ifndef _ETHNAME_H_
 #define _ETHNAME_H_
 
-#include "abilib.h"
 #include "etherlib.h"
+#include "daolib.h"
 #include "name_options.h"
 
 class CAccountName : public CAccount
 {
 public:
+	SFString source;
+	SFString name;
 	CAccountName() { }
 	CAccountName(SFString& nameIn)
 	{
@@ -20,6 +22,7 @@ public:
 #define F(a) (SFString("`") + (SFString(#a) + "`: `" + a + "` ")).Substitute("`","\"")
 		return ("{" + F(addr) + ", " + F(name) + ", " + F(source) + "}").Substitute(" ,",",");
 	}
+        SFBool Match(const SFString& s1, const SFString& s2, const SFString& s3, SFBool matchCase, SFBool all);
 };
 
 extern CAccountName *accounts;

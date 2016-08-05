@@ -26,6 +26,7 @@
  * of 'EXISTING_CODE' tags.
  */
 #include "transaction.h"
+#include "account.h"
 
 //---------------------------------------------------------------------------
 IMPLEMENT_NODE(CTransaction, CBaseNode, NO_SCHEMA);
@@ -52,14 +53,16 @@ SFString toNice(const SFString& in)
 	if (!in.startsWith("0xb61d27f6")&&!in.startsWith("0xf00d4b5d"))
 		return in;
 	SFString input = in;
-	SFString ret = (input.Left(10) + "<br>\n");
-	input=input.Mid(10,1000000);
+
+	SFInt32 cnt=0;
+	CStringExportContext ctx;
+	ctx << input.Left(10) << "<br>\n";  input = input.Mid(10,1000000);
 	while (!input.IsEmpty())
 	{
-		ret += (input.Left(128) + "<br>\n");
-		input=input.Mid(128,100000);
+		ctx << "[" << cnt++ << "]: " << input.Left(64) << "<br>\n";
+		input=input.Mid(64,100000);
 	}
-	return ret;
+	return ctx.str;
 }
 #endif
 
@@ -283,17 +286,15 @@ void CTransaction::registerClass(void)
 	// EXISTING_CODE
 	ADD_FIELD(CTransaction, "date", T_DATE, ++fieldNum);
 	ADD_FIELD(CTransaction, "ether", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CTransaction, "hitLimit", T_RADIO, ++fieldNum);
-	ADD_FIELD(CTransaction, "inputLen", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "addr_list", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "function", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "recNum", T_NUMBER, ++fieldNum);
 
 	// Hide fields we don't want to show by default
 //	HIDE_FIELD(CTransaction, "date");
 //	HIDE_FIELD(CTransaction, "ether");
+	HIDE_FIELD(CTransaction, "addr_list");
 	HIDE_FIELD(CTransaction, "confirmations");
-//	HIDE_FIELD(CTransaction, "hitLimit");
-//	HIDE_FIELD(CTransaction, "inputLen");
 	HIDE_FIELD(CTransaction, "recNum");
 	HIDE_FIELD(CTransaction, "function");
 //	HIDE_FIELD(CTransaction, "isInternalTx");
@@ -320,6 +321,9 @@ int sortTransaction(const SFString& f1, const SFString& f2, const void *rr1, con
 int sortTransactionByName(const void *rr1, const void *rr2) { return sortTransaction("tr_Name", "", rr1, rr2); }
 int sortTransactionByID  (const void *rr1, const void *rr2) { return sortTransaction("transactionID", "", rr1, rr2); }
 
+#ifdef NEW_CODE
+SFBool shortAddr=FALSE;
+#endif
 //---------------------------------------------------------------------------
 SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
@@ -328,6 +332,8 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
+		case 'a':
+			if (fieldIn % "addr_list") return tra->getAddrList();
 		case 'd':
 			if (fieldIn % "date") return tra->m_transDate.Format("%Y-%m-%d %H:%M:%S UTC");
 		case 'e':
@@ -351,15 +357,17 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 		case 'f':
 			if ( fieldIn % "function" ) return tra->inputToFunction();
 			break;
-		case 'h':
-			if ( fieldIn % "hitLimit" ) return ((tra->gas == tra->gasUsed) ? "TRUE" : "FALSE");
-			break;
-		case 'i':
-			if ( fieldIn % "inputLen" ) return asString(tra->input.GetLength());
-			break;
 		case 'r':
-			if ( fieldIn % "recNum" ) return asString(tra->handle);
+			if ( fieldIn % "recNum" ) return asString(tra->pParent ? tra->pParent->getHandle() : 0);
 			break;
+#if 1 //def NEW_CODE
+		case 's':
+			if ( fieldIn % "sh_date" ) return tra->m_transDate.Format("%m/%d/16 %H:%M");
+//			if ( fieldIn % "sh_function" ) { shortAddr=TRUE; SFString ret = tra->inputToFunction(); shortAddr=FALSE; return ret; }
+			if ( fieldIn % "sh_from" ) return fmtAddress(tra->from);
+			if ( fieldIn % "sh_to" ) return fmtAddress(tra->to);
+			break;
+#endif
 		// EXISTING_CODE
 		default:
 			break;
@@ -379,224 +387,7 @@ SFBool CTransaction::handleCustomFormat(CExportContext& ctx, const SFString& fmt
 	return FALSE;
 }
 
-//---------------------------------------------------------------------------
 // EXISTING_CODE
-////---------------------------------------------------------------------------
-#include "slurp.h"
-SFBool CTransaction::isFunction(const SFString& func) const
-{
-	if (func.IsEmpty())
-		return FALSE;
-	
-	switch (func[0])
-	{
-		case 'a':
-			if ( func == "approve" ) return input.startsWith( "0x095ea7b3" );
-			else return FALSE;
-			break;
-			
-		case 'c':
-			if ( func == "checkProposalCode" ) return input.startsWith( "0xeceb2945" );
-			else if ( func == "createTokenProxy" ) return input.startsWith( "0xbaac5300" );
-			else return FALSE;
-			break;
-			
-		case 'e':
-			if ( func == "executeProposal" ) return input.startsWith( "0x237e9492" );
-			else return FALSE;
-			break;
-			
-		case 'g':
-			if ( func == "getMyReward" ) return input.startsWith( "0xcc9ae3f6" );
-			else return FALSE;
-			break;
-			
-		case 'h':
-			if ( func == "halveMinQuorum" ) return input.startsWith( "0x78524b2e" );
-			else return FALSE;
-			break;
-			
-		case 'n':
-			if ( func == "newProposal" ) return input.startsWith( "0x612e45a3" );
-			else if ( func == "none" )
-			{
-				SFString ret = inputToFunction();
-				if (ret.ContainsAny("acghrstuv"))
-					return FALSE;
-				return (ret == " ");
-			}
-			else return FALSE;
-			break;
-
-		case 'p':
-			if ( func == "payOut" ) return input.startsWith( "0x0221038a" );
-			else return FALSE;
-			break;
-			
-		case 'r':
-			if ( func == "receiveEther" ) return input.startsWith( "0xa3912ec8" );
-			else if ( func == "refund" ) return input.startsWith( "0x590e1ae3" );
-			else if ( func == "retrieveDAOReward" ) return input.startsWith( "0xa1da2fb9" );
-			else return FALSE;
-			break;
-			
-		case 's':
-			if ( func == "splitDAO" ) return input.startsWith( "0x82661dc4" );
-			else return FALSE;
-			break;
-			
-		case 't':
-			if ( func == "transfer" ) return input.startsWith( "0xa9059cbb" );
-			else if ( func == "transferFrom" ) return input.startsWith( "0x23b872dd" );
-			else if ( func == "transferFromWithoutReward" ) return input.startsWith( "0xdbde1988" );
-			else if ( func == "transferWithoutReward" ) return input.startsWith( "0x4e10c3ee" );
-			else return FALSE;
-			break;
-			
-		case 'u':
-			if ( func == "unblockMe" ) return input.startsWith( "0x2632bf20" );
-			else return FALSE;
-			break;
-			
-		case 'v':
-			if ( func == "vote" ) return input.startsWith( "0xc9d27afe" );
-			else return FALSE;
-			break;
-	}
-	
-	return FALSE;
-}
-
-#define grabPart(a,b)       StripLeading((a).Mid(64*(b),64),'0')
-#define grabBigNum(a,b)     strtoull((const char*)grabPart(a,b),NULL,16)
-#define toAddr(a,b)         "0x"+grabPart(a,b)
-#define toBigNum(a,b)       asStringULL(grabBigNum(a,b))
-#define toBigNum3(a,b)      padNum3(grabBigNum(a,b))
-#define toBool(a,b)         (grabBigNum(a,b)?"true":"false")
-#define toVote(a,b)         (grabBigNum(a,b)?"Yea":"Nay")
-#define theRest(a,b)        (a).Mid(64*(b),(a).GetLength());
-
-//---------------------------------------------------------------------------
-SFString parseParams(const SFString& which, const SFString& params)
-{
-	if (which=="approve")
-	{
-		//function approve(address _spender, uint256 _amount) returns (bool success) {  discuss
-		return which + "|" + toAddr(params,0) + "|" + toBigNum(params,1);
-
-	} else if (which=="splitDAO")
-	{
-		//function splitDAO(uint _proposalID, address _newCurator)
-		return which + "|" + toBigNum3(params,0) + "|" + toAddr(params,1);
-
-	} else if (which=="createTokenProxy")
-	{
-		//function createTokenProxy(address _tokenHolder)
-		return which + "|" + toAddr(params,0);
-
-	} else if (which=="transferFrom")
-	{
-		//function transferFrom(address _from, address _to, uint256 _amount)
-		return which + "|" + toAddr(params,0) + "|" + toAddr(params,1) + "|" + toBigNum(params,2);
-
-	} else if (which=="transfer")
-	{
-		//function transfer(address _to, uint256 _amount)
-		return which + "|" + toAddr(params,0) + "|" + toBigNum(params,1);
-
-	} else if (which=="getMyReward")
-	{
-		//function getMyReward()
-		return which;
-	
-	} else if (which=="payOut")
-	{
-		//function payOut(address _recipient, uint _amount)
-		return which + "|" + toAddr(params,0) + "|" + toBigNum(params,1);
-
-	} else if (which=="receiveEther")
-	{
-		//function receiveEther()
-		return which;
-	
-	} else if (which=="vote")
-	{
-		//function vote(uint _proposalID, bool _supportsProposal)
-		return which + "|" + toBigNum3(params,0) + "|" + toVote(params,1);
-	
-	} else if (which=="executeProposal")
-	{
-		//function executeProposal(uint _proposalID, bytes _transactionData)
-		return which + "|" + toBigNum3(params,0) + "|" + theRest(params,1);
-
-	} else if (which=="newProposal")
-	{
-		//function newProposal(address _recipient, uint _amount, string _description, bytes _transactionData, uint _debatingPeriod, bool _newCurator)
-		SFString recip = toAddr(params, 0);
-		SFString amt = toBigNum(params,1);
-		SFString part4 =      StripLeading(params.Right(128).Left(64), '0');
-		SFString part5 =      StripLeading(params.Right(64),'0');
-		SFString part3b = params;
-		part3b.Replace(recip,"");
-		part3b.Replace(amt,"");
-		part3b.ReplaceReverse(part5,"");
-		part3b.ReplaceReverse(part4,"");
-		part3b = StripLeading(part3b,'0');
-		SFString part3a = toAddr(part3b,0);
-		part3b.Replace(part3a.Substitute("0x",""),"");
-		return which + "|" + recip + "|" + amt + "|" + part3a + "|" + part4 + "|" + part5 + "|" + part3b;
-
-	}
-
-	return which;
-}
-
-//---------------------------------------------------------------------------
-SFString CTransaction::inputToFunction(void) const
-{
-	if (input.GetLength()<10)
-		return " ";
-
-	switch (input[2])
-	{
-		case '0': if (input.startsWith( "0x095ea7b3" )) return parseParams("approve",                   input.Mid(10,input.GetLength()));
-		     else if (input.startsWith( "0x0221038a" )) return parseParams("payOut",                    input.Mid(10,input.GetLength())); break;
-
-		case '2': if (input.startsWith( "0x237e9492" )) return parseParams("executeProposal",           input.Mid(10,input.GetLength()));
-		     else if (input.startsWith( "0x23b872dd" )) return parseParams("transferFrom",              input.Mid(10,input.GetLength()));
-		     else if (input.startsWith( "0x2632bf20" )) return parseParams("unblockMe",                 input.Mid(10,input.GetLength())); break;
-
-		case '4': if (input.startsWith( "0x4e10c3ee" )) return parseParams("transferWithoutReward",     input.Mid(10,input.GetLength())); break;
-
-		case '5': if (input.startsWith( "0x590e1ae3" )) return parseParams("refund",                    input.Mid(10,input.GetLength())); break;
-
-		case '6': if (input.startsWith( "0x612e45a3" )) return parseParams("newProposal",               input.Mid(10,input.GetLength())); break;
-
-		case '7': if (input.startsWith( "0x78524b2e" )) return parseParams("halveMinQuorum",            input.Mid(10,input.GetLength())); break;
-
-		case '8': if (input.startsWith( "0x82661dc4" )) return parseParams("splitDAO",                  input.Mid(10,input.GetLength())); break;
-
-		case 'a': if (input.startsWith( "0xa1da2fb9" )) return parseParams("retrieveDAOReward",         input.Mid(10,input.GetLength()));
-		     else if (input.startsWith( "0xa3912ec8" )) return parseParams("receiveEther",              input.Mid(10,input.GetLength()));
-		     else if (input.startsWith( "0xa9059cbb" )) return parseParams("transfer",                  input.Mid(10,input.GetLength())); break;
-
-		case 'b': if (input.startsWith( "0xbaac5300" )) return parseParams("createTokenProxy",          input.Mid(10,input.GetLength())); break;
-
-		case 'c': if (input.startsWith( "0xc9d27afe" )) return parseParams("vote",                      input.Mid(10,input.GetLength()));
-		     else if (input.startsWith( "0xcc9ae3f6" )) return parseParams("getMyReward",               input.Mid(10,input.GetLength())); break;
-
-		case 'd': if (input.startsWith( "0xdbde1988" )) return parseParams("transferFromWithoutReward", input.Mid(10,input.GetLength())); break;
-
-		case 'e': if (input.startsWith( "0xeceb2945" )) return parseParams("checkProposalCode",         input.Mid(10,input.GetLength())); break;
-	}
-
-	for (int i=0;i<nFunctions;i++)
-		if (input.Mid(2,8) == funcTable[i].encoding)
-			return funcTable[i].Format("[{NAME}]");
-
-	return " ";
-}
-
 //---------------------------------------------------------------------------
 int sortTransactionsForWrite(const void *rr1, const void *rr2)
 {
@@ -609,5 +400,345 @@ int sortTransactionsForWrite(const void *rr1, const void *rr2)
 	ret = toLong(tr1->nonce) - toLong(tr2->nonce); if (ret!=0) return (int)ret;
 
 	return (int)tr1->hash.Compare(tr2->hash);
+}
+
+//---------------------------------------------------------------------------
+SFBool CTransaction::isFunction(const SFString& func) const
+{
+	if (func=="none")
+	{
+		SFString ret = inputToFunction();
+		if (ret.ContainsAny("acghrstuv"))
+			return FALSE;
+		return (ret==" ");
+	}
+
+	return (funcPtr ? funcPtr->name == func : FALSE);
+}
+
+//------------------------------------------------------------------------------
+#define grabPart(a,b)       StripLeading((a).Mid(64*(b),64),'0')
+#define grabBigNum(a,b)     strtoull((const char*)grabPart(a,b),NULL,16)
+#define toAddr(a,b)         "0x"+padLeft(grabPart(a,b),40,'0')
+#define toAddrOld(a,b)      "0x"+grabPart(a,b)
+#define toAscString(a,b)    hex2String("0x"+grabPart(a,b))
+#define toBigNum(a,b)       asStringULL(grabBigNum(a,b))
+#define toBigNum3(a,b)      padNum3(grabBigNum(a,b))
+#define theRest(a,b)        (a).Mid(64*(b),(a).GetLength());
+#define toVote(a,b)         (grabBigNum(a,b)?"Yea":"Nay")
+#define toBoolean(a,b)      (grabBigNum(a,b)?"true":"false")
+#define toBytes(a,b)        ((a).Mid(64*(b),64))
+SFString parse(const SFString& params, int nItems, SFString *types)
+{
+	SFString ret;
+	for (int item=0;item<nItems;item++)
+	{
+		SFString t = types[item];
+		SFBool isDynamic = (t=="string" || t=="bytes" || t.Contains("[]"));
+		SFString val;
+
+#ifdef NEW_CODE
+		     if ( t == "address"                    ) { val =          toAddr      (params,item); if (shortAddr) val = fmtAddress(val); }
+#else
+		     if ( t == "address"                    )   val =          toAddr      (params,item);
+#endif
+		else if ( t == "bool"                       )   val =          toBoolean   (params,item);
+		else if ( t == "vote"                       )   val =          toVote      (params,item);
+		else if ( t == "uint3"                      )   val =          toBigNum3   (params,item);
+		else if ( t == "bytes256"                   )   val =          toAscString (params,item);
+		else if ( t.Contains("int") &&   !isDynamic )   val =          toBigNum    (params,item);
+		else if ( t.Contains("bytes") && !isDynamic )   val =          toBytes     (params,item); 
+		else if ( isDynamic                         )   val = "off:" + toBigNum    (params,item);
+		else                                            val = "unknown type: " + t;
+
+		if (val.Contains("off:"))
+		{
+			long start = toLong(val.Substitute("off:","")) / 32;
+			long len   = grabBigNum(params,start);
+			if (t == "string")
+				val = hex2String(params.Mid((start+1)*64,len*2)).Substitute("\n","\\n").Substitute("\r","");
+			else
+				val = "0x"+params.Mid((start+1)*64,len*2);
+		}
+
+//		if (transCount++<100) printf("%05ld-%03d: %-10.10s %s %s\n", transCount, item, (const char*)types[item], (const char*)params.Mid(item*64,64), (const char*)val);
+		ret += ("|" + val);
+	}
+//	if (transCount<100) printf("\n");
+	return ret;
+}
+
+/*
+variable:
+	if contains []
+	if == bytes
+	if == string
+
+fixed:
+	address		left	160	no
+	bool		left	1	yes
+	int8		left	8	yes
+	int16		left	16	yes
+	int32		left 	32	yes
+	int256		left	256	yes
+	uint8		left	8	yes
+	uint16		left	16	yes
+	uint32		left	32	yes
+	uint256		left	256	yes
+	bytes8		right	8	no
+	bytes16		right	16	no
+	bytes32		right	32	no
+
+non-canonical:
+	uint
+*/
+
+//---------------------------------------------------------------------------
+SFString parseParams(const CTransaction* trans, const SFString& which, const SFString& params)
+{
+	if (which=="approve")
+	{
+		//function approve(address _spender, uint256 _amount) returns (bool success) {  discuss
+		SFString items[] = { "address", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="splitDAO")
+	{
+		//function splitDAO(uint _proposalID, address _newCurator)
+		SFString items[] = { "uint3", "address", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="createTokenProxy")
+	{
+		//function createTokenProxy(address _tokenHolder)
+		SFString items[] = { "address", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="getMyReward")
+	{
+		//function getMyReward()
+		SFString items[] = { };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+	
+	} else if (which=="payOut")
+	{
+		//function payOut(address _recipient, uint _amount)
+		SFString items[] = { "address", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="receiveEther")
+	{
+		//function receiveEther()
+		SFString items[] = { };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+		return which;
+	
+	} else if (which=="changeDomain")
+	{
+		//function changeDomain( uint domain, uint expires, uint price, address transfer ) 
+		SFString items[] = { "bytes256", "uint256", "uint256", "address", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="changeId")
+	{
+		//function changeId( uint domain, uint name, uint value )
+		SFString items[] = { "bytes256", "bytes256", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="getDomain")
+	{
+		//function getDomain( uint domain )
+		SFString items[] = { "bytes256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="getId")
+	{
+		//function getId( uint domain, uint id )
+		SFString items[] = { "bytes256", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="balanceOf")
+	{
+		//function balanceOf(addr _owner);
+		SFString items[] = { "address", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="vote")
+	{
+		//function vote(uint _proposalID, bool _supportsProposal)
+		SFString items[] = { "uint3", "vote", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+	
+	} else if (which=="executeProposal")
+	{
+		//function executeProposal(uint _proposalID, bytes _transactionData)
+		SFString items[] = { "uint3", "bytes", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="transferFrom")
+	{
+		//function transferFrom(address _from, address _to, uint256 _amount)
+		SFString items[] = { "address", "address", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="transfer")
+	{
+		//function transfer(address _to, uint256 _amount)
+		SFString items[] = { "address", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="newProposal")
+	{
+		//function newProposal(address _recipient,uint _amount,string _description,bytes _transactionData,uint _debatingPeriod,bool _newCurator)
+		SFString items[] = { "address", "uint256", "string", "bytes", "uint256", "bool", };
+		int nItems = sizeof(items) / sizeof(SFString);
+
+		SFString type = (grabBigNum(trans->value,0)>0?" (non-split)":" (split)");
+//		if (trans && trans->pParent && ((CAccount*)trans->pParent)->addr == recipient)
+//			type.Replace(")", "-self)");
+		return which + type + parse(params, nItems, items);
+	}
+
+	return which;
+}
+
+//---------------------------------------------------------------------------
+SFString CTransaction::inputToFunction(void) const
+{
+	if (funcPtr)
+		return parseParams(this, funcPtr->name, input.Mid(10,input.GetLength()));
+
+	if (input.GetLength()<10)
+		return " ";
+#if 1
+	switch (input[2])
+	{
+		case '0':
+			if      (input.startsWith( "0x095ea7b3" )) return parseParams(this, "approve",                   input.Mid(10,input.GetLength()));
+		     	else if (input.startsWith( "0x0221038a" )) return parseParams(this, "payOut",                    input.Mid(10,input.GetLength()));
+		     	break;
+
+		case '1':
+			if      (input.startsWith( "0x1a7a98e2" )) return parseParams(this, "getDomain",                 input.Mid(10,input.GetLength()));
+			break;
+
+		case '2':
+			if      (input.startsWith( "0x237e9492" )) return parseParams(this, "executeProposal",           input.Mid(10,input.GetLength()));
+		     	else if (input.startsWith( "0x24fc65ed" )) return parseParams(this, "getId",                     input.Mid(10,input.GetLength()));
+		     	else if (input.startsWith( "0x23b872dd" )) return parseParams(this, "transferFrom",              input.Mid(10,input.GetLength()));
+		     	else if (input.startsWith( "0x2632bf20" )) return parseParams(this, "unblockMe",                 input.Mid(10,input.GetLength()));
+		     	break;
+
+		case '3':
+			break;
+
+		case '4':
+			if      (input.startsWith( "0x4e10c3ee" )) return parseParams(this, "transferWithoutReward",     input.Mid(10,input.GetLength()));
+			break;
+
+		case '5':
+			if      (input.startsWith( "0x590e1ae3" )) return parseParams(this, "refund",                    input.Mid(10,input.GetLength()));
+			break;
+
+		case '6':
+			if      (input.startsWith( "0x612e45a3" )) return parseParams(this, "newProposal",               input.Mid(10,input.GetLength()));
+			break;
+
+		case '7':
+			if      (input.startsWith( "0x78524b2e" )) return parseParams(this, "halveMinQuorum",            input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0x75090ebf" )) return parseParams(this, "changeDomain",              input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0x70a08231" )) return parseParams(this, "balanceOf",                 input.Mid(10,input.GetLength()));
+			break;
+
+		case '8':
+			if      (input.startsWith( "0x82661dc4" )) return parseParams(this, "splitDAO",                  input.Mid(10,input.GetLength()));
+			break;
+
+		case '9':
+			break;
+
+		case 'a':
+			if      (input.startsWith( "0xa1da2fb9" )) return parseParams(this, "retrieveDAOReward",         input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0xa3912ec8" )) return parseParams(this, "receiveEther",              input.Mid(10,input.GetLength()));
+		     	else if (input.startsWith( "0xa9059cbb" )) return parseParams(this, "transfer",                  input.Mid(10,input.GetLength()));
+		     	break;
+
+		case 'b':
+			if      (input.startsWith( "0xbaac5300" )) return parseParams(this, "createTokenProxy",          input.Mid(10,input.GetLength()));
+			break;
+
+		case 'c':
+			if      (input.startsWith( "0xc9d27afe" )) return parseParams(this, "vote",                      input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0xcc9ae3f6" )) return parseParams(this, "getMyReward",               input.Mid(10,input.GetLength()));
+		     	break;
+
+		case 'd':
+			if      (input.startsWith( "0xdbde1988" )) return parseParams(this, "transferFromWithoutReward", input.Mid(10,input.GetLength()));
+			break;
+
+		case 'e':
+			if      (input.startsWith( "0xeceb2945" )) return parseParams(this, "checkProposalCode",         input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0xeb1ff845" )) return parseParams(this, "changeId",                  input.Mid(10,input.GetLength()));
+		     	break;
+
+		case 'f':
+			break;
+	}
+
+	if (pParent)
+	{
+#if 1 //NEW_CODE
+		for (int i=0;i<((CAccount*)pParent)->abi.abiByName.getCount();i++)
+			if (input.Mid(2,8) == ((CAccount*)pParent)->abi.abiByName[i].encoding)
+				return ((CAccount*)pParent)->abi.abiByName[i].Format("[{NAME}]");
+#else
+		for (int i=0;i<((CAccount*)pParent)->abi.abiByEncoding.getCount();i++)
+			if (input.Mid(2,8) == ((CAccount*)pParent)->abi.abiByEncoding[i].encoding)
+				return ((CAccount*)pParent)->abi.abiByEncoding[i].Format("[{NAME}]");
+#endif
+	}
+#endif
+
+	return " ";
+}
+
+SFString CTransaction::getAddrsFromInput(char delim) const
+{
+	SFString ret;
+	if (funcPtr && funcPtr->hasAddrs)
+	{
+		SFString func = parseParams(this, funcPtr->name, input.Mid(10,input.GetLength()));
+		nextTokenClear(func,'|'); // remove function name
+		SFInt32 cnt=0;
+		while (!func.IsEmpty())
+		{
+			SFString val = nextTokenClear(func,'|');
+			CParameter pp = funcPtr->inputs[cnt];
+			if (pp.type == "address")
+				ret += (val + delim);
+			cnt++;
+		}
+	}
+	return ret;
+}
+
+SFString CTransaction::getAddrList(char delim) const
+{
+	return Strip((from + delim + to + delim + getAddrsFromInput(delim)), delim);
 }
 // EXISTING_CODE

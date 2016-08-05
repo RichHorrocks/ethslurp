@@ -156,7 +156,10 @@ inline SFArchive& operator>>(SFArchive& archive, ARRAY_CLASS& array) \
 	archive >> count; \
 	array.Grow(count+1); \
 	for (int i=0;i<count;i++) \
+	{ \
 		array[i].Serialize(archive); \
+		array[i].pParent = archive.pParent; \
+	} \
 	return archive; \
 }
 

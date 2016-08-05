@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
 #include "etherlib.h"
+#include "daolib.h"
 #include "slurp_options.h"
 
 //---------------------------------------------------------------------------------------------------
@@ -35,7 +36,7 @@ private:
 	CWebAPI   api;
 
 public:
-	CSlurp    theAccount;
+	CAccount theAccount;
 
               CSlurperApp (void) : config(NULL) { };
              ~CSlurperApp (void) {  }
@@ -47,7 +48,7 @@ public:
 
 private:
 	void      buildDisplayStrings (CSlurpOptions& options);
-	SFString  getFormatString     (CSlurpOptions& options, const SFString& name);
+	SFString  getFormatString     (CSlurpOptions& options, const SFString& name, SFBool ignoreBlank);
 };
 
 //--------------------------------------------------------------------------------
@@ -56,5 +57,10 @@ extern SFString getHomeFolder(void);
 //---------------------------------------------------------------------------------------------------
 extern SFBool establishFolders(CConfig& config, const SFString& vers);
 extern void   findBlockRange  (const SFString& contents, SFInt32& minBlock, SFInt32& maxBlock);
+
+//---------------------------------------------------------------------------------------------------
+extern void reportTimes(const SFString& func, double start, double stop, double timeSpent);
+#define START_TIMER()		PERF_START();
+#define STOP_TIMER(func)	PERF_STOP(); reportTimes(func, timerStart, timerStop, timeSpent); 
 
 #endif

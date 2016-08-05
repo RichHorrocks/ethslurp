@@ -1,0 +1,38 @@
+echo "in/out/in/out test"
+cat tests/file1.txt | ./hex2Ascii 2>/dev/null | ./ascii2Hex 2>/dev/null | ./hex2Ascii 2>/dev/null | ./ascii2Hex 2>/dev/null | tee tests/file2.txt
+diff tests/file1.txt tests/file2.txt
+
+echo "01. ethrlp (should show help)"                         | tee tests/test1.txt
+ethrlp -t -h                                                     >>tests/test1.txt
+
+echo "02. ethrlp -h (show help)"                             | tee tests/test2.txt
+ethrlp -t -h                                                     >>tests/test2.txt
+
+echo "03. ethrlp ShouldConvertToHexOneArg"                   | tee tests/test3.txt
+ethrlp ShouldConvertToHexOneArg -t                                >shit ; echo >>shit ; cat shit >>tests/test3.txt
+ethrlp -d `cat shit` -t                                          >>tests/test3.txt
+
+echo "04. ethrlp Split input should preserve spaces"         | tee tests/test4.txt
+ethrlp Split input should preserve spaces -t                      >shit; echo >>shit ; cat shit >>tests/test4.txt
+ethrlp -d `cat shit` -t                                          >>tests/test4.txt
+
+echo "05. ethrlp <long string> (convert to ascii)"           | tee tests/test5.txt
+ethrlp -d `cat tests/long_string1.txt` -t                        >>tests/test5.txt
+
+echo "06. ethrlp <hex no 0x> (correctly passed thru)"        | tee tests/test6.txt
+ethrlp 5468697320697320612074657374206f6620746865 -t            >>tests/test6.txt
+
+echo "07. ethrlp -d <hex no 0x> (forced to be seen as hex)"  | tee tests/test7.txt
+ethrlp -d 5468697320697320612074657374206f6620746865 -t         >>tests/test7.txt
+
+echo "08. ethrlp <ascii with '0x'> (correctly converted)"    | tee tests/test8.txt
+ethrlp 0x5468697320697320612074 -t                                >tests/test8.txt
+
+echo "08. ethrlp -e <ascii with '0x'> (forced as ascii)"     | tee tests/test8.txt
+ethrlp -e 0x5468697320697320612074 -t                             >tests/test8.txt
+
+echo "09. ethrlp -e \`../../LICENSE\`"                   | tee tests/test9.txt
+ethrlp "`cat ../../LICENSE`" -t                              >shit ; echo >>shit ; cat shit >>tests/test9.txt
+ethrlp -d "`cat shit`" -t                                        >>tests/test9.txt
+
+rm -f shit

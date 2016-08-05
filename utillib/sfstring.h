@@ -817,6 +817,11 @@ inline SFString asHex(SFInt32 val)
 	return ret.Right(2);
 }
 
+//------------------------------------------------------------------------------
+extern SFString hex2String(const SFString& inHex);
+extern SFString string2Hex(const SFString& inAscii);
+extern char hex2Ascii(char *str);
+
 #define WIERD_NUM (-20206)
 
 inline SFString asString(SFInt32 i, SFInt32 def=WIERD_NUM)

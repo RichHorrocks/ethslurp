@@ -24,7 +24,8 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
-#include "abilib.h"
+#include "etherlib.h"
+#include "abi.h"
 #include "transaction.h"
 
 //--------------------------------------------------------------------------
@@ -49,27 +50,30 @@ class CAccount : public CBaseNode
 public:
 	SFInt32 handle;
 	SFString addr;
-	SFString name;
-	SFString source;
-	SFInt32 nTransactions;
-	CTransaction *transactions;
+	SFString header;
+	SFString displayString;
+	SFBool pageSize;
+	SFInt32 lastPage;
+	SFInt32 lastBlock;
+	SFInt32 nVisible;
+	CAbi abi;
+	CTransactionArray transactions;
 
 public:
-					CAccount  (void);
-					CAccount  (const CAccount& ac);
-				   ~CAccount  (void);
-	CAccount&	operator= 		(const CAccount& ac);
+					CAccount(void);
+					CAccount(const CAccount& sl);
+				       ~CAccount  (void);
+	CAccount& operator= 		(const CAccount& sl);
 
 	DECLARE_NODE (CAccount);
 
 	// EXISTING_CODE
-        SFBool Match(const SFString& s1, const SFString& s2, const SFString& s3, SFBool matchCase, SFBool all);
 	// EXISTING_CODE
 
 protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CAccount& ac);
+	void			Copy      		(const CAccount& sl);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -84,11 +88,11 @@ inline CAccount::CAccount(void)
 }
 
 //--------------------------------------------------------------------------
-inline CAccount::CAccount(const CAccount& ac)
+inline CAccount::CAccount(const CAccount& sl)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(ac);
+	Copy(sl);
 }
 
 // EXISTING_CODE
@@ -106,6 +110,10 @@ inline CAccount::~CAccount(void)
 inline void CAccount::Clear(void)
 {
 	// EXISTING_CODE
+#if 1 //NEW_CODE
+	abi.abiByName.Clear();
+#endif
+	abi.abiByEncoding.Clear();
 	// EXISTING_CODE
 }
 
@@ -116,37 +124,48 @@ inline void CAccount::Init(void)
 
 	handle = 0;
 	addr = EMPTY;
-	name = EMPTY;
-	source = EMPTY;
-	nTransactions = 0;
-	transactions = NULL;
+	header = EMPTY;
+	displayString = EMPTY;
+	pageSize = 0;
+	lastPage = 0;
+	lastBlock = 0;
+	nVisible = 0;
+//	transactions = ??; /* unknown type: CTransactionArray */
 
 	// EXISTING_CODE
+//	abi.abiByName.Clear();
+//	abi.abiByEncoding.Clear();
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CAccount::Copy(const CAccount& ac)
+inline void CAccount::Copy(const CAccount& sl)
 {
 	Clear();
 
-	CBaseNode::Copy(ac);
-	handle = ac.handle;
-	addr = ac.addr;
-	name = ac.name;
-	source = ac.source;
-	nTransactions = ac.nTransactions;
-	if (transactions)
-		*transactions = *ac.transactions;
+	CBaseNode::Copy(sl);
+	handle = sl.handle;
+	addr = sl.addr;
+	header = sl.header;
+	displayString = sl.displayString;
+	pageSize = sl.pageSize;
+	lastPage = sl.lastPage;
+	lastBlock = sl.lastBlock;
+	nVisible = sl.nVisible;
+	transactions = sl.transactions;
 
 	// EXISTING_CODE
+#if 1 //NEW_CODE
+	abi.abiByName = sl.abi.abiByName;
+#endif
+	abi.abiByEncoding = sl.abi.abiByEncoding;
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CAccount& CAccount::operator=(const CAccount& ac)
+inline CAccount& CAccount::operator=(const CAccount& sl)
 {
-	Copy(ac);
+	Copy(sl);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
@@ -180,6 +199,11 @@ extern SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, 
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE
+extern SFBool verbose;
+extern SFBool isTesting;
+extern CFileExportContext& outErr;
+#define REP_FREQ   11
+#define REP_INFREQ 563
 // EXISTING_CODE
 
 #endif

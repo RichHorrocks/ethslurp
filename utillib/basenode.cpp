@@ -47,6 +47,7 @@ void CBaseNode::Init(void)
 	m_deleted  = FALSE;
 	m_schema = NO_SCHEMA;
 	m_showing = TRUE;
+	pParent = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -56,6 +57,7 @@ void CBaseNode::Copy(const CBaseNode& bn)
 	m_deleted  = bn.m_deleted;
 	m_schema = bn.m_schema;
 	m_showing = bn.m_showing;
+	pParent = NULL;
 }
 
 //--------------------------------------------------------------------------------
@@ -244,7 +246,7 @@ char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 
 	char *fieldName=NULL;
 	char *fieldVal=NULL;
-	while (*s)
+	while (s && *s)
 	{
 		switch (state)
 		{
@@ -289,7 +291,7 @@ char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 			s++;
 			if (*s && *s==',')
 				s++;
-			if (*s && (*s=='{'||*s==']'))
+			if (s && *s && (*s=='{'||*s==']'))
 			{
 				finishParse();
 				return s;
@@ -325,6 +327,7 @@ char *cleanUpJson(char *s)
 //---------------------------------------------------------------------------
 SFBool CBaseNode::SerializeHeader(SFArchive& archive)
 {
+	archive.pParent = this; // sets this value for items stored in lists or arrays -- read only
 	if (archive.m_isReading)
 	{
 		SFString str;

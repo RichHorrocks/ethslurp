@@ -1,5 +1,5 @@
-#ifndef _SLURP_OPTIONS_H
-#define _SLURP_OPTIONS_H
+#ifndef _DAPPS_OPTIONS_H
+#define _DAPPS_OPTIONS_H
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 

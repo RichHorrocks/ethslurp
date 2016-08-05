@@ -1327,3 +1327,37 @@ SFBool IsValidEmail(const SFString& email)
 	
 	return TRUE;
 }
+
+//----------------------------------------------------------------------------
+// convert %dd hex values back to characters
+//----------------------------------------------------------------------------
+char hex2Ascii(char *str)
+{
+	char c;
+	c =  (char)((str[0] >= 'A' ? ((str[0]&0xDF)-'A')+10 : (str[0]-'0')));
+	c *= 16;
+	c = (char)(c + (str[1] >= 'A' ? ((str[1]&0xDF)-'A')+10 : (str[1]-'0')));
+	return c;
+}
+
+//----------------------------------------------------------------------------
+SFString hex2String(const SFString& inHex)
+{
+	SFString ret, in = inHex.startsWith("0x") ? inHex.Mid(2,inHex.GetLength()) : inHex;
+	while (!in.IsEmpty())
+	{
+		SFString nibble = in.Left(2);
+		in = in.Mid(2,in.GetLength());
+		ret += hex2Ascii((char*)(const char*)nibble);
+	}
+	return ret;
+}
+
+//----------------------------------------------------------------------------
+SFString string2Hex(const SFString& inAscii)
+{
+	SFString ret;
+	for (int i=0;i<inAscii.GetLength();i++)
+		ret += asHex(inAscii[i]);
+	return ret;
+}

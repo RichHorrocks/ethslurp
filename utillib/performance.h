@@ -272,4 +272,7 @@ public:
 //#define SFTime CPerformanceClock
 //typedef double SFTime;
 
+#define PERF_START()	double timerStart = vrNow();
+#define PERF_STOP()	double timerStop = vrNow(); double timeSpent = timerStop - timerStart;
+
 #endif

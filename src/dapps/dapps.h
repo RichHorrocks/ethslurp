@@ -1,8 +1,8 @@
 #ifndef _ETHNAME_H_
 #define _ETHNAME_H_
 
-#include "abilib.h"
 #include "etherlib.h"
+#include "daolib.h"
 #include "dapps_options.h"
 
 #if 0

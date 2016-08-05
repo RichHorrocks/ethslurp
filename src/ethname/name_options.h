@@ -1,5 +1,5 @@
-#ifndef _SLURP_OPTIONS_H
-#define _SLURP_OPTIONS_H
+#ifndef _ETHNAME_OPTIONS_H
+#define _ETHNAME_OPTIONS_H
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 

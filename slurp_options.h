@@ -26,7 +26,6 @@ SOFTWARE.
 class CSlurpOptions : public COptions
 {
 public:
-	SFBool   slurp;
 	SFBool   prettyPrint;
 	SFBool   rerun;
 	SFBool   incomeOnly;

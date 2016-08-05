@@ -54,4 +54,4 @@ objs/%.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(cflags) -c $< -o $@
 
 clean:
-	-@$(RM) -f $(product) $(objects) 2> /dev/null
+	-@$(RM) -f $(dest) $(product) objs/* 2> /dev/null
