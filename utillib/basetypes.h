@@ -110,6 +110,19 @@ inline SFInt32 toLong(char *str)       { return (SFInt32)strtol((const char*)(st
 #include "sfstring.h"
 
 //-------------------------------------------------------------------------
+inline SFString formatFloat(double f, int decimals=10)
+{
+	char s[100],r[100];
+	sprintf(s,"%.*g", decimals, ((long)(  pow(10, decimals) * (  fabs(f) - labs( (long) f )  )  + 0.5)) / pow(10,decimals));
+	if (strchr(s,'e'))
+		s[1] = '\0';
+	sprintf(r,"%d%s", (int)f, s+1);
+	return SFString(r);
+}
+#define fmtFloat(f) (const char*)formatFloat(f)
+#define fmtFloatp(f,p) (const char*)formatFloat(f,p)
+
+//-------------------------------------------------------------------------
 inline SFBool toBool(const SFString& in) { return in%"true" || toLong(in)!=0; }
 
 //-------------------------------------------------------------------------
@@ -218,6 +231,6 @@ inline void XX_C(const SFString& p, const SFString& v)
 #define XX_H( ) { XX_C("", "HERE" ); }
 #define XX_L( ) { XX_C("", SFString('~', 80)); }
 #define XX_O(a) { XX_C("", (a)); }
-#define XX_T( ) { XX_C("", "THERE"); }
+#define XX_T(a) { XX_C("", (a).Format(FMT_SORTALL)); }
 
 #endif
