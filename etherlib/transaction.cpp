@@ -46,12 +46,9 @@ void CTransaction::Format(CExportContext& ctx, const SFString& fmtIn, void *data
 		ctx << getNextChunk(fmt, nextTransactionChunk, &dn);
 }
 
-//#define NICE
-#ifdef NICE
+//---------------------------------------------------------------------------
 SFString toNice(const SFString& in)
 {
-	if (!in.startsWith("0xb61d27f6")&&!in.startsWith("0xf00d4b5d"))
-		return in;
 	SFString input = in;
 
 	SFInt32 cnt=0;
@@ -64,7 +61,6 @@ SFString toNice(const SFString& in)
 	}
 	return ctx.str;
 }
-#endif
 
 //---------------------------------------------------------------------------
 SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void *data)
@@ -101,11 +97,8 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "hash" ) return tra->hash;
 			break;
 		case 'i':
-#ifdef NICE
-			if ( fieldIn % "input" ) return toNice(tra->input);
-#else
+			if ( fieldIn % "input_nice" ) return toNice(tra->input);
 			if ( fieldIn % "input" ) return tra->input;
-#endif
 			if ( fieldIn % "isError" ) return asString(tra->isError);
 			if ( fieldIn % "isInternalTx" ) return asString(tra->isInternalTx);
 			break;
