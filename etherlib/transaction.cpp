@@ -49,17 +49,37 @@ void CTransaction::Format(CExportContext& ctx, const SFString& fmtIn, void *data
 //---------------------------------------------------------------------------
 SFString toNice(const SFString& in)
 {
-	SFString input = in;
+	if (in.IsEmpty()||in=="0x")
+		return in;
 
+	SFString input = in;
 	SFInt32 cnt=0;
-	CStringExportContext ctx;
-	ctx << input.Left(10) << "<br>\n";  input = input.Mid(10,1000000);
+
+const char* STR_1=
+"([{HEAD}])\n" \
+"[{ROWS}]\n";
+
+const char* STR_2=
+"\t\t\t\tbr\n"
+"\t\t\t\tfont(color=\"red\")\n" \
+"\t\t\t\t\tb [[{CNT}]]\n" \
+"\t\t\t\t| : [{X}]\n";
+
+	SFString ret = STR_1;
+	ret.Replace("[{HEAD}]",input.Left(10));
+	input = input.Mid(10,1000000);
+
+	SFString rows;
 	while (!input.IsEmpty())
 	{
-		ctx << "[" << cnt++ << "]: " << input.Left(64) << "<br>\n";
-		input=input.Mid(64,100000);
+		SFString row = STR_2;
+		row.Replace("[{CNT}]",asString(cnt++));
+		row.Replace("[{X}]",input.Left(64));
+		rows += "\n" + row;
+		input=input.Mid(64,1000000);
 	}
-	return ctx.str;
+	ret.Replace("[{ROWS}]", (rows.IsEmpty()?"":rows));
+	return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -72,7 +92,7 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 	SFString ret = nextTransactionChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'b':
@@ -114,12 +134,12 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "value" ) return tra->value;
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	ret = nextBasenodeChunk(fieldIn, force, tra);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -131,6 +151,16 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 	{
 		timeStamp = toLong(fieldValue);
 		m_transDate = dateFromTimeStamp(timeStamp);
+		return TRUE;
+	} else if ( fieldName % "input" )
+	{
+		input = fieldValue;
+		function = Format("[{FUNCTION}]");
+		return TRUE;
+	} else if ( fieldName % "value" )
+	{
+		value = fieldValue;
+		ether = (double)strtold((const char*)Format("[{ETHER}]"),NULL);
 		return TRUE;
 	}
 	// EXISTING_CODE
@@ -185,6 +215,8 @@ void CTransaction::finishParse()
 {
 	// EXISTING_CODE
 	m_transDate = dateFromTimeStamp(timeStamp);
+	function = Format("[{FUNCTION}]");
+	ether = (double)strtold((const char*)Format("[{ETHER}]"),NULL);
 	// EXISTING_CODE
 }
 
@@ -365,7 +397,7 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 		default:
 			break;
 	}
-	
+
 #pragma unused(tr)
 #pragma unused(tra)
 
@@ -454,10 +486,8 @@ SFString parse(const SFString& params, int nItems, SFString *types)
 				val = "0x"+params.Mid((start+1)*64,len*2);
 		}
 
-//		if (transCount++<100) printf("%05ld-%03d: %-10.10s %s %s\n", transCount, item, (const char*)types[item], (const char*)params.Mid(item*64,64), (const char*)val);
 		ret += ("|" + val);
 	}
-//	if (transCount<100) printf("\n");
 	return ret;
 }
 
@@ -516,7 +546,7 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 		SFString items[] = { };
 		int nItems = sizeof(items) / sizeof(SFString);
 		return which + parse(params, nItems, items);
-	
+
 	} else if (which=="payOut")
 	{
 		//function payOut(address _recipient, uint _amount)
@@ -531,7 +561,7 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 		int nItems = sizeof(items) / sizeof(SFString);
 		return which + parse(params, nItems, items);
 		return which;
-	
+
 	} else if (which=="changeDomain")
 	{
 		//function changeDomain( uint domain, uint expires, uint price, address transfer ) 
@@ -573,7 +603,7 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 		SFString items[] = { "uint3", "vote", };
 		int nItems = sizeof(items) / sizeof(SFString);
 		return which + parse(params, nItems, items);
-	
+
 	} else if (which=="executeProposal")
 	{
 		//function executeProposal(uint _proposalID, bytes _transactionData)
@@ -605,6 +635,12 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 //		if (trans && trans->pParent && ((CAccount*)trans->pParent)->addr == recipient)
 //			type.Replace(")", "-self)");
 		return which + type + parse(params, nItems, items);
+
+	} else if (which=="SendEmail")
+	{
+		SFString items[] = { "string","string", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
 	}
 
 	return which;

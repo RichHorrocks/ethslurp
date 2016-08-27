@@ -242,7 +242,7 @@ SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const v
 		default:
 			break;
 	}
-	
+
 #pragma unused(sl)
 #pragma unused(slu)
 

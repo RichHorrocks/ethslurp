@@ -55,7 +55,7 @@ SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data)
 	SFString ret = nextAbiChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'a':
@@ -80,12 +80,12 @@ SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data)
 			if ( fieldIn % "handle" ) return asString(abi->handle);
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	ret = nextBasenodeChunk(fieldIn, force, abi);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -200,7 +200,7 @@ SFString nextAbiChunk_custom(const SFString& fieldIn, SFBool& force, const void 
 		default:
 			break;
 	}
-	
+
 #pragma unused(ab)
 #pragma unused(abi)
 

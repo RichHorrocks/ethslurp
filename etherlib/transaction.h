@@ -77,10 +77,12 @@ public:
 	// EXISTING_CODE
 	SFString inputToFunction(void) const;
 	SFBool   isFunction(const SFString& func) const;
-	SFTime   m_transDate;
 	SFString getAddrList(char delim='\t') const;
 	SFString getAddrsFromInput(char delim='\t') const;
 	CFunction *funcPtr;
+	SFTime     m_transDate;
+	SFString   function;
+	double     ether;
 	// EXISTING_CODE
 
 protected:

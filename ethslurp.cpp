@@ -219,7 +219,12 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 		while (!done)
 		{
 			SFString url = SFString("https://api.etherscan.io/api?module=account&action=txlist&sort=asc") +
-			"&address=" + theAccount.addr + "&page="    + asString(page) + "&offset="  + asString(options.pageSize) + "&apikey="  + api.getKey();
+						"&address=" + theAccount.addr +
+						"&page="    + asString(page) +
+						"&offset="  +
+						asString(options.pageSize) +
+						"&apikey="  + api.getKey();
+
 			// Grab a page of data from the web api
 			SFString thisPage = urlToString(url);
 

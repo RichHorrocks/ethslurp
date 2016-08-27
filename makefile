@@ -10,6 +10,7 @@ slurp_options.cpp
 # probably don't have to change below this line
 
 objects = $(patsubst %.cpp,objs/%.o,$(src))
+objs=./objs
 
 all:
 	@cd utillib; make; cd ..
