@@ -1,5 +1,5 @@
-#ifndef _ABI_H_
-#define _ABI_H_
+#ifndef _PRICEQUOTE_H_
+#define _PRICEQUOTE_H_
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -23,61 +23,61 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
-#include "function.h"
-#include "parameter.h"
+#include "utillib.h"
 
 //--------------------------------------------------------------------------
-class CAbi;
-typedef SFArrayBase<CAbi>         CAbiArray;
-typedef SFList<CAbi*>             CAbiList;
-typedef CNotifyClass<const CAbi*> CAbiNotify;
-typedef SFUniqueList<CAbi*>       CAbiListU;
+class CPriceQuote;
+typedef SFArrayBase<CPriceQuote>         CPriceQuoteArray;
+typedef SFList<CPriceQuote*>             CPriceQuoteList;
+typedef CNotifyClass<const CPriceQuote*> CPriceQuoteNotify;
+typedef SFUniqueList<CPriceQuote*>       CPriceQuoteListU;
 
 //---------------------------------------------------------------------------
-extern int sortAbi        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
-extern int sortAbiByName  (const void *rr1, const void *rr2);
-extern int sortAbiByID    (const void *rr1, const void *rr2);
-extern int isDuplicateAbi (const void *rr1, const void *rr2);
+extern int sortPricequote        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
+extern int sortPricequoteByName  (const void *rr1, const void *rr2);
+extern int sortPricequoteByID    (const void *rr1, const void *rr2);
+extern int isDuplicatePricequote (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CAbi : public CBaseNode
+class CPriceQuote : public CBaseNode
 {
 public:
 	SFInt32 handle;
-	CFunctionArray abiByName;
-	CFunctionArray abiByEncoding;
+	SFInt32 timeStamp;
+	float open;
+	float high;
+	float low;
+	float close;
+	float quoteVolume;
+	float volume;
+	float weightedAvg;
 
 public:
-					CAbi  (void);
-					CAbi  (const CAbi& ab);
-				   ~CAbi  (void);
-	CAbi&	operator= 		(const CAbi& ab);
+					CPriceQuote  (void);
+					CPriceQuote  (const CPriceQuote& pr);
+				   ~CPriceQuote  (void);
+	CPriceQuote&	operator= 		(const CPriceQuote& pr);
 
-	DECLARE_NODE (CAbi);
+	DECLARE_NODE (CPriceQuote);
 
 	// EXISTING_CODE
-        void loadABI(const SFString& addr);
-        void clearABI(void);
-#if 1 //NEW_CODE
-        CFunction *findFunctionByName(const SFString& search);
-#endif
-        CFunction *findFunctionByEncoding(const SFString& search);
+	SFTime date;
 	// EXISTING_CODE
 
 protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CAbi& ab);
+	void			Copy      		(const CPriceQuote& pr);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 };
 
 //--------------------------------------------------------------------------
-inline CAbi::CAbi(void)
+inline CPriceQuote::CPriceQuote(void)
 {
 	Init();
 	// EXISTING_CODE
@@ -85,18 +85,18 @@ inline CAbi::CAbi(void)
 }
 
 //--------------------------------------------------------------------------
-inline CAbi::CAbi(const CAbi& ab)
+inline CPriceQuote::CPriceQuote(const CPriceQuote& pr)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(ab);
+	Copy(pr);
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-inline CAbi::~CAbi(void)
+inline CPriceQuote::~CPriceQuote(void)
 {
 	Clear();
 	// EXISTING_CODE
@@ -104,54 +104,64 @@ inline CAbi::~CAbi(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CAbi::Clear(void)
+inline void CPriceQuote::Clear(void)
 {
 	// EXISTING_CODE
-#if 1 //NEW_CODE
-	abiByName.Clear();
-#endif
-	abiByEncoding.Clear();
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CAbi::Init(void)
+inline void CPriceQuote::Init(void)
 {
 	CBaseNode::Init();
 
 	handle = 0;
-//	abiByName = ??; /* unknown type: CFunctionArray */
-//	abiByEncoding = ??; /* unknown type: CFunctionArray */
+	timeStamp = 0;
+	open = 0.0;
+	high = 0.0;
+	low = 0.0;
+	close = 0.0;
+	quoteVolume = 0.0;
+	volume = 0.0;
+	weightedAvg = 0.0;
 
 	// EXISTING_CODE
+	date = earliestDate;
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CAbi::Copy(const CAbi& ab)
+inline void CPriceQuote::Copy(const CPriceQuote& pr)
 {
 	Clear();
 
-	CBaseNode::Copy(ab);
-	handle = ab.handle;
-	abiByName = ab.abiByName;
-	abiByEncoding = ab.abiByEncoding;
+	CBaseNode::Copy(pr);
+	handle = pr.handle;
+	timeStamp = pr.timeStamp;
+	open = pr.open;
+	high = pr.high;
+	low = pr.low;
+	close = pr.close;
+	quoteVolume = pr.quoteVolume;
+	volume = pr.volume;
+	weightedAvg = pr.weightedAvg;
 
 	// EXISTING_CODE
+	date = pr.date;
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CAbi& CAbi::operator=(const CAbi& ab)
+inline CPriceQuote& CPriceQuote::operator=(const CPriceQuote& pr)
 {
-	Copy(ab);
+	Copy(pr);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
 }
 
 //---------------------------------------------------------------------------
-inline SFString CAbi::getValueByName(const SFString& fieldName) const
+inline SFString CPriceQuote::getValueByName(const SFString& fieldName) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -159,7 +169,7 @@ inline SFString CAbi::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CAbi::getHandle(void) const
+inline SFInt32 CPriceQuote::getHandle(void) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -167,22 +177,17 @@ inline SFInt32 CAbi::getHandle(void) const
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextPricequoteChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
-IMPLEMENT_ARCHIVE_ARRAY(CAbiArray);
-IMPLEMENT_ARCHIVE_LIST(CAbiList);
+IMPLEMENT_ARCHIVE_ARRAY(CPriceQuoteArray);
+IMPLEMENT_ARCHIVE_LIST(CPriceQuoteList);
 
 //---------------------------------------------------------------------------
-extern SFString nextAbiChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextPricequoteChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE
-extern SFBool verbose;
-extern SFBool isTesting;
-extern CFileExportContext& outErr;
-#define REP_FREQ   11
-#define REP_INFREQ 563
 // EXISTING_CODE
 
 #endif

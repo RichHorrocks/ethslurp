@@ -3,9 +3,7 @@
 //-----------------------------------------------------------------------
 int main(int argc, const char *argv[])
 {
-	loadData();
 	CNameOptions options;
-
 	if (!options.prepareArguments(argc, argv))
 		return 0;
 
@@ -14,6 +12,12 @@ int main(int argc, const char *argv[])
 	{
 		SFString command = nextTokenClear(options.commandList, '\n');
 		options.parseArguments(command);
+		if (options.list)
+		{
+			for (int i=0;i<nNames;i++)
+				out << accounts[i].Format12() << "\n";
+			exit(0);
+		}
 		out << showName(options.addr, options.name, options.source, options.matchCase, options.all);
 		if (options.write)
 			out << "Writing is not implemented.\n";
@@ -21,6 +25,7 @@ int main(int argc, const char *argv[])
 	}
 	if (accounts)
 		delete [] accounts;
+
 	return 0;
 }
 
@@ -31,6 +36,7 @@ void loadData(void)
 		return;
 
 	SFString contents = asciiFileToString(DATA_FILE);
+
 	SFInt32 nLines = countOf('\n',contents);
 	accounts = new CAccountName[nLines];
 	if (!accounts)

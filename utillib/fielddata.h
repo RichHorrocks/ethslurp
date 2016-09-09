@@ -364,6 +364,8 @@ typedef SFArrayBase<CFieldData> CFieldArray;
 #define T_HALFTEXT          ( 12 | TS_SEARCH | TS_SORT)
 #define T_SHORTTEXT         ( 13 | TS_SEARCH | TS_SORT)
 #define T_NUMBER            ( 14 | TS_SEARCH | TS_SORT)
+#define T_FLOAT             T_NUMBER
+#define T_DOUBLE            T_NUMBER
 #define T_NOTES             ( 15 | TS_SEARCH | TS_SORT)
 #define T_ICONLIST          ( 16 | TS_SEARCH | TS_SORT)
 #define T_ONOFF             ( 17 | TS_SEARCH | TS_SORT)

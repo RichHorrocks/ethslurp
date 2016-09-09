@@ -35,7 +35,7 @@ public:
 
 	               COptions        (void) { fromFile = FALSE; }
 	    virtual   ~COptions        (void) { }
-		SFBool prepareArguments(int argc, const char *argv[]);
+		SFBool prepareArguments(int argc, const char *argv[], const SFString& homeFolder=nullString);
 	virtual SFBool parseArguments  (SFString& command) = 0;
 
 protected:

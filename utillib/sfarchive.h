@@ -64,6 +64,9 @@ public:
 
 	SFArchive& operator<<(char c);
 	SFArchive& operator<<(long dw);
+	SFArchive& operator<<(long long dw);
+	SFArchive& operator<<(unsigned long dw);
+	SFArchive& operator<<(unsigned long long dw);
 	SFArchive& operator<<(float f);
 	SFArchive& operator<<(double f);
 	SFArchive& operator<<(const SFString& str);
@@ -75,6 +78,9 @@ public:
 
 	SFArchive& operator>>(char& c);
 	SFArchive& operator>>(long& dw);
+	SFArchive& operator>>(long long& dw);
+	SFArchive& operator>>(unsigned long& dw);
+	SFArchive& operator>>(unsigned long long& dw);
 	SFArchive& operator>>(float& f);
 	SFArchive& operator>>(double& f);
 	SFArchive& operator>>(SFString& str);

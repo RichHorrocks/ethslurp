@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "proposal.h"
@@ -55,7 +55,7 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 	SFString ret = nextProposalChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'a':
@@ -79,13 +79,13 @@ SFString nextProposalChunk(const SFString& fieldIn, SFBool& force, const void *d
 			if ( fieldIn % "recipient" ) return pro->recipient;
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	CTransactionNotify dn(pro);
 	ret = nextTransactionChunk(fieldIn, force, &dn);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -225,7 +225,7 @@ SFString nextProposalChunk_custom(const SFString& fieldIn, SFBool& force, const 
 		default:
 			break;
 	}
-	
+
 #pragma unused(pr)
 #pragma unused(pro)
 

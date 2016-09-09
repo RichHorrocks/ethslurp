@@ -38,6 +38,24 @@ SFArchive& SFArchive::operator<<(long dw)
 	return *this;
 }
 
+SFArchive& SFArchive::operator<<(unsigned long dw)
+{
+	Write(dw);
+	return *this;
+}
+
+SFArchive& SFArchive::operator<<(long long dw)
+{
+	Write(dw);
+	return *this;
+}
+
+SFArchive& SFArchive::operator<<(unsigned long long dw)
+{
+	Write(dw);
+	return *this;
+}
+
 SFArchive& SFArchive::operator<<(float f)
 {
 	Write(f);
@@ -94,6 +112,24 @@ SFArchive& SFArchive::operator>>(char& c)
 }
 
 SFArchive& SFArchive::operator>>(long& dw)
+{
+	Read(dw);
+	return *this;
+}
+
+SFArchive& SFArchive::operator>>(unsigned long& dw)
+{
+	Read(dw);
+	return *this;
+}
+
+SFArchive& SFArchive::operator>>(long long& dw)
+{
+	Read(dw);
+	return *this;
+}
+
+SFArchive& SFArchive::operator>>(unsigned long long& dw)
 {
 	Read(dw);
 	return *this;

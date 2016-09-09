@@ -322,11 +322,14 @@ SFInt32 CSharedResource::Read(void *buff, SFInt32 size, SFInt32 cnt)
 }
 
 //----------------------------------------------------------------------
-SFInt32 CSharedResource::Read(char&   val) { return Read(&val, sizeof(char),   1); }
-SFInt32 CSharedResource::Read(long&   val) { return Read(&val, sizeof(long),   1); }
-SFInt32 CSharedResource::Read(float&  val) { return Read(&val, sizeof(float),  1); }
-SFInt32 CSharedResource::Read(double& val) { return Read(&val, sizeof(double), 1); }
-SFInt32 CSharedResource::Read(SFTime& val) { return Read(&val.m_nSeconds, sizeof(SFInt64), 1); }
+SFInt32 CSharedResource::Read(         char&      val) { return Read(&val, sizeof(char),      1); }
+SFInt32 CSharedResource::Read(         long&      val) { return Read(&val, sizeof(long),      1); }
+SFInt32 CSharedResource::Read(unsigned long&      val) { return Read(&val, sizeof(long),      1); }
+SFInt32 CSharedResource::Read(         long long& val) { return Read(&val, sizeof(long long), 1); }
+SFInt32 CSharedResource::Read(unsigned long long& val) { return Read(&val, sizeof(long long), 1); }
+SFInt32 CSharedResource::Read(         float&     val) { return Read(&val, sizeof(float),     1); }
+SFInt32 CSharedResource::Read(         double&    val) { return Read(&val, sizeof(double),    1); }
+SFInt32 CSharedResource::Read(         SFTime&    val) { return Read(&val.m_nSeconds, sizeof(SFInt64), 1); }
 
 //----------------------------------------------------------------------
 SFInt32 CSharedResource::Read(SFString& str)
@@ -411,11 +414,14 @@ SFInt32 CSharedResource::Write(const void *buff, SFInt32 size, SFInt32 cnt) cons
 }
 
 //----------------------------------------------------------------------
-SFInt32 CSharedResource::Write(char          val) const { return Write(&val, sizeof(char), 1); }
-SFInt32 CSharedResource::Write(long          val) const { return Write(&val, sizeof(long), 1); }
-SFInt32 CSharedResource::Write(float         val) const { return Write(&val, sizeof(float), 1); }
-SFInt32 CSharedResource::Write(double        val) const { return Write(&val, sizeof(double), 1); }
-SFInt32 CSharedResource::Write(const SFTime& val) const { return Write(&val.m_nSeconds, sizeof(SFInt64), 1); }
+SFInt32 CSharedResource::Write(         char          val) const { return Write(&val, sizeof(char),      1); }
+SFInt32 CSharedResource::Write(         long          val) const { return Write(&val, sizeof(long),      1); }
+SFInt32 CSharedResource::Write(unsigned long          val) const { return Write(&val, sizeof(long),      1); }
+SFInt32 CSharedResource::Write(         long long     val) const { return Write(&val, sizeof(long long), 1); }
+SFInt32 CSharedResource::Write(unsigned long long     val) const { return Write(&val, sizeof(long long), 1); }
+SFInt32 CSharedResource::Write(         float         val) const { return Write(&val, sizeof(float),     1); }
+SFInt32 CSharedResource::Write(         double        val) const { return Write(&val, sizeof(double),    1); }
+SFInt32 CSharedResource::Write(         const SFTime& val) const { return Write(&val.m_nSeconds, sizeof(SFInt64), 1); }
 
 //----------------------------------------------------------------------
 SFInt32 CSharedResource::Write(const SFString& val) const

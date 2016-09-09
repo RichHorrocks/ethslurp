@@ -661,33 +661,34 @@ const static SFString fmts[] = {
 	"%#h:%M%P",                  // FMT_TIME
 	"%#h:%M%p",                  // FMT_TIMESH
 	"%#m/%#d",                   // FMT_DATENOYEAR
-	"%#m/%#d/%Y",                // FMT_DATE
-	"%A, %B %#d, %Y",            // FMT_DAY - 5
+	"%#m/%#d/%Y",                // FMT_DATE - 5
+	"%A, %B %#d, %Y",            // FMT_DAY
 	"%b %#d, %y",                // FMT_DAYSH
 	"Week of %A, %B %#d, %Y",    // FMT_WEEK
 	"Week of %b %#d, %y",        // FMT_WEEKSH
-	"Wk of %a, %b %#d, %Y",      // FMT_WEEKSHDATE
-	"%a, %b %#d, %Y",            // FMT_DATEFMT - 10
+	"Wk of %a, %b %#d, %Y",      // FMT_WEEKSHDATE - 10
+	"%a, %b %#d, %Y",            // FMT_DATEFMT
 	"%a %#d",                    // FMT_DAYNAMEDAY
 	"%B %Y",                     // FMT_MONTH
 	"%b %y",                     // FMT_MONTHSH
-	"%Y",                        // FMT_YEAR
-	"%y",                        // FMT_YEARSH - 15
+	"%Y",                        // FMT_YEAR - 15
+	"%y",                        // FMT_YEARSH
 	"%A",                        // FMT_DAYNAME
 	"%a",                        // FMT_DAYNAMESH
 	"%B",                        // FMT_MONTHNAME
-	"%b",                        // FMT_MONTHNAMESH
-	"%Q",                        // FMT_SECSTODAY - 20
+	"%b",                        // FMT_MONTHNAMESH - 20
+	"%Q",                        // FMT_SECSTODAY
 	"%#d",                       // FMT_DAYNUMBER
 	"%Y%m%d",                    // FMT_SORTYYYYMMDD
 	"%A %#d",                    // FMT_DAYNAMEDAYL
-	"%#h:%M %P",                 // FMT_TIME_EXPORT
-	"%#m/%#d/%Y %#h:%M:%S %P",   // FMT_DEFAULT_EXPORT - 25
+	"%#h:%M %P",                 // FMT_TIME_EXPORT - 25
+	"%#m/%#d/%Y %#h:%M:%S %P",   // FMT_DEFAULT_EXPORT
 	"%Y%m%d%H%M%S",              // FMT_SORTALL
 	"%A, %B %#d. %Y - %#h:%M%P", // FMT_TIMESTAMP
-	"%b %#d",                    // FMT_DAYSH_NOYEAR - 28
-	"%Y%m%dT%H%M%S",             // FMT_VCAL_DATE
+	"%b %#d",                    // FMT_DAYSH_NOYEAR
+	"%Y%m%dT%H%M%S",             // FMT_VCAL_DATE - 30
 	"%Y;%m;%d;%H;%M;%S;",        // FMT_SEMI_SEP
+	"%Y-%m-%d %H:%M:%S UTC",     // FMT_JSON
 };
 
 #ifdef _DEBUG
@@ -772,7 +773,7 @@ SFTime dateFromTimeStamp(SFInt32 tsIn)
 	struct tm *tm = gmtime(&utc);
 	char retStr[40];
 	strftime(retStr, sizeof(retStr), "%Y-%m-%d %H:%M:%S UTC", tm);
-	
+
 	SFString str = retStr;
 	SFInt32 y =  toLong(nextTokenClear(str,'-'));
 	SFInt32 m =  toLong(nextTokenClear(str,'-'));

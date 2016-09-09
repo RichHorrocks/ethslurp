@@ -17,6 +17,7 @@ all:
 	@cd etherlib; make; cd ..
 	@cd daolib; make; cd ..
 	@cd src/ethname; make; cd ../..
+	@cd src/ethprice; make; cd ../..
 	@echo "$(product) build started"
 	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	@make $(product)
@@ -32,6 +33,8 @@ test: all
 	@cd theData/whales; make; cd -
 	@cd theData/hack; make; cd -
 	@make -B back
+
+#	@cd src/summation ; make data ; cd -
 
 back:
 	@rm -fR theData/backup

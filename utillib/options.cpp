@@ -28,11 +28,11 @@ SOFTWARE.
 #include "sffile.h"
 #include "options.h"
 
-SFString programName;
+SFString programName="ethslurp";
 //--------------------------------------------------------------------------------
-SFBool COptions::prepareArguments(int argc, const char *argv[])
+SFBool COptions::prepareArguments(int argc, const char *argv[], const SFString& homeFolder)
 {
-	programName = SFFile(argv[0]).getFilename();
+	programName = (homeFolder==nullString ? SFFile(argv[0]).getFilename() : homeFolder);
 	if (argc==1)
 		return usage();
 
@@ -128,6 +128,7 @@ SFBool COptions::prepareArguments(int argc, const char *argv[])
 	}
 	commandList += stdInCmds;
 	commandList.ReplaceAll(" \n","\n");
+	commandList = Strip(commandList,'\n');
 
 	if (args) delete [] args;
 	return 1;

@@ -24,9 +24,9 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "transaction.h"
 #include "etherlib.h"
 #include "abi.h"
-#include "transaction.h"
 
 //--------------------------------------------------------------------------
 class CAccount;
@@ -60,20 +60,21 @@ public:
 	CTransactionArray transactions;
 
 public:
-					CAccount(void);
-					CAccount(const CAccount& sl);
-				       ~CAccount  (void);
-	CAccount& operator= 		(const CAccount& sl);
+					CAccount  (void);
+					CAccount  (const CAccount& ac);
+				   ~CAccount  (void);
+	CAccount&	operator= 		(const CAccount& ac);
 
 	DECLARE_NODE (CAccount);
 
 	// EXISTING_CODE
+	SFInt32 deleteNotShowing(void);
 	// EXISTING_CODE
 
 protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CAccount& sl);
+	void			Copy      		(const CAccount& ac);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -88,11 +89,11 @@ inline CAccount::CAccount(void)
 }
 
 //--------------------------------------------------------------------------
-inline CAccount::CAccount(const CAccount& sl)
+inline CAccount::CAccount(const CAccount& ac)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(sl);
+	Copy(ac);
 }
 
 // EXISTING_CODE
@@ -130,6 +131,7 @@ inline void CAccount::Init(void)
 	lastPage = 0;
 	lastBlock = 0;
 	nVisible = 0;
+//	abi = ??; /* unknown type: CAbi */
 //	transactions = ??; /* unknown type: CTransactionArray */
 
 	// EXISTING_CODE
@@ -139,33 +141,34 @@ inline void CAccount::Init(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CAccount::Copy(const CAccount& sl)
+inline void CAccount::Copy(const CAccount& ac)
 {
 	Clear();
 
-	CBaseNode::Copy(sl);
-	handle = sl.handle;
-	addr = sl.addr;
-	header = sl.header;
-	displayString = sl.displayString;
-	pageSize = sl.pageSize;
-	lastPage = sl.lastPage;
-	lastBlock = sl.lastBlock;
-	nVisible = sl.nVisible;
-	transactions = sl.transactions;
+	CBaseNode::Copy(ac);
+	handle = ac.handle;
+	addr = ac.addr;
+	header = ac.header;
+	displayString = ac.displayString;
+	pageSize = ac.pageSize;
+	lastPage = ac.lastPage;
+	lastBlock = ac.lastBlock;
+	nVisible = ac.nVisible;
+	abi = ac.abi;
+	transactions = ac.transactions;
 
 	// EXISTING_CODE
 #if 1 //NEW_CODE
-	abi.abiByName = sl.abi.abiByName;
+	abi.abiByName = ac.abi.abiByName;
 #endif
-	abi.abiByEncoding = sl.abi.abiByEncoding;
+	abi.abiByEncoding = ac.abi.abiByEncoding;
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CAccount& CAccount::operator=(const CAccount& sl)
+inline CAccount& CAccount::operator=(const CAccount& ac)
 {
-	Copy(sl);
+	Copy(ac);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;

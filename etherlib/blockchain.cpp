@@ -1,3 +1,4 @@
+#if 0
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -25,13 +26,13 @@
  * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
-#include "createtokenproxy.h"
+#include "blockchain.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CCreateTokenProxy, CTransaction, NO_SCHEMA);
+IMPLEMENT_NODE(CBlockChain, CBaseNode, NO_SCHEMA);
 
 //---------------------------------------------------------------------------
-void CCreateTokenProxy::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
+void CBlockChain::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	if (!isShowing())
 		return;
@@ -40,32 +41,40 @@ void CCreateTokenProxy::Format(CExportContext& ctx, const SFString& fmtIn, void 
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
-	CCreateTokenProxyNotify dn(this);
+	CBlockChainNotify dn(this);
 	while (!fmt.IsEmpty())
-		ctx << getNextChunk(fmt, nextCreatetokenproxyChunk, &dn);
+		ctx << getNextChunk(fmt, nextBlockchainChunk, &dn);
 }
 
 //---------------------------------------------------------------------------
-SFString nextCreatetokenproxyChunk(const SFString& fieldIn, SFBool& force, const void *data)
+SFString nextBlockchainChunk(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CCreateTokenProxyNotify *cr = (CCreateTokenProxyNotify*)data;
-	const CCreateTokenProxy *cre = cr->getDataPtr();
+	CBlockChainNotify *bl = (CBlockChainNotify*)data;
+	const CBlockChain *blo = bl->getDataPtr();
 
 	// Now give customized code a chance to override
-	SFString ret = nextCreatetokenproxyChunk_custom(fieldIn, force, data);
+	SFString ret = nextBlockchainChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
 
 	switch (tolower(fieldIn[0]))
 	{
-		case 't':
-			if ( fieldIn % "tokenHolder" ) return cre->tokenHolder;
+		case 'b':
+			if ( fieldIn % "blocks" )
+			{
+				SFString ret = "\n";
+				for (int i=0;i<blo->blocks.getCount();i++)
+					ret += blo->blocks[i].Format();
+				return ret;
+			}
+			break;
+		case 'h':
+			if ( fieldIn % "handle" ) return asString(blo->handle);
 			break;
 	}
 
 	// Finally, give the parent class a chance
-	CTransactionNotify dn(cre);
-	ret = nextTransactionChunk(fieldIn, force, &dn);
+	ret = nextBasenodeChunk(fieldIn, force, blo);
 	if (!ret.IsEmpty())
 		return ret;
 
@@ -73,18 +82,18 @@ SFString nextCreatetokenproxyChunk(const SFString& fieldIn, SFBool& force, const
 }
 
 //---------------------------------------------------------------------------------------------------
-SFBool CCreateTokenProxy::setValueByName(const SFString& fieldName, const SFString& fieldValue)
+SFBool CBlockChain::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 
-	if (CTransaction::setValueByName(fieldName, fieldValue))
-		return TRUE;
-
 	switch (tolower(fieldName[0]))
 	{
-		case 't':
-			if ( fieldName % "tokenHolder" ) { tokenHolder = toLower(fieldValue); return TRUE; }
+		case 'b':
+			if ( fieldName % "blocks" ) return TRUE;
+			break;
+		case 'h':
+			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			break;
 		default:
 			break;
@@ -93,57 +102,58 @@ SFBool CCreateTokenProxy::setValueByName(const SFString& fieldName, const SFStri
 }
 
 //---------------------------------------------------------------------------------------------------
-void CCreateTokenProxy::finishParse()
+void CBlockChain::finishParse()
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //---------------------------------------------------------------------------------------------------
-void CCreateTokenProxy::Serialize(SFArchive& archive)
+void CBlockChain::Serialize(SFArchive& archive)
 {
-	CTransaction::Serialize(archive);
+	if (!SerializeHeader(archive))
+		return;
 
 	if (archive.isReading())
 	{
-		archive >> tokenHolder;
+		archive >> handle;
+		archive >> blocks;
 		finishParse();
 	} else
 	{
-		archive << tokenHolder;
+		archive << handle;
+		archive << blocks;
 
 	}
 }
 
 //---------------------------------------------------------------------------
-void CCreateTokenProxy::registerClass(void)
+void CBlockChain::registerClass(void)
 {
 	static bool been_here=false;
 	if (been_here) return;
 	been_here=true;
 
-	CTransaction::registerClass();
-
 	SFInt32 fieldNum=1000;
-	ADD_FIELD(CCreateTokenProxy, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CCreateTokenProxy, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CCreateTokenProxy, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CCreateTokenProxy, "tokenHolder", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlockChain, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
+	ADD_FIELD(CBlockChain, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CBlockChain, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CBlockChain, "blocks", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
-	HIDE_FIELD(CCreateTokenProxy, "schema");
-	HIDE_FIELD(CCreateTokenProxy, "deleted");
-	HIDE_FIELD(CCreateTokenProxy, "handle");
+	HIDE_FIELD(CBlockChain, "schema");
+	HIDE_FIELD(CBlockChain, "deleted");
+	HIDE_FIELD(CBlockChain, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //---------------------------------------------------------------------------
-int sortCreatetokenproxy(const SFString& f1, const SFString& f2, const void *rr1, const void *rr2)
+int sortBlockchain(const SFString& f1, const SFString& f2, const void *rr1, const void *rr2)
 {
-	CCreateTokenProxy *g1 = (CCreateTokenProxy*)rr1;
-	CCreateTokenProxy *g2 = (CCreateTokenProxy*)rr2;
+	CBlockChain *g1 = (CBlockChain*)rr1;
+	CBlockChain *g2 = (CBlockChain*)rr2;
 
 	SFString v1 = g1->getValueByName(f1);
 	SFString v2 = g2->getValueByName(f1);
@@ -155,14 +165,14 @@ int sortCreatetokenproxy(const SFString& f1, const SFString& f2, const void *rr1
 	v2 = g2->getValueByName(f2);
 	return (int)v1.Compare(v2);
 }
-int sortCreatetokenproxyByName(const void *rr1, const void *rr2) { return sortCreatetokenproxy("cr_Name", "", rr1, rr2); }
-int sortCreatetokenproxyByID  (const void *rr1, const void *rr2) { return sortCreatetokenproxy("createtokenproxyID", "", rr1, rr2); }
+int sortBlockchainByName(const void *rr1, const void *rr2) { return sortBlockchain("bl_Name", "", rr1, rr2); }
+int sortBlockchainByID  (const void *rr1, const void *rr2) { return sortBlockchain("blockchainID", "", rr1, rr2); }
 
 //---------------------------------------------------------------------------
-SFString nextCreatetokenproxyChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
+SFString nextBlockchainChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CCreateTokenProxyNotify *cr = (CCreateTokenProxyNotify*)data;
-	const CCreateTokenProxy *cre = cr->getDataPtr();
+	CBlockChainNotify *bl = (CBlockChainNotify*)data;
+	const CBlockChain *blo = bl->getDataPtr();
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
@@ -171,14 +181,14 @@ SFString nextCreatetokenproxyChunk_custom(const SFString& fieldIn, SFBool& force
 			break;
 	}
 
-#pragma unused(cr)
-#pragma unused(cre)
+#pragma unused(bl)
+#pragma unused(blo)
 
 	return EMPTY;
 }
 
 //---------------------------------------------------------------------------
-SFBool CCreateTokenProxy::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
+SFBool CBlockChain::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -188,3 +198,4 @@ SFBool CCreateTokenProxy::handleCustomFormat(CExportContext& ctx, const SFString
 //---------------------------------------------------------------------------
 // EXISTING_CODE
 // EXISTING_CODE
+#endif

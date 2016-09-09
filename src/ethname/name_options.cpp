@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "daolib.h"
+#include "etherlib.h"
 #include "name_options.h"
 
 //---------------------------------------------------------------------------------------------------
@@ -30,6 +30,7 @@ CParams params[] =
 	CParams("~term [name]",	"search for 'term' in either name or address. If 'name' is present, term \n\t\t\t     is assumed to be an address. In this case, both must match" ),
 	CParams("-all",		"search 'source' field as well name and address" ),
 	CParams("-count",	"print only the count of the number of matches" ),
+	CParams("-list",        "list all names" ),
 	CParams("-matchCase",	"matches must agree in case (the default is to ignore case)" ),
 	CParams("-open",	"open the name database for editing" ),
 	CParams("-write",	"write the name/address pair to database. Will prompt for an optional source" ),
@@ -52,6 +53,10 @@ SFBool CNameOptions::parseArguments(SFString& command)
 		} else if (arg == "-c" || arg == "-count")
 		{
 			count = TRUE;
+
+		} else if (arg == "-l" || arg == "-list")
+		{
+			list = TRUE;
 
 		} else if (arg == "-m" || arg == "-matchCase")
 		{
@@ -102,6 +107,7 @@ void CNameOptions::Init(void)
 	all = FALSE;
 	write = FALSE;
 	matchCase = FALSE;
+	list = FALSE;
 }
 
 //---------------------------------------------------------------------------------------------------

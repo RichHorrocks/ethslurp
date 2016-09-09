@@ -2,7 +2,6 @@
 #define _ETHNAME_H_
 
 #include "etherlib.h"
-#include "daolib.h"
 #include "name_options.h"
 
 class CAccountName : public CAccount

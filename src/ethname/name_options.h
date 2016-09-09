@@ -34,6 +34,7 @@ public:
 	SFBool matchCase;
 	SFBool open;
 	SFBool write;
+	SFBool list;
 
 	       CNameOptions   (void);
 	      ~CNameOptions   (void) {};

@@ -12,17 +12,12 @@ api_key
 TODO.txt
 abis
 theData
-voteCount.cpp
-votes.html
-prop_data.txt
-props.txt
-balances
-withdraw_watch
-curator_watch
 docs
 docs/*
-src/getEvents
-src/summation
+src
+src/ethname/*
+src/ethprice/*
+src/*/*
 
 # Precompiled Headers
 *.gch

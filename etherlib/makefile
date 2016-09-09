@@ -1,15 +1,21 @@
-cflags=-Wall -O2 -DLINUX -I../utillib -I../ -I./
+cflags=-Wall -O2 -DLINUX -DCOMPRESS -I../utillib -I../ -I./
+#cflags=-Wall -O2 -DLINUX -I../utillib -I../ -I./
 
 product=etherlib.a
 
 src= \
 abi.cpp \
 account.cpp \
+block.cpp \
 dapp.cpp \
 function.cpp \
 parameter.cpp \
+pricequote.cpp \
 transaction.cpp \
-webapi.cpp
+webapi.cpp \
+etherlib.cpp
+
+#blockchain.cpp \
 
 #-------------------------------------------------
 # probably don't have to change below this line

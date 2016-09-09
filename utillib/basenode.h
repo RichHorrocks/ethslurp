@@ -52,7 +52,7 @@ public:
 			void     setSchema       (SFInt32 val);
 			SFBool   isShowing       (void) const;
 			void     setShowing      (SFInt32 val);
-	
+
 	virtual SFBool   isKindOf        (const ghRuntimeClass* pClass) const;
 	virtual char    *parseJson       (char *s, SFInt32& nFields);
 	virtual char    *parseCSV        (char *s, SFInt32& nFields, const SFString *fields);

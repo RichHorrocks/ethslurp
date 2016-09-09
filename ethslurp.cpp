@@ -433,6 +433,18 @@ SFBool CSlurperApp::Display(CSlurpOptions& options, SFString& message)
 		theAccount.transactions.Sort(sortReverseChron);
 	theAccount.Format(outScreen, getFormatString(options, "file", FALSE));
 
+#if 0
+	// Do not write records that are not showing (i.e. delete them first)
+	SFArchive archive(FALSE, NO_SCHEMA, FALSE);
+	SFString fileName = options.archiveFile.Substitute(".txt",".bin");
+	if (archive.Lock(fileName, binaryWriteCreate, LOCK_CREATE))
+	{
+		theAccount.deleteNotShowing();
+		theAccount.transactions.Sort(sortTransactionsForWrite);
+		theAccount.Serialize(archive);
+		archive.Close();
+	}
+#endif
 	if (!isTesting)
 	{
 #ifdef NEW_CODE
@@ -584,6 +596,13 @@ void findBlockRange(const SFString& json, SFInt32& minBlock, SFInt32& maxBlock)
 // Make sure our data folder exist, if not establish it
 SFBool establishFolders(CConfig& config, const SFString& vers)
 {
+	// Just double check we're in the right bracnh
+	if (getCWD().Contains("/src.GitHub.1"))
+	{
+		outErr << "You're in src.GitHub.1 folder. Comment this code if you mean to be.\n";
+		exit(0);
+	}
+
 	SFString configFilename = configPath("ethslurp.conf");
 
 	config.setFilename(configFilename);

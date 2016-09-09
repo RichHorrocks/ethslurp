@@ -167,37 +167,39 @@ inline SFInt32 SFTime::GetDayOfWeek() const
 	return ::getDayOfWeek(getDatePart());
 }
 
+// We only do the test for equality and greater than. We then use these to do all other tests
 inline SFBool SFTime::operator==(const SFTime& date) const
 {
-  return (m_nSeconds == date.m_nSeconds);
+	ASSERT(IsValid());
+	return (m_nSeconds == date.m_nSeconds);
 }
 
 inline SFBool SFTime::operator!=(const SFTime& date) const
 {
-	ASSERT(IsValid());
 	return !operator==(date);
 }
 
 inline SFBool SFTime::operator>(const SFTime& date) const
 {
-  return (m_nSeconds > date.m_nSeconds);
-}
-
-inline SFBool SFTime::operator<(const SFTime& date) const
-{
-  return (m_nSeconds < date.m_nSeconds);
+	return (m_nSeconds > date.m_nSeconds);
 }
 
 inline SFBool SFTime::operator>=(const SFTime& date) const
 {
-  return operator>(date) || operator==(date);
+	return operator>(date) || operator==(date);
+}
+
+inline SFBool SFTime::operator<(const SFTime& date) const
+{
+	return (m_nSeconds < date.m_nSeconds);
 }
 
 inline SFBool SFTime::operator<=(const SFTime& date) const
 {
-  return operator<(date) || operator==(date);
+	return operator<(date) || operator==(date);
 }
 
+//-----------------------------------------------------------------
 inline SFTime SFTime::operator+(const SFTimeSpan& ts) const
 {
 	SFTime ret;
@@ -253,7 +255,17 @@ inline SFString getPaddedDate(const SFTime& date)
 	return ret;
 }
 
+//---------------------------------------------------------------------------------------------
 extern SFString getFormatString (SFInt32 fmt, SFBool euro, SFBool mil, const SFString& dSep, const SFString& tSep);
 extern SFTime dateFromTimeStamp(SFInt32 tsIn);
+
+//---------------------------------------------------------------------------------------------
+inline SFInt32 toTimeStamp(const SFTime& timeIn)
+{
+	SFTime  jan1970(1970,1,1,0,0,0);
+	SFInt32 j70 = (long)jan1970.GetTotalSeconds();
+	SFInt32 t   = (long)timeIn.GetTotalSeconds();
+	return (t - j70);
+}
 
 #endif

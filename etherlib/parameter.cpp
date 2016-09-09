@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "parameter.h"
@@ -55,7 +55,7 @@ SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *
 	SFString ret = nextParameterChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'h':
@@ -68,12 +68,12 @@ SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *
 			if ( fieldIn % "type" ) return par->type;
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	ret = nextBasenodeChunk(fieldIn, force, par);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -182,7 +182,7 @@ SFString nextParameterChunk_custom(const SFString& fieldIn, SFBool& force, const
 		default:
 			break;
 	}
-	
+
 #pragma unused(pa)
 #pragma unused(par)
 

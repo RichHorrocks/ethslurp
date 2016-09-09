@@ -1,5 +1,5 @@
-#ifndef _ABI_H_
-#define _ABI_H_
+#ifndef _BLOCK_H_
+#define _BLOCK_H_
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -23,61 +23,71 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
-#include "function.h"
-#include "parameter.h"
+#include "etherlib.h"
 
 //--------------------------------------------------------------------------
-class CAbi;
-typedef SFArrayBase<CAbi>         CAbiArray;
-typedef SFList<CAbi*>             CAbiList;
-typedef CNotifyClass<const CAbi*> CAbiNotify;
-typedef SFUniqueList<CAbi*>       CAbiListU;
+class CBlock;
+typedef SFArrayBase<CBlock>         CBlockArray;
+typedef SFList<CBlock*>             CBlockList;
+typedef CNotifyClass<const CBlock*> CBlockNotify;
+typedef SFUniqueList<CBlock*>       CBlockListU;
 
 //---------------------------------------------------------------------------
-extern int sortAbi        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
-extern int sortAbiByName  (const void *rr1, const void *rr2);
-extern int sortAbiByID    (const void *rr1, const void *rr2);
-extern int isDuplicateAbi (const void *rr1, const void *rr2);
+extern int sortBlock        (const SFString& f1, const SFString& f2, const void *rr1, const void *rr2);
+extern int sortBlockByName  (const void *rr1, const void *rr2);
+extern int sortBlockByID    (const void *rr1, const void *rr2);
+extern int isDuplicateBlock (const void *rr1, const void *rr2);
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-class CAbi : public CBaseNode
+class CBlock : public CBaseNode
 {
 public:
 	SFInt32 handle;
-	CFunctionArray abiByName;
-	CFunctionArray abiByEncoding;
+	SFString difficulty;
+	SFString extraData;
+	SFString gasLimit;
+	SFString gasUsed;
+	SFString hash;
+	SFString logsBloom;
+	SFString miner;
+	SFString nonce;
+	SFString number;
+	SFString parentHash;
+	SFString receiptRoot;
+	SFString sha3Uncles;
+	SFString size;
+	SFString stateRoot;
+	SFString timestamp;
+	SFString totalDifficulty;
+	CTransactionArray transactions;
+	SFString transactionsRoot;
+	SFStringArray uncles;
 
 public:
-					CAbi  (void);
-					CAbi  (const CAbi& ab);
-				   ~CAbi  (void);
-	CAbi&	operator= 		(const CAbi& ab);
+					CBlock  (void);
+					CBlock  (const CBlock& bl);
+				   ~CBlock  (void);
+	CBlock&	operator= 		(const CBlock& bl);
 
-	DECLARE_NODE (CAbi);
+	DECLARE_NODE (CBlock);
 
 	// EXISTING_CODE
-        void loadABI(const SFString& addr);
-        void clearABI(void);
-#if 1 //NEW_CODE
-        CFunction *findFunctionByName(const SFString& search);
-#endif
-        CFunction *findFunctionByEncoding(const SFString& search);
 	// EXISTING_CODE
 
 protected:
 	void			Clear      		(void);
 	void			Init      		(void);
-	void			Copy      		(const CAbi& ab);
+	void			Copy      		(const CBlock& bl);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 };
 
 //--------------------------------------------------------------------------
-inline CAbi::CAbi(void)
+inline CBlock::CBlock(void)
 {
 	Init();
 	// EXISTING_CODE
@@ -85,18 +95,18 @@ inline CAbi::CAbi(void)
 }
 
 //--------------------------------------------------------------------------
-inline CAbi::CAbi(const CAbi& ab)
+inline CBlock::CBlock(const CBlock& bl)
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
-	Copy(ab);
+	Copy(bl);
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 //--------------------------------------------------------------------------
-inline CAbi::~CAbi(void)
+inline CBlock::~CBlock(void)
 {
 	Clear();
 	// EXISTING_CODE
@@ -104,54 +114,84 @@ inline CAbi::~CAbi(void)
 }
 
 //--------------------------------------------------------------------------
-inline void CAbi::Clear(void)
+inline void CBlock::Clear(void)
 {
 	// EXISTING_CODE
-#if 1 //NEW_CODE
-	abiByName.Clear();
-#endif
-	abiByEncoding.Clear();
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CAbi::Init(void)
+inline void CBlock::Init(void)
 {
 	CBaseNode::Init();
 
 	handle = 0;
-//	abiByName = ??; /* unknown type: CFunctionArray */
-//	abiByEncoding = ??; /* unknown type: CFunctionArray */
+	difficulty = EMPTY;
+	extraData = EMPTY;
+	gasLimit = EMPTY;
+	gasUsed = EMPTY;
+	hash = EMPTY;
+	logsBloom = EMPTY;
+	miner = EMPTY;
+	nonce = EMPTY;
+	number = EMPTY;
+	parentHash = EMPTY;
+	receiptRoot = EMPTY;
+	sha3Uncles = EMPTY;
+	size = EMPTY;
+	stateRoot = EMPTY;
+	timestamp = EMPTY;
+	totalDifficulty = EMPTY;
+//	transactions = ??; /* unknown type: CTransactionArray */
+	transactionsRoot = EMPTY;
+//	uncles = ??; /* unknown type: SFStringArray */
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline void CAbi::Copy(const CAbi& ab)
+inline void CBlock::Copy(const CBlock& bl)
 {
 	Clear();
 
-	CBaseNode::Copy(ab);
-	handle = ab.handle;
-	abiByName = ab.abiByName;
-	abiByEncoding = ab.abiByEncoding;
+	CBaseNode::Copy(bl);
+	handle = bl.handle;
+	difficulty = bl.difficulty;
+	extraData = bl.extraData;
+	gasLimit = bl.gasLimit;
+	gasUsed = bl.gasUsed;
+	hash = bl.hash;
+	logsBloom = bl.logsBloom;
+	miner = bl.miner;
+	nonce = bl.nonce;
+	number = bl.number;
+	parentHash = bl.parentHash;
+	receiptRoot = bl.receiptRoot;
+	sha3Uncles = bl.sha3Uncles;
+	size = bl.size;
+	stateRoot = bl.stateRoot;
+	timestamp = bl.timestamp;
+	totalDifficulty = bl.totalDifficulty;
+	transactions = bl.transactions;
+	transactionsRoot = bl.transactionsRoot;
+	uncles = bl.uncles;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
 //--------------------------------------------------------------------------
-inline CAbi& CAbi::operator=(const CAbi& ab)
+inline CBlock& CBlock::operator=(const CBlock& bl)
 {
-	Copy(ab);
+	Copy(bl);
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return *this;
 }
 
 //---------------------------------------------------------------------------
-inline SFString CAbi::getValueByName(const SFString& fieldName) const
+inline SFString CBlock::getValueByName(const SFString& fieldName) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -159,7 +199,7 @@ inline SFString CAbi::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CAbi::getHandle(void) const
+inline SFInt32 CBlock::getHandle(void) const
 {
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -167,22 +207,17 @@ inline SFInt32 CAbi::getHandle(void) const
 }
 
 //---------------------------------------------------------------------------
-extern SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
-IMPLEMENT_ARCHIVE_ARRAY(CAbiArray);
-IMPLEMENT_ARCHIVE_LIST(CAbiList);
+IMPLEMENT_ARCHIVE_ARRAY(CBlockArray);
+IMPLEMENT_ARCHIVE_LIST(CBlockList);
 
 //---------------------------------------------------------------------------
-extern SFString nextAbiChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
+extern SFString nextBlockChunk_custom(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE
-extern SFBool verbose;
-extern SFBool isTesting;
-extern CFileExportContext& outErr;
-#define REP_FREQ   11
-#define REP_INFREQ 563
 // EXISTING_CODE
 
 #endif

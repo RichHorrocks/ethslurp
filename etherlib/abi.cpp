@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "abi.h"
@@ -59,7 +59,6 @@ SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data)
 	switch (tolower(fieldIn[0]))
 	{
 		case 'a':
-#if 1 //NEW_CODE
 			if ( fieldIn % "abiByName" )
 			{
 				SFString ret = "\n";
@@ -67,7 +66,6 @@ SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data)
 					ret += abi->abiByName[i].Format();
 				return ret;
 			}
-#endif
 			if ( fieldIn % "abiByEncoding" )
 			{
 				SFString ret = "\n";
@@ -98,9 +96,7 @@ SFBool CAbi::setValueByName(const SFString& fieldName, const SFString& fieldValu
 	switch (tolower(fieldName[0]))
 	{
 		case 'a':
-#if 1 //NEW_CODE
 			if ( fieldName % "abiByName" ) return TRUE;
-#endif
 			if ( fieldName % "abiByEncoding" ) return TRUE;
 			break;
 		case 'h':
@@ -128,17 +124,13 @@ void CAbi::Serialize(SFArchive& archive)
 	if (archive.isReading())
 	{
 		archive >> handle;
-#if 1 //NEW_CODE
 		archive >> abiByName;
-#endif
 		archive >> abiByEncoding;
 		finishParse();
 	} else
 	{
 		archive << handle;
-#if 1 //NEW_CODE
 		archive << abiByName;
-#endif
 		archive << abiByEncoding;
 
 	}
@@ -155,9 +147,7 @@ void CAbi::registerClass(void)
 	ADD_FIELD(CAbi, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CAbi, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAbi, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
-#if 1 //NEW_CODE
 	ADD_FIELD(CAbi, "abiByName", T_TEXT|TS_ARRAY, ++fieldNum);
-#endif
 	ADD_FIELD(CAbi, "abiByEncoding", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
@@ -267,6 +257,13 @@ CFunction *CAbi::findFunctionByEncoding(const SFString& enc)
 	CFunction search;
 	search.encoding = enc;
 	return abiByEncoding.Find(&search,findByEncoding);
+}
+
+//---------------------------------------------------------------------------
+void CAbi::clearABI(void)
+{
+	abiByName.Clear();
+	abiByEncoding.Clear();
 }
 
 //---------------------------------------------------------------------------

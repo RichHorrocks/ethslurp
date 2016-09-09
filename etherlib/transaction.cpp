@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "transaction.h"
@@ -44,42 +44,6 @@ void CTransaction::Format(CExportContext& ctx, const SFString& fmtIn, void *data
 	CTransactionNotify dn(this);
 	while (!fmt.IsEmpty())
 		ctx << getNextChunk(fmt, nextTransactionChunk, &dn);
-}
-
-//---------------------------------------------------------------------------
-SFString toNice(const SFString& in)
-{
-	if (in.IsEmpty()||in=="0x")
-		return in;
-
-	SFString input = in;
-	SFInt32 cnt=0;
-
-const char* STR_1=
-"([{HEAD}])\n" \
-"[{ROWS}]\n";
-
-const char* STR_2=
-"\t\t\t\tbr\n"
-"\t\t\t\tfont(color=\"red\")\n" \
-"\t\t\t\t\tb [[{CNT}]]\n" \
-"\t\t\t\t| : [{X}]\n";
-
-	SFString ret = STR_1;
-	ret.Replace("[{HEAD}]",input.Left(10));
-	input = input.Mid(10,1000000);
-
-	SFString rows;
-	while (!input.IsEmpty())
-	{
-		SFString row = STR_2;
-		row.Replace("[{CNT}]",asString(cnt++));
-		row.Replace("[{X}]",input.Left(64));
-		rows += "\n" + row;
-		input=input.Mid(64,1000000);
-	}
-	ret.Replace("[{ROWS}]", (rows.IsEmpty()?"":rows));
-	return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -147,6 +111,9 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
+	if (fieldName == "to" && fieldValue == "null")
+		*((SFString*)&fieldValue) = "0x";
+
 	if ( fieldName % "timeStamp" )
 	{
 		timeStamp = toLong(fieldValue);
@@ -229,44 +196,51 @@ void CTransaction::Serialize(SFArchive& archive)
 	if (archive.isReading())
 	{
 		archive >> handle;
-		archive >> blockHash;
+		if (handle != curVersion)
+		{
+			readBackLevel(archive);
+			return;
+		}
+
+		SFString tmp;
+		{ archive >> tmp; blockHash = uncompressHash(tmp); }
 		archive >> blockNumber;
 		archive >> confirmations;
 		archive >> contractAddress;
 		archive >> cumulativeGasUsed;
-		archive >> from;
+		{ archive >> tmp; from = uncompressHash(tmp); }
 		archive >> gas;
 		archive >> gasPrice;
 		archive >> gasUsed;
-		archive >> hash;
+		{ archive >> tmp; hash = uncompressHash(tmp); }
 		archive >> input;
 		archive >> isError;
 		archive >> isInternalTx;
 		archive >> nonce;
 		archive >> timeStamp;
-		archive >> to;
+		{ archive >> tmp; to = uncompressHash(tmp); }
 		archive >> transactionIndex;
 		archive >> value;
 		finishParse();
 	} else
 	{
-		archive << handle;
-		archive << blockHash;
+		archive << curVersion;
+		archive << compressHash(blockHash);
 		archive << blockNumber;
 		archive << confirmations;
 		archive << contractAddress;
 		archive << cumulativeGasUsed;
-		archive << from;
+		archive << compressHash(from);
 		archive << gas;
 		archive << gasPrice;
 		archive << gasUsed;
-		archive << hash;
+		archive << compressHash(hash);
 		archive << input;
 		archive << isError;
 		archive << isInternalTx;
 		archive << nonce;
 		archive << timeStamp;
-		archive << to;
+		archive << compressHash(to);
 		archive << transactionIndex;
 		archive << value;
 
@@ -346,9 +320,6 @@ int sortTransaction(const SFString& f1, const SFString& f2, const void *rr1, con
 int sortTransactionByName(const void *rr1, const void *rr2) { return sortTransaction("tr_Name", "", rr1, rr2); }
 int sortTransactionByID  (const void *rr1, const void *rr2) { return sortTransaction("transactionID", "", rr1, rr2); }
 
-#ifdef NEW_CODE
-SFBool shortAddr=FALSE;
-#endif
 //---------------------------------------------------------------------------
 SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
@@ -360,7 +331,7 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 		case 'a':
 			if (fieldIn % "addr_list") return tra->getAddrList();
 		case 'd':
-			if (fieldIn % "date") return tra->m_transDate.Format("%Y-%m-%d %H:%M:%S UTC");
+			if (fieldIn % "date") return tra->m_transDate.Format(FMT_JSON);
 		case 'e':
 			if ( fieldIn % "ether" )
 			{
@@ -412,7 +383,68 @@ SFBool CTransaction::handleCustomFormat(CExportContext& ctx, const SFString& fmt
 	return FALSE;
 }
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
+//---------------------------------------------------------------------------
+SFBool CTransaction::readBackLevel(SFArchive& archive)
+{
+	archive >> blockHash;
+	archive >> blockNumber;
+	archive >> confirmations;
+	archive >> contractAddress;
+	archive >> cumulativeGasUsed;
+	archive >> from;
+	archive >> gas;
+	archive >> gasPrice;
+	archive >> gasUsed;
+	archive >> hash;
+	archive >> input;
+	archive >> isError;
+	archive >> isInternalTx;
+	archive >> nonce;
+	archive >> timeStamp;
+	archive >> to;
+	archive >> transactionIndex;
+	archive >> value;
+	finishParse();
+	return TRUE;
+}
+
+//---------------------------------------------------------------------------
+SFString toNice(const SFString& in)
+{
+	if (in.IsEmpty()||in=="0x")
+		return in;
+
+	SFString input = in;
+	SFInt32 cnt=0;
+
+const char* STR_1=
+"([{HEAD}])\n" \
+"[{ROWS}]\n";
+
+const char* STR_2=
+"\t\t\t\tbr\n"
+"\t\t\t\tfont(color=\"red\")\n" \
+"\t\t\t\t\tb [[{CNT}]]\n" \
+"\t\t\t\t| : [{X}]\n";
+
+	SFString ret = STR_1;
+	ret.Replace("[{HEAD}]",input.Left(10));
+	input = input.Mid(10,1000000);
+
+	SFString rows;
+	while (!input.IsEmpty())
+	{
+		SFString row = STR_2;
+		row.Replace("[{CNT}]",asString(cnt++));
+		row.Replace("[{X}]",input.Left(64));
+		rows += "\n" + row;
+		input=input.Mid(64,1000000);
+	}
+	ret.Replace("[{ROWS}]", (rows.IsEmpty()?"":rows));
+	return ret;
+}
 //---------------------------------------------------------------------------
 int sortTransactionsForWrite(const void *rr1, const void *rr2)
 {

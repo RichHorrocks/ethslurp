@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "vote.h"
@@ -55,7 +55,7 @@ SFString nextVoteChunk(const SFString& fieldIn, SFBool& force, const void *data)
 	SFString ret = nextVoteChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'p':
@@ -66,13 +66,13 @@ SFString nextVoteChunk(const SFString& fieldIn, SFBool& force, const void *data)
 			if ( fieldIn % "votedYes" ) return asString(vot->votedYes);
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	CTransactionNotify dn(vot);
 	ret = nextTransactionChunk(fieldIn, force, &dn);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -194,7 +194,7 @@ SFString nextVoteChunk_custom(const SFString& fieldIn, SFBool& force, const void
 		default:
 			break;
 	}
-	
+
 #pragma unused(vo)
 #pragma unused(vot)
 

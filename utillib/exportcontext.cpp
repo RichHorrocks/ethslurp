@@ -117,7 +117,7 @@ CExportContext& CExportContext::operator<<(const SFString& str)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(const SFTime& tm)
 {
-	Output(tm.Format(FMT_DEFAULT));
+	Output(tm.Format(FMT_JSON));
 	return *this;
 }
 

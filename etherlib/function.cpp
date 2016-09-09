@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "function.h"
@@ -55,7 +55,7 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 	SFString ret = nextFunctionChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'a':
@@ -96,12 +96,12 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 			if ( fieldIn % "type" ) return fun->type;
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	ret = nextBasenodeChunk(fieldIn, force, fun);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -250,7 +250,7 @@ SFString nextFunctionChunk_custom(const SFString& fieldIn, SFBool& force, const 
 		default:
 			break;
 	}
-	
+
 #pragma unused(fu)
 #pragma unused(fun)
 

@@ -75,6 +75,7 @@ public:
 	DECLARE_NODE (CTransaction);
 
 	// EXISTING_CODE
+	SFBool   readBackLevel(SFArchive& archive);
 	SFString inputToFunction(void) const;
 	SFBool   isFunction(const SFString& func) const;
 	SFString getAddrList(char delim='\t') const;
@@ -189,6 +190,8 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	// EXISTING_CODE
 	m_transDate = tr.m_transDate;
 	funcPtr = tr.funcPtr;
+	function = tr.function;
+	ether = tr.ether;
 	// EXISTING_CODE
 }
 
@@ -229,6 +232,7 @@ extern SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& for
 
 //---------------------------------------------------------------------------
 // EXISTING_CODE
+extern SFString toNice(const SFString& in);
 extern int sortTransactionsForWrite(const void *rr1, const void *rr2);
 //---------------------------------------------------------------------------
 inline SFString fmtAddress(const SFString& addr)

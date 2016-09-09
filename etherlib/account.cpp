@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "account.h"
@@ -48,8 +48,8 @@ void CAccount::Format(CExportContext& ctx, const SFString& fmtIn, void *data) co
 //---------------------------------------------------------------------------
 SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAccountNotify *sl = (CAccountNotify*)data;
-	const CAccount *slu = sl->getDataPtr();
+	CAccountNotify *ac = (CAccountNotify*)data;
+	const CAccount *acc = ac->getDataPtr();
 
 	// Now give customized code a chance to override
 	SFString ret = nextAccountChunk_custom(fieldIn, force, data);
@@ -59,38 +59,39 @@ SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *da
 	switch (tolower(fieldIn[0]))
 	{
 		case 'a':
-			if ( fieldIn % "addr" ) return slu->addr;
+			if ( fieldIn % "addr" ) return acc->addr;
+//			if ( fieldIn % "abi" ) return acc->abi;
 			break;
 		case 'd':
-			if ( fieldIn % "displayString" ) return slu->displayString;
+			if ( fieldIn % "displayString" ) return acc->displayString;
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(slu->handle);
-			if ( fieldIn % "header" ) return slu->header;
+			if ( fieldIn % "handle" ) return asString(acc->handle);
+			if ( fieldIn % "header" ) return acc->header;
 			break;
 		case 'l':
-			if ( fieldIn % "lastPage" ) return asString(slu->lastPage);
-			if ( fieldIn % "lastBlock" ) return asString(slu->lastBlock);
+			if ( fieldIn % "lastPage" ) return asString(acc->lastPage);
+			if ( fieldIn % "lastBlock" ) return asString(acc->lastBlock);
 			break;
 		case 'n':
-			if ( fieldIn % "nVisible" ) return asString(slu->nVisible);
+			if ( fieldIn % "nVisible" ) return asString(acc->nVisible);
 			break;
 		case 'p':
-			if ( fieldIn % "pageSize" ) return asString(slu->pageSize);
+			if ( fieldIn % "pageSize" ) return asString(acc->pageSize);
 			break;
 		case 't':
 			if ( fieldIn % "transactions" )
 			{
 				SFString ret = "\n";
-				for (int i=0;i<slu->transactions.getCount();i++)
-					ret += slu->transactions[i].Format();
+				for (int i=0;i<acc->transactions.getCount();i++)
+					ret += acc->transactions[i].Format();
 				return ret;
 			}
 			break;
 	}
 
 	// Finally, give the parent class a chance
-	ret = nextBasenodeChunk(fieldIn, force, slu);
+	ret = nextBasenodeChunk(fieldIn, force, acc);
 	if (!ret.IsEmpty())
 		return ret;
 
@@ -107,6 +108,7 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 	{
 		case 'a':
 			if ( fieldName % "addr" ) { addr = fieldValue; return TRUE; }
+//			if ( fieldName % "abi" ) { abi = fieldValue; return TRUE; }
 			break;
 		case 'd':
 			if ( fieldName % "displayString" ) { displayString = fieldValue; return TRUE; }
@@ -159,6 +161,7 @@ void CAccount::Serialize(SFArchive& archive)
 		archive >> lastPage;
 		archive >> lastBlock;
 		archive >> nVisible;
+//		archive >> abi;
 		archive >> transactions;
 		finishParse();
 	} else
@@ -171,6 +174,7 @@ void CAccount::Serialize(SFArchive& archive)
 		archive << lastPage;
 		archive << lastBlock;
 		archive << nVisible;
+//		archive << abi;
 		archive << transactions;
 
 	}
@@ -194,6 +198,7 @@ void CAccount::registerClass(void)
 	ADD_FIELD(CAccount, "lastPage", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CAccount, "lastBlock", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CAccount, "nVisible", T_NUMBER, ++fieldNum);
+//	ADD_FIELD(CAccount, "abi", T_TEXT, ++fieldNum);
 	ADD_FIELD(CAccount, "transactions", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
@@ -221,30 +226,30 @@ int sortAccount(const SFString& f1, const SFString& f2, const void *rr1, const v
 	v2 = g2->getValueByName(f2);
 	return (int)v1.Compare(v2);
 }
-int sortAccountByName(const void *rr1, const void *rr2) { return sortAccount("sl_Name", "", rr1, rr2); }
+int sortAccountByName(const void *rr1, const void *rr2) { return sortAccount("ac_Name", "", rr1, rr2); }
 int sortAccountByID  (const void *rr1, const void *rr2) { return sortAccount("accountID", "", rr1, rr2); }
 
 //---------------------------------------------------------------------------
 SFString nextAccountChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAccountNotify *sl = (CAccountNotify*)data;
-	const CAccount *slu = sl->getDataPtr();
+	CAccountNotify *ac = (CAccountNotify*)data;
+	const CAccount *acc = ac->getDataPtr();
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
 		case 'n':
-			if ( fieldIn % "now" ) return (isTesting ? "TESTING_TIME" : Now().Format(FMT_DEFAULT));
+			if ( fieldIn % "now" ) return (isTesting ? "TESTING_TIME" : Now().Format(FMT_JSON));
 			break;
 		case 'r':
-			if ( fieldIn % "records" ) return (slu->transactions.getCount() == 0 ? "No records" : "");
+			if ( fieldIn % "records" ) return (acc->transactions.getCount() == 0 ? "No records" : "");
 			break;
 		// EXISTING_CODE
 		default:
 			break;
 	}
 
-#pragma unused(sl)
-#pragma unused(slu)
+#pragma unused(ac)
+#pragma unused(acc)
 
 	return EMPTY;
 }
@@ -306,5 +311,19 @@ SFBool CAccount::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, 
 	return FALSE;
 }
 
+//---------------------------------------------------------------------------
 // EXISTING_CODE
+SFInt32 CAccount::deleteNotShowing(void)
+{
+	SFInt32 nDeleted=0;
+	for (int i=0;i<transactions.getCount();i++)
+	{
+		if (!transactions[i].isShowing())
+		{
+			transactions[i].setDeleted(TRUE);
+			nDeleted++;
+		}
+	}
+	return nDeleted;
+}
 // EXISTING_CODE

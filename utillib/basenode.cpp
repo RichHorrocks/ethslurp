@@ -168,7 +168,7 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 
 	typedef enum { OUTSIDE=0, INSIDE } parseState;
 	parseState state = OUTSIDE;
-	
+
 	char *fieldVal=NULL;
 	while (*s)
 	{
@@ -179,7 +179,7 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 				{
 					state = INSIDE;
 					fieldVal=s+1;
-					
+
 				} else if (*s=='\n')
 				{
 					finishParse();
@@ -187,7 +187,7 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 				}
 				s++;
 				break;
-				
+
 			case INSIDE:
 				if (*s == '\"')
 				{
@@ -199,7 +199,7 @@ char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 					}
 					fieldVal = NULL;
 					state = OUTSIDE;
-					
+
 				}
 				s++;
 				break;
@@ -255,7 +255,7 @@ char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 				state = IN_NAME;
 			s++;
 			break;
-		
+
 		case IN_NAME:
 			if (!fieldName)
 			{

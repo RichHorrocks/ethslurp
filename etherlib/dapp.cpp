@@ -22,7 +22,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside 
+ * This file was generated with makeClass. Edit only those parts inside
  * of 'EXISTING_CODE' tags.
  */
 #include "dapp.h"
@@ -55,7 +55,7 @@ SFString nextDappChunk(const SFString& fieldIn, SFBool& force, const void *data)
 	SFString ret = nextDappChunk_custom(fieldIn, force, data);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	switch (tolower(fieldIn[0]))
 	{
 		case 'd':
@@ -86,12 +86,12 @@ SFString nextDappChunk(const SFString& fieldIn, SFBool& force, const void *data)
 			if ( fieldIn % "tags" ) return dap->tags;
 			break;
 	}
-	
+
 	// Finally, give the parent class a chance
 	ret = nextBasenodeChunk(fieldIn, force, dap);
 	if (!ret.IsEmpty())
 		return ret;
-	
+
 	return "<span class=warning>Field not found: [{" + fieldIn + "}]</span>\n";
 }
 
@@ -242,7 +242,7 @@ SFString nextDappChunk_custom(const SFString& fieldIn, SFBool& force, const void
 		default:
 			break;
 	}
-	
+
 #pragma unused(da)
 #pragma unused(dap)
 

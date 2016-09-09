@@ -44,14 +44,17 @@ using namespace std;
 #include <pwd.h>
 
 //-------------------------------------------------------------------------
-#define FORCE_ANSI    0x10000 // needed for Format function for some reason
-#define FORCE_UNICODE 0x20000
-typedef struct tm     SF_TIMESTRUCT;
-typedef long          SFBool;
-typedef long          SFInt32;
-typedef unsigned long SFUint32;
-typedef long long     SFInt64;
-typedef unsigned char uchar;
+#define FORCE_ANSI         0x10000 // needed for Format function for some reason
+#define FORCE_UNICODE      0x20000
+typedef struct tm          SF_TIMESTRUCT;
+typedef long               SFBool;
+typedef long               SFInt32;
+typedef unsigned long      SFUint32;
+typedef long long          SFInt64;
+typedef unsigned long long SFUint64;
+typedef float              SFFloat;
+typedef double             SFDouble;
+typedef unsigned char      uchar;
 
 //-------------------------------------------------------------------------
 #ifndef _MAX_PATH
@@ -106,21 +109,16 @@ inline SFInt32 toLong(const char *str) { return (SFInt32)strtol((const char*)(st
 inline SFInt32 toLong(char *str)       { return (SFInt32)strtol((const char*)(str),NULL,10); }
 
 //-------------------------------------------------------------------------
-// The one class that is used almost everywhere
-#include "sfstring.h"
+inline SFFloat toFloat(const char *str) { return (SFFloat)strtof((const char*)(str),NULL); }
+inline SFFloat toFloat(char *str)       { return (SFFloat)strtof((const char*)(str),NULL); }
 
 //-------------------------------------------------------------------------
-inline SFString formatFloat(double f, int decimals=10)
-{
-	char s[100],r[100];
-	sprintf(s,"%.*g", decimals, ((long)(  pow(10, decimals) * (  fabs(f) - labs( (long) f )  )  + 0.5)) / pow(10,decimals));
-	if (strchr(s,'e'))
-		s[1] = '\0';
-	sprintf(r,"%d%s", (int)f, s+1);
-	return SFString(r);
-}
-#define fmtFloat(f) (const char*)formatFloat(f)
-#define fmtFloatp(f,p) (const char*)formatFloat(f,p)
+inline SFDouble toDouble(const char *str) { return (SFDouble)strtold((const char*)(str),NULL); }
+inline SFDouble toDouble(char *str)       { return (SFDouble)strtold((const char*)(str),NULL); }
+
+//-------------------------------------------------------------------------
+// The one class that is used almost everywhere
+#include "sfstring.h"
 
 //-------------------------------------------------------------------------
 inline SFBool toBool(const SFString& in) { return in%"true" || toLong(in)!=0; }
@@ -231,6 +229,6 @@ inline void XX_C(const SFString& p, const SFString& v)
 #define XX_H( ) { XX_C("", "HERE" ); }
 #define XX_L( ) { XX_C("", SFString('~', 80)); }
 #define XX_O(a) { XX_C("", (a)); }
-#define XX_T(a) { XX_C("", (a).Format(FMT_SORTALL)); }
+#define XX_T(a) { XX_C("", (a).Format(FMT_JSON)); }
 
 #endif

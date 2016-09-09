@@ -15,19 +15,22 @@ exportcontext.cpp \
 importcontext.cpp \
 fielddata.cpp \
 fieldlist.cpp \
-point.cpp \
 options.cpp \
+paths.cpp \
+point.cpp \
 rect.cpp \
 runtimeclass.cpp \
 sfarchive.cpp \
 sfdate.cpp \
 sffile.cpp \
+sffolder.cpp \
 sfos.cpp \
 sfstring.cpp \
 sftime.cpp \
 sftimeofday.cpp \
 sftimespan.cpp \
-version.cpp
+version.cpp \
+visitor.cpp
 
 #-------------------------------------------------
 # probably don't have to change below this line

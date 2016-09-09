@@ -817,6 +817,19 @@ inline SFString asHex(SFInt32 val)
 	return ret.Right(2);
 }
 
+//-------------------------------------------------------------------------
+inline SFString formatFloat(double f, SFInt32 decimals=10)
+{
+        char s[100],r[100];
+        sprintf(s,"%.*g", (int)decimals, ((long)(  pow(10, decimals) * (  fabs(f) - labs( (long) f )  )  + 0.5)) / pow(10,decimals));
+        if (strchr(s,'e'))
+                s[1] = '\0';
+        sprintf(r,"%d%s", (int)f, s+1);
+        return SFString(r);
+}
+#define fmtFloat(f) (const char*)formatFloat(f)
+#define fmtFloatp(f,p) (const char*)formatFloat(f,p)
+
 //------------------------------------------------------------------------------
 extern SFString hex2String(const SFString& inHex);
 extern SFString string2Hex(const SFString& inAscii);
@@ -849,6 +862,16 @@ inline SFString asStringULL(unsigned long long i, SFUint32 def=(SFUint32)WIERD_N
 	char ret[128];
 	sprintf(ret, "%llu", i);
 	return SFString(ret);
+}
+
+inline SFString asStringF(SFFloat f, SFInt32 decimals=10)
+{
+	return formatFloat(f,decimals);
+}
+
+inline SFString asStringD(SFDouble d, SFInt32 decimals=10)
+{
+	return formatFloat(d,decimals);
 }
 
 inline SFString asBitmap(unsigned long value)

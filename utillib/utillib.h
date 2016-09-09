@@ -47,5 +47,8 @@ SOFTWARE.
 #include "performance.h"
 #include "sffile.h"
 #include "options.h"
+#include "paths.h"
+#include "sffolder.h"
+#include "visitor.h"
 
 #endif

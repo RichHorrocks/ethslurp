@@ -55,38 +55,39 @@ SOFTWARE.
 
 // Date display formatting shortcuts
 // Internationalized
-#define FMT_DEFAULT         0
-#define FMT_TIMENOMINS      1
-#define FMT_TIME            2
-#define FMT_TIMESH          3
-#define FMT_DATENOYEAR      4
-#define FMT_DATE            5
-#define FMT_DAY             6
-#define FMT_DAYSH           7
-#define FMT_WEEK            8
-#define FMT_WEEKSH          9
-#define FMT_WEEKSHDATE     10
-#define FMT_DATEFMT        11
-#define FMT_DAYNAMEDAY     12
-#define FMT_MONTH          13
-#define FMT_MONTHSH        14
-#define FMT_YEAR           15
-#define FMT_YEARSH         16
-#define FMT_DAYNAME        17
-#define FMT_DAYNAMESH      18
-#define FMT_MONTHNAME      19
-#define FMT_MONTHNAMESH    20
-#define FMT_SECSTODAY      21
-#define FMT_DAYNUMBER      22
-#define FMT_SORTYYYYMMDD   23
-#define FMT_DAYNAMEDAYL    24
-#define FMT_TIME_EXPORT    25
-#define FMT_DEFAULT_EXPORT 26
-#define FMT_SORTALL        27
-#define FMT_TIMESTAMP      28
-#define FMT_DAYSH_NOYEAR   29
-#define FMT_VCAL_DATE      30
-#define FMT_SEMI_SEP       31
+#define FMT_DEFAULT          0
+#define FMT_TIMENOMINS       1
+#define FMT_TIME             2
+#define FMT_TIMESH           3
+#define FMT_DATENOYEAR       4
+#define FMT_DATE             5
+#define FMT_DAY              6
+#define FMT_DAYSH            7
+#define FMT_WEEK             8
+#define FMT_WEEKSH           9
+#define FMT_WEEKSHDATE      10
+#define FMT_DATEFMT         11
+#define FMT_DAYNAMEDAY      12
+#define FMT_MONTH           13
+#define FMT_MONTHSH         14
+#define FMT_YEAR            15
+#define FMT_YEARSH          16
+#define FMT_DAYNAME         17
+#define FMT_DAYNAMESH       18
+#define FMT_MONTHNAME       19
+#define FMT_MONTHNAMESH     20
+#define FMT_SECSTODAY       21
+#define FMT_DAYNUMBER       22
+#define FMT_SORTYYYYMMDD    23
+#define FMT_DAYNAMEDAYL     24
+#define FMT_TIME_EXPORT     25
+#define FMT_DEFAULT_EXPORT  26
+#define FMT_SORTALL         27
+#define FMT_TIMESTAMP       28
+#define FMT_DAYSH_NOYEAR    29
+#define FMT_VCAL_DATE       30
+#define FMT_SEMI_SEP        31
+#define FMT_JSON            32
 
 // Not a real viewtype but used in some EO and BO macros
 #define VT_HOUR (VT_LAST+1)
@@ -778,3 +779,4 @@ extern SFTime snagDate(const SFString& str, const SFTime& def=Now(), SFBool dir=
 //extern SFTime newestFileDateInFolder(const SFString& path, SFString *whichFilePtr, const SFString& ignore);
 
 #endif
+
