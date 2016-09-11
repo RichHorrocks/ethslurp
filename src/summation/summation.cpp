@@ -26,15 +26,6 @@ SFInt32 nAddrs = sizeof (addrs) / sizeof(SFString);
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-#if 0
-	outErr << "f:" << firstDate << "\n";
-	outErr << "l:" << lastDate << "\n";
-	outErr << "c:" << cre_end << "\n";
-	outErr << "o:" << opp_end << "\n";
-	outErr << "h:" << hck_end << "\n";
-	outErr << "r:" << rec_end << "\n";
-#endif
-
 	for (int a=0;a<nAddrs;a++)
 	{
 		endOfPer = firstDate + SFTimeSpan(1,0,0,0);
@@ -55,63 +46,79 @@ int main(int argc, char *argv[])
 	outErr.Flush();
 
 	CChartData chart;
-	chart.objectName = "overview";
-	chart.title      = "Lifetime by Functional Group";
-	chart.subTitle   = firstDate.Format(FMT_JSON) + " - " + lastDate.Format(FMT_JSON) + "<br>Price source: Poloniex.com";
-	chart.yAxes      = "'Transactions by Group','ETH Price in USD'";
-	chart.legend     = TRUE;
-	chart.byGroup    = TRUE;
-	chart.start      = firstDate;
-	chart.stop       = lastDate;
+	chart.objectName  = "overview";
+	chart.title       = "Lifetime by Functional Group";
+	chart.subTitle    = firstDate.Format(FMT_JSON) + " - " + lastDate.Format(FMT_JSON) + "<br>Price source: Poloniex.com";
+	chart.yAxes       = "'Transactions by Group','ETH Price in USD'";
+	chart.legend      = TRUE;
+	chart.byGroup     = TRUE;
+	chart.start       = firstDate;
+	chart.stop        = lastDate;
+	chart.seriesTypes = "areaspline";
 	generateChart(chart);
 	generateTable(chart);
 
-	chart.objectName = "detailCreation";
-	chart.title      = "Detail of Creation Period by Function";
-	chart.subTitle   = firstDate.Format(FMT_JSON) + " - " + cre_end.Format(FMT_JSON) + "<br>Price source: Poloniex.com";
-	chart.yAxes      = "'Number of Function Calls'";
-	chart.legend     = FALSE;
-	chart.byGroup    = FALSE;
-	chart.start      = firstDate;
-	chart.stop       = cre_end;
-	chart.showPrice  = FALSE;
+	chart.objectName  = "detailCreation";
+	chart.title       = "Detail of Creation Period by Function";
+	chart.subTitle    = firstDate.Format(FMT_JSON) + " - " + cre_end.Format(FMT_JSON);
+	chart.yAxes       = "'Number of Function Calls'";
+	chart.legend      = FALSE;
+	chart.byGroup     = FALSE;
+	chart.start       = firstDate;
+	chart.stop        = cre_end;
+	chart.colWid      = 15;
+	chart.showPrice   = FALSE;
+	chart.seriesTypes = "column|areaspline|column";
+	generateChart(chart);
+	chart.nameSuffix  = "_1";
+//	generateTable(chart);
+	chart.nameSuffix  = "_2";
+//	generateTable(chart);
+	chart.nameSuffix  = "";
+
+	chart.objectName  = "detailOperational";
+	chart.nameSuffix  = "_1";
+	chart.title       = "1st Day of Period";
+	chart.subTitle    = AddOneDay(cre_end).Format(FMT_JSON);
+	chart.start       = BOND(cre_end);
+	chart.stop        = BOND(BOND(cre_end));
+	chart.colWid      = 10;
+	chart.seriesTypes = "column";
 	generateChart(chart);
 //	generateTable(chart);
 
-	chart.objectName = "detailOperational";
-	chart.nameSuffix = "_1";
-	chart.title      = "1st Day of Period";
-	chart.subTitle   = BOND(cre_end).Format(FMT_JSON);
-	chart.start      = BOND(cre_end);
-	chart.stop       = BOND(BOND(cre_end));
+	chart.objectName  = "detailOperational";
+	chart.nameSuffix  = "_2";
+	chart.title       = "Remaining Days of Operational Period All Functions";
+	chart.subTitle    = AddOneDay(AddOneDay(cre_end)).Format(FMT_JSON) + " - " + opp_end.Format(FMT_JSON);
+	chart.start       = BOND(BOND(cre_end));
+	chart.stop        = opp_end;
+	setSortOrder        ("vote|transfer|transferFrom|approve|newProposal (non-split)|new Proposal (split),splitDAO");
+	chart.seriesTypes = "areaspline|column|column|column|column|column|column";
 	generateChart(chart);
 //	generateTable(chart);
 
-	chart.objectName = "detailOperational";
-	chart.nameSuffix = "_2";
-	chart.title      = "Remaining Days of Operational Period";
-	chart.subTitle   = BOND(BOND(cre_end)).Format(FMT_JSON) + " - " + opp_end.Format(FMT_JSON) + "<br>Price source: Poloniex.com";
-	chart.start      = BOND(BOND(cre_end));
-	chart.stop       = opp_end;
+	chart.objectName  = "detailPostHack";
+	chart.nameSuffix  = "";
+	chart.title       = "Detail of Post Hack Period by Function";
+	chart.subTitle    = opp_end.Format(FMT_JSON) + " - " + hck_end.Format(FMT_JSON);
+	chart.start       = opp_end;
+	chart.stop        = hck_end;
+	chart.seriesTypes = "column";
 	generateChart(chart);
 //	generateTable(chart);
 
-	chart.objectName = "detailPostHack";
-	chart.nameSuffix = "";
-	chart.title      = "Detail of Post Hack Period by Function";
-	chart.subTitle   = opp_end.Format(FMT_JSON) + " - " + hck_end.Format(FMT_JSON) + "<br>Price source: Poloniex.com";
-	chart.start      = opp_end;
-	chart.stop       = hck_end;
+	chart.objectName  = "detailRecovery";
+	chart.title       = "Detail of Recovery Period by Function";
+	chart.subTitle    = hck_end.Format(FMT_JSON) + " - " + rec_end.Format(FMT_JSON);
+	chart.start       = hck_end;
+	chart.stop        = rec_end;
+	chart.colWid      = 15;
+	setSortOrder        ("newProposal (split)|vote|transferFrom|approve|transfer|withdraw|function()");
+	chart.seriesTypes = "areaspline|column|column|column|column|column|column";
 	generateChart(chart);
 //	generateTable(chart);
 
-	chart.objectName = "detailRecovery";
-	chart.title      = "Detail of Recovery Period by Function";
-	chart.subTitle   = hck_end.Format(FMT_JSON) + " - " + rec_end.Format(FMT_JSON) + "<br>Price source: Poloniex.com";
-	chart.start      = hck_end;
-	chart.stop       = rec_end;
-	generateChart(chart);
-//	generateTable(chart);
 	outErr << "\tDone...                  \n";
 }
 

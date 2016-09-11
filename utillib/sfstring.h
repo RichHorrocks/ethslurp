@@ -837,41 +837,35 @@ extern char hex2Ascii(char *str);
 
 #define WIERD_NUM (-20206)
 
-inline SFString asString(SFInt32 i, SFInt32 def=WIERD_NUM)
+inline SFString asString(SFInt32 i)
 {
-	if (i == def && def != WIERD_NUM)
-		return nullString;
 	char ret[128];
 	sprintf(ret, "%ld", i);
 	return SFString(ret);
 }
 
-inline SFString asStringU(SFUint32 i, SFUint32 def=(SFUint32)WIERD_NUM)
+inline SFString asStringU(SFUint32 i)
 {
-	if (i == def && def != (SFUint32)WIERD_NUM)
-		return nullString;
 	char ret[128];
 	sprintf(ret, "%lu", i);
 	return SFString(ret);
 }
 
-inline SFString asStringULL(unsigned long long i, SFUint32 def=(SFUint32)WIERD_NUM)
+inline SFString asStringULL(unsigned long long i)
 {
-	if (i == def && def != (SFUint32)WIERD_NUM)
-		return nullString;
 	char ret[128];
 	sprintf(ret, "%llu", i);
 	return SFString(ret);
 }
 
-inline SFString asStringF(SFFloat f, SFInt32 decimals=10)
+inline SFString asStringF(SFFloat f)
 {
-	return formatFloat(f,decimals);
+	return formatFloat(f,10);
 }
 
-inline SFString asStringD(SFDouble d, SFInt32 decimals=10)
+inline SFString asStringD(SFDouble d)
 {
-	return formatFloat(d,decimals);
+	return formatFloat(d,10);
 }
 
 inline SFString asBitmap(unsigned long value)

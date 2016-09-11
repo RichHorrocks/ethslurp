@@ -23,15 +23,17 @@ all:
 	@make $(product)
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+data: test
+
 test: all
-	@cd src/ethname; make test ; cd -
+#	@cd src/ethname; make test ; cd -
 	@cd theData/tests; make; cd -
-	@cd theData/theDAO; make; cd -
-	@cd theData/funcs; make; cd -
+#	@cd theData/theDAO; make; cd -
+#	@cd theData/funcs; make; cd -
 	@cd theData/ghc; make; cd -
-	@cd theData/otherContracts; make; cd -
-	@cd theData/whales; make; cd -
-	@cd theData/hack; make; cd -
+#	@cd theData/otherContracts; make; cd -
+#	@cd theData/whales; make; cd -
+#	@cd theData/hack; make; cd -
 	@make -B back
 
 #	@cd src/summation ; make data ; cd -

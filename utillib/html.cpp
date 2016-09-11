@@ -30,7 +30,7 @@ CSelect::CSelect(CExportContext& ctx, CSelectionData *data)
 	int n=0;
 	ADDATTRIB      ("name",     data->name);
 	ADDATTRIB      ("id",       data->name);
-	ADDATTRIB      ("size",     asString(1,-1));
+	ADDATTRIB      ("size",     asAttrStr(1,-1));
 	ADDATTRIBSINGLE("disabled", data->disabled);
 	ADDATTRIB      ("onChange", data->onChangeStr);
 	ADDMOUSEATTRIB ();
@@ -97,7 +97,7 @@ CSelect::CSelect(CExportContext& ctx, const SFString& name, SFInt32 size)
 	int n=0;
 	ADDATTRIB      ("name",         name);
 	ADDATTRIB      ("id",           name);
-	ADDATTRIB      ("size",         asString(size,-1));
+	ADDATTRIB      ("size",         asAttrStr(size,-1));
 	ADDMOUSEATTRIB ();
 	InitElement    ("select", -1, n, attribs);
 }
@@ -111,7 +111,7 @@ CSelect::CSelect(CExportContext& ctx, const SFString& name, SFInt32 size, const 
 	int n=0;
 	ADDATTRIB      ("name",         name);
 	ADDATTRIB      ("id",           name);
-	ADDATTRIB      ("size",         asString(size,-1));
+	ADDATTRIB      ("size",         asAttrStr(size,-1));
 	ADDATTRIBSINGLE("disabled",     disabled);
 	ADDATTRIB      ("onChange",     onChangeStr);
 	ADDMOUSEATTRIB ();
@@ -127,7 +127,7 @@ CSelect::CSelect(CExportContext& ctx, const SFString& name, SFInt32 nFields, SFS
 	int n=0;
 	ADDATTRIB      ("name",         name);
 	ADDATTRIB      ("id",           name);
-	ADDATTRIB      ("size",         asString(1,-1));
+	ADDATTRIB      ("size",         asAttrStr(1,-1));
 	ADDMOUSEATTRIB ();
 	InitElement    ("select", -1, n, attribs);
 	Create(nFields, vals, prompts, selected);
@@ -142,7 +142,7 @@ CSelect::CSelect(CExportContext& ctx, SFAttribute vals[], SFInt32 nFields, const
 	int n=0;
 	ADDATTRIB      ("name",         name);
 	ADDATTRIB      ("id",           name);
-	ADDATTRIB      ("size",         asString(1,-1));
+	ADDATTRIB      ("size",         asAttrStr(1,-1));
 	ADDATTRIB      ("onChange",     onChangeStr);
 	ADDMOUSEATTRIB ();
 	InitElement    ("select", -1, n, attribs);
@@ -158,7 +158,7 @@ CSelect::CSelect(CExportContext& ctx, const SFString& name, SFInt32 nFields, SFS
 	int n=0;
 	ADDATTRIB      ("name",         name);
 	ADDATTRIB      ("id",           name);
-	ADDATTRIB      ("size",         asString(1,-1));
+	ADDATTRIB      ("size",         asAttrStr(1,-1));
 	ADDATTRIBSINGLE("disabled",     disabled);
 	ADDATTRIB      ("onChange",     onChangeStr);
 	ADDMOUSEATTRIB ();

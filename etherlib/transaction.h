@@ -156,8 +156,10 @@ inline void CTransaction::Init(void)
 	value = EMPTY;
 
 	// EXISTING_CODE
+	//SFString function
 	m_transDate = earliestDate;
 	funcPtr = NULL;
+	ether = 0.0;
 	// EXISTING_CODE
 }
 

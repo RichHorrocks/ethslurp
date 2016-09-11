@@ -68,6 +68,16 @@ public:
 };
 
 //-------------------------------------------------------------------------
+inline SFString asAttrStr(SFInt32 i, SFInt32 def=WIERD_NUM)
+{
+	if (i == def && def != WIERD_NUM)
+		return nullString;
+	char ret[128];
+	sprintf(ret, "%ld", i);
+	return SFString(ret);
+}
+
+//-------------------------------------------------------------------------
 class CColumn : public CElement
 {
 public:
@@ -86,13 +96,13 @@ public:
 				ADDATTRIB("align", _aligns[align]);
 			ADDATTRIB("background", background);
 			if (rs!=1)
-				{ ADDATTRIB("rowspan", asString(rs, 0)); }
+				{ ADDATTRIB("rowspan", asAttrStr(rs, 0)); }
 			if (cs!=1)
-				{ ADDATTRIB("colspan", asString(cs, 0)); }
+				{ ADDATTRIB("colspan", asAttrStr(cs, 0)); }
 			ADDATTRIBSINGLE("nowrap", nowrap);
 			ADDATTRIB("valign", valign);
 			if (pctWidth!=-1)
-				{ ADDATTRIB("width", asString(pctWidth, -1)+"%"); }
+				{ ADDATTRIB("width", asAttrStr(pctWidth, -1)+"%"); }
 			InitElement("td", 1, n, attribs);
 			if (nl)
 				m_ctx << "\n";
@@ -117,13 +127,13 @@ public:
 					ADDATTRIB("bgcolor", bgcolor);
 			}
 			if (rs!=1)
-				{ ADDATTRIB("rowspan", asString(rs, 0)); }
+				{ ADDATTRIB("rowspan", asAttrStr(rs, 0)); }
 			if (cs!=1)
-				{ ADDATTRIB("colspan", asString(cs, 0)); }
+				{ ADDATTRIB("colspan", asAttrStr(cs, 0)); }
 			ADDATTRIBSINGLE("nowrap", nowrap);
 			ADDATTRIB("valign", valign);
 			if (pctWidth!=-1)
-				{ ADDATTRIB("width", asString(pctWidth, -1)+"%"); }
+				{ ADDATTRIB("width", asAttrStr(pctWidth, -1)+"%"); }
 			InitElement("td", 1, n, attribs);
 			if (nl)
 				m_ctx << "\n";
@@ -208,14 +218,14 @@ public:
 					img += (" align=\"absmiddle\"");
 
 				if (width > 0)
-					img += (" width=\"" + asString(width) + "\"");
+					img += (" width=\"" + asAttrStr(width) + "\"");
 				else if (width < 0)
-					img += (" width=\"" + asString(-width) + "%\""); // negative is percentage
+					img += (" width=\"" + asAttrStr(-width) + "%\""); // negative is percentage
 
 				if (height > 0)
-					img += (" height=\"" + asString(height) + "\"");
+					img += (" height=\"" + asAttrStr(height) + "\"");
 				else if (height < 0)
-					img += (" height=\"" + asString(-height) + "%\""); // negative is percentage
+					img += (" height=\"" + asAttrStr(-height) + "%\""); // negative is percentage
 
 				img += " border=\"0\">";
 			}
@@ -247,14 +257,14 @@ public:
 					img += (" align=\"absmiddle\"");
 
 				if (width > 0)
-					img += (" width=\"" + asString(width) + "\"");
+					img += (" width=\"" + asAttrStr(width) + "\"");
 				else if (width < 0)
-					img += (" width=\"" + asString(-width) + "%\""); // negative is percentage
+					img += (" width=\"" + asAttrStr(-width) + "%\""); // negative is percentage
 
 				if (height > 0)
-					img += (" height=\"" + asString(height) + "\"");
+					img += (" height=\"" + asAttrStr(height) + "\"");
 				else if (height < 0)
-					img += (" height=\"" + asString(-height) + "%\""); // negative is percentage
+					img += (" height=\"" + asAttrStr(-height) + "%\""); // negative is percentage
 
 				img += " border=\"0\">";
 			}
@@ -289,8 +299,8 @@ public:
 			SFInt32 n=0;
 			ADDATTRIB("src",       source);
 			ADDATTRIB("autostart", SFString("true"));
-			ADDATTRIB("width",     asString(0));
-			ADDATTRIB("height",    asString(0));
+			ADDATTRIB("width",     asAttrStr(0));
+			ADDATTRIB("height",    asAttrStr(0));
 			ADDATTRIB("loop",      ((loop) ? SFString("true") : SFString("false")));
 			// we use embed so it also works under Netscape which does not support the <bgsound tag
 			InitElement("embed", -1, n, attribs);
@@ -366,7 +376,7 @@ public:
 			SFAttribute attribs[25];
 			SFInt32 n=0;
 			ADDATTRIBSINGLE("noshade", noshade);
-			ADDATTRIB("size", asString(size, 2));
+			ADDATTRIB("size", asAttrStr(size, 2));
 			ADDATTRIB("width", width);
 			InitElement("hr", -1, n, attribs);
 		};
@@ -408,7 +418,7 @@ protected:
 				}
 				if (size)
 				{
-					m_ctx << " size=\"" << asString(0) << "\"";
+					m_ctx << " size=\"" << asAttrStr(0) << "\"";
 				}
 				m_ctx << ">";
 			}
@@ -660,10 +670,10 @@ public:
 			SFInt32 n=0;
 			ADDATTRIB("type", type);
 			ADDATTRIB("name", name);
-			ADDATTRIB("size", asString(size, -1));
+			ADDATTRIB("size", asAttrStr(size, -1));
 			ADDATTRIB("value", value);
 			ADDATTRIB("onClick", onClickStr);
-			ADDATTRIB("maxlength", asString(maxSize, -1));
+			ADDATTRIB("maxlength", asAttrStr(maxSize, -1));
 			ADDATTRIBSINGLE("checked", checked);
 			if (type=="checkbox")
 			{
@@ -683,7 +693,7 @@ public:
 			SFInt32 n=0;
 			ADDATTRIB("type", type);
 			ADDATTRIB("name", name);
-			ADDATTRIB("size", asString(size, -1));
+			ADDATTRIB("size", asAttrStr(size, -1));
 			ADDATTRIB("value", value);
 			ADDATTRIBSINGLE("checked", checked);
 			if (type=="checkbox")
@@ -713,7 +723,7 @@ public:
 		{
 		}
 	 CHiddenInput(CExportContext& ctx, const SFString& name, SFInt32 value) 
-		: CInput(ctx, "hidden", name, -1, asString(value, -10012), FALSE, FALSE, nullString, -1) // never defaults
+		: CInput(ctx, "hidden", name, -1, asAttrStr(value, -10012), FALSE, FALSE, nullString, -1) // never defaults
 		{
 		}
 	~CHiddenInput()
@@ -773,8 +783,8 @@ public:
 			SFAttribute attribs[25];
 			SFInt32 n=0;
 			ADDATTRIB      ("name",     name);
-			ADDATTRIB      ("rows",     asString(rows));
-			ADDATTRIB      ("cols",     asString(cols));
+			ADDATTRIB      ("rows",     asAttrStr(rows));
+			ADDATTRIB      ("cols",     asAttrStr(cols));
 			ADDATTRIBSINGLE("disabled", disabled);
 			InitElement("textarea", 0, n, attribs);
 		}
