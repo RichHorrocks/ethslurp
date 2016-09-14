@@ -868,6 +868,23 @@ inline SFString asStringD(SFDouble d)
 	return formatFloat(d,10);
 }
 
+inline SFString asDelimited(SFInt32 i)
+{
+	SFString ret;
+	SFString s = asString(i);
+	if (i<1000)
+		return s;
+	s.Reverse();
+	for (int i=0;i<s.GetLength();i++)
+	{
+		ret += s[i];
+		if (!((i+1)%3))
+			ret += ",";
+	}
+	ret.Reverse();
+	return ret;
+}
+
 inline SFString asBitmap(unsigned long value)
 {
 	SFString ret;

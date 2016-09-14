@@ -47,7 +47,7 @@ extern int isDuplicateVote (const void *rr1, const void *rr2);
 class CVote : public CTransaction
 {
 public:
-	SFString voter;
+	SFAddress voter;
 	SFInt32 proposalID;
 	SFBool votedYes;
 

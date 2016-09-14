@@ -49,12 +49,13 @@ public:
 	SFString            retStr;
 
 	         CVisitor   (const CVisitOptions& o);
-	void     doVisit    (void *data=NULL);
+	virtual ~CVisitor   (void) {};
+	virtual  void     doVisit    (void *data=NULL);
 
-private:
+protected:
 	void     setMainRoot(const SFString& root);
 	void     setCurRoot (const SFString& root);
-	void     doList     (void *data=NULL, SFBool folders=FALSE);
+	virtual  void     doList     (void *data=NULL, SFBool folders=FALSE);
 
 	CVisitor(const CVisitor& v) {}
 	CVisitor& operator=(const CVisitor& v) { return *this; }

@@ -24,6 +24,7 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 #include "utillib.h"
+#include "ethtypes.h"
 #include "function.h"
 
 //--------------------------------------------------------------------------
@@ -47,22 +48,22 @@ class CTransaction : public CBaseNode
 {
 public:
 	SFInt32 handle;
-	SFString blockHash;
+	SFHash blockHash;
 	SFInt32 blockNumber;
 	SFInt32 confirmations;
-	SFString contractAddress;
+	SFAddress contractAddress;
 	SFString cumulativeGasUsed;
-	SFString from;
+	SFAddress from;
 	SFString gas;
 	SFString gasPrice;
 	SFString gasUsed;
-	SFString hash;
+	SFHash hash;
 	SFString input;
 	SFBool isError;
 	SFBool isInternalTx;
 	SFString nonce;
 	SFInt32 timeStamp;
-	SFString to;
+	SFAddress to;
 	SFInt32 transactionIndex;
 	SFString value;
 

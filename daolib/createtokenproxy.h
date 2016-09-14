@@ -47,7 +47,7 @@ extern int isDuplicateCreatetokenproxy (const void *rr1, const void *rr2);
 class CCreateTokenProxy : public CTransaction
 {
 public:
-	SFString tokenHolder;
+	SFAddress tokenHolder;
 
 public:
 					CCreateTokenProxy  (void);

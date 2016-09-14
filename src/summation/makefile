@@ -10,6 +10,7 @@ product=objs/$(exec)
 dest=.
 src= \
 summation.cpp \
+charts.cpp \
 funcMap.cpp \
 accumulator.cpp
 
@@ -65,7 +66,7 @@ cleanall:
 
 clean:
 	@rm -f $(product) objs/*
-	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/public/js/detail*Chart.js
-	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/public/js/overviewChart.js
-#	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/views/detail*Table.jade
-	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/views/overviewTable.jade
+	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/public/js/detail*Chart*.js
+	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/public/js/overviewChart*.js
+#	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/views/detail*Table*.jade
+	@rm -f ~/src.GitHub/quickblocks.io/subdomains/dao/views/overviewTable*.jade

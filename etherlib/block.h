@@ -50,13 +50,13 @@ public:
 	SFString extraData;
 	SFString gasLimit;
 	SFString gasUsed;
-	SFString hash;
+	SFHash   hash;
 	SFString logsBloom;
 	SFString miner;
 	SFString nonce;
 	SFString number;
-	SFString parentHash;
-	SFString receiptRoot;
+	SFHash   parentHash;
+	SFHash   receiptRoot;
 	SFString sha3Uncles;
 	SFString size;
 	SFString stateRoot;

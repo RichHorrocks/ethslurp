@@ -48,8 +48,8 @@ class CProposal : public CTransaction
 {
 public:
 	SFInt32 proposalID;
-	SFString creator;
-	SFString recipient;
+	SFAddress creator;
+	SFAddress recipient;
 	SFString amount;
 	SFString data;
 	SFInt32 debatePeriod;

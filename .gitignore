@@ -14,10 +14,20 @@ abis
 theData
 docs
 docs/*
-src
-src/ethname/*
 src/ethprice/*
-src/*/*
+src/balances/*
+src/blockChunk/*
+src/curator_watch/*
+src/summation/junk/*
+src/dapps/*
+src/ethfunc/*
+src/ethrlp/*
+src/getABIs/*
+src/getEvents/*
+src/jsonparser/*
+src/otherJunk/*
+src/votes/*
+src/withdraw_watch/*
 
 # Precompiled Headers
 *.gch

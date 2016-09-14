@@ -25,6 +25,7 @@ SOFTWARE.
 --------------------------------------------------------------------------------*/
 #define curVersion ((long)0x00000201)
 
+#include "ethtypes.h"
 #include "parameter.h"
 #include "function.h"
 #include "abi.h"

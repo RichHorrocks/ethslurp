@@ -49,7 +49,7 @@ class CAccount : public CBaseNode
 {
 public:
 	SFInt32 handle;
-	SFString addr;
+	SFAddress addr;
 	SFString header;
 	SFString displayString;
 	SFBool pageSize;

@@ -16,7 +16,6 @@ all:
 	@cd utillib; make; cd ..
 	@cd etherlib; make; cd ..
 	@cd daolib; make; cd ..
-	@cd src/ethname; make; cd ../..
 	@cd src/ethprice; make; cd ../..
 	@echo "$(product) build started"
 	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -26,14 +25,13 @@ all:
 data: test
 
 test: all
-#	@cd src/ethname; make test ; cd -
 	@cd theData/tests; make; cd -
-#	@cd theData/theDAO; make; cd -
-#	@cd theData/funcs; make; cd -
+	@cd theData/theDAO; make; cd -
+	@cd theData/funcs; make; cd -
 	@cd theData/ghc; make; cd -
-#	@cd theData/otherContracts; make; cd -
-#	@cd theData/whales; make; cd -
-#	@cd theData/hack; make; cd -
+	@cd theData/otherContracts; make; cd -
+	@cd theData/whales; make; cd -
+	@cd theData/hack; make; cd -
 	@make -B back
 
 #	@cd src/summation ; make data ; cd -
@@ -62,5 +60,4 @@ clean:
 	@cd utillib; make clean; cd ..
 	@cd etherlib; make clean; cd ..
 	@cd daolib; make clean; cd ..
-	@cd src/ethname; make clean; cd ../..
 	-@$(RM) -f $(product) $(objs)/*.o $(objs)/*.a 2> /dev/null
