@@ -23,6 +23,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "function.h"
 #include "parameter.h"
 
@@ -46,7 +50,6 @@ extern int isDuplicateAbi (const void *rr1, const void *rr2);
 class CAbi : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	CFunctionArray abiByName;
 	CFunctionArray abiByEncoding;
 
@@ -71,6 +74,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CAbi& ab);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -119,7 +123,6 @@ inline void CAbi::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 //	abiByName = ??; /* unknown type: CFunctionArray */
 //	abiByEncoding = ??; /* unknown type: CFunctionArray */
 
@@ -133,12 +136,12 @@ inline void CAbi::Copy(const CAbi& ab)
 	Clear();
 
 	CBaseNode::Copy(ab);
-	handle = ab.handle;
 	abiByName = ab.abiByName;
 	abiByEncoding = ab.abiByEncoding;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -156,14 +159,6 @@ inline SFString CAbi::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CAbi::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

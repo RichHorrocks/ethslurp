@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "createtokenproxy.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CCreateTokenProxy, CTransaction, NO_SCHEMA);
+IMPLEMENT_NODE(CCreateTokenProxy, CTransaction, curVersion);
 
 //---------------------------------------------------------------------------
 void CCreateTokenProxy::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CCreateTokenProxy::Format(CExportContext& ctx, const SFString& fmtIn, void 
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -127,13 +133,11 @@ void CCreateTokenProxy::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CCreateTokenProxy, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CCreateTokenProxy, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CCreateTokenProxy, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CCreateTokenProxy, "tokenHolder", T_TEXT, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CCreateTokenProxy, "schema");
 	HIDE_FIELD(CCreateTokenProxy, "deleted");
-	HIDE_FIELD(CCreateTokenProxy, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -183,6 +187,15 @@ SFBool CCreateTokenProxy::handleCustomFormat(CExportContext& ctx, const SFString
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CCreateTokenProxy::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

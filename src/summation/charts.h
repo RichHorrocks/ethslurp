@@ -57,8 +57,6 @@ inline int sortBySortOrder(const void *v1, const void *v2)
 
 //------------------------------------------------------------------------------
 extern const char* STR_THECHART;
-extern const char* STR_FUNC_TABLE;
-extern const char* STR_FUNC_ROW;
 extern const char* STR_CHART_AXES;
 extern const char* STR_CHART_LEGEND;
 extern const char* STR_CHART_SERIES_1;

@@ -80,8 +80,7 @@ CExportContext& CExportContext::operator<<(int i)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(float f)
 {
-	char val[10];
-	sprintf(val, (fmt.IsEmpty() ? "%f" : (const char*)fmt), f);
+	SFString val = formatFloat(f);
 	Output(val);
 	return *this;
 }
@@ -89,8 +88,7 @@ CExportContext& CExportContext::operator<<(float f)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(double f)
 {
-	char val[10];
-	sprintf(val, (fmt.IsEmpty() ? "%g" : (const char*)fmt), f);
+	SFString val = formatFloat(f);
 	Output(val);
 	return *this;
 }

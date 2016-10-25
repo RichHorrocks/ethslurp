@@ -1,4 +1,4 @@
-cflags=-Wall -O2 -DLINUX -I. -I../../etherlib -I../../daolib -I../../utillib 
+cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I../../etherlib -I../../daolib -I../../utillib 
 libs=../../*/*.a /usr/lib/libcurl.dylib
 
 exec=dapps

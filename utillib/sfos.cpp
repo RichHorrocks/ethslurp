@@ -112,7 +112,7 @@ static int globErrFunc(const char *epath, int eerrno)
 //------------------------------------------------------------------
 // Returns a list of either files or folders, but not both.
 //------------------------------------------------------------------
-static void doGlob(SFInt32& nStrs, SFString *strs, const SFString& maskIn, SFBool wantFiles, SFBool keepPaths )
+void doGlob(SFInt32& nStrs, SFString *strs, const SFString& maskIn, SFBool wantFiles, SFBool keepPaths )
 {
 	ASSERT(!strs || nStrs);
 
@@ -912,9 +912,6 @@ int SFos::GetTimeZoneInformation(TIME_ZONE_INFORMATION& tzi)
 */
 
 //------------------------------------------------------------------
-extern void doGlob(SFInt32& nStrs, SFString *strs, const SFString& mask, SFBool wantFiles, SFBool keepPaths );
-
-//------------------------------------------------------------------
 SFInt32 SFos::nFiles(const SFString& path)
 {
 	SFInt32 count=0;
@@ -925,7 +922,7 @@ SFInt32 SFos::nFiles(const SFString& path)
 //------------------------------------------------------------------
 void SFos::listFiles(SFInt32& nStrs, SFString *strs, const SFString& mask)
 {
-	::doGlob( nStrs, strs, mask, true, mask.Contains("/*/"));
+	::doGlob( nStrs, strs, mask, true, mask.Contains("/*/")); /* fixes color coding in pico */
 }
 
 //------------------------------------------------------------------
@@ -939,7 +936,7 @@ SFInt32 SFos::nFolders(const SFString& path)
 //------------------------------------------------------------------
 void SFos::listFolders(SFInt32& nStrs, SFString *strs, const SFString& mask)
 {
-	::doGlob( nStrs, strs, mask, false, mask.Contains("/*/"));
+	::doGlob( nStrs, strs, mask, false, mask.Contains("/*/")); /* fixes color coding in pico */
 }
 
 //------------------------------------------------------------------

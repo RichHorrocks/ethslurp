@@ -50,5 +50,9 @@ SOFTWARE.
 #include "paths.h"
 #include "sffolder.h"
 #include "visitor.h"
+#include "sha3.h"
+#include "codeWriter.h"
+
+#define curVersion ((long)0x00000201)
 
 #endif

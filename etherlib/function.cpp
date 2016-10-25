@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "function.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CFunction, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CFunction, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CFunction::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CFunction::Format(CExportContext& ctx, const SFString& fmtIn, void *data) c
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -67,17 +73,18 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 		case 'e':
 			if ( fieldIn % "encoding" ) return fun->encoding;
 			break;
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(fun->handle);
-			break;
 		case 'i':
 			if ( fieldIn % "indexed" ) return asString(fun->indexed);
 			if ( fieldIn % "inputs" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<fun->inputs.getCount();i++)
+				SFInt32 cnt = fun->inputs.getCount();
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
 					ret += fun->inputs[i].Format();
-				return ret;
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
 			}
 			break;
 		case 'n':
@@ -86,10 +93,14 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 		case 'o':
 			if ( fieldIn % "outputs" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<fun->outputs.getCount();i++)
+				SFInt32 cnt = fun->outputs.getCount();
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
 					ret += fun->outputs[i].Format();
-				return ret;
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
 			}
 			break;
 		case 't':
@@ -109,8 +120,16 @@ SFString nextFunctionChunk(const SFString& fieldIn, SFBool& force, const void *d
 SFBool CFunction::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
-	if ( fieldName % "inputs" ) { parseParams(TRUE, fieldValue); return TRUE; }
-	if ( fieldName % "outputs" ) { parseParams(FALSE, fieldValue); return TRUE; }
+	if ( fieldName % "inputs" )
+	{
+		parseParams(TRUE, fieldValue);
+		return TRUE;
+	}
+	if ( fieldName % "outputs" )
+	{
+		parseParams(FALSE, fieldValue);
+		return TRUE;
+	}
 	// EXISTING_CODE
 
 	switch (tolower(fieldName[0]))
@@ -123,9 +142,6 @@ SFBool CFunction::setValueByName(const SFString& fieldName, const SFString& fiel
 			break;
 		case 'e':
 			if ( fieldName % "encoding" ) { encoding = fieldValue; return TRUE; }
-			break;
-		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			break;
 		case 'i':
 			if ( fieldName % "indexed" ) { indexed = toBool(fieldValue); return TRUE; }
@@ -163,7 +179,6 @@ void CFunction::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> name;
 		archive >> type;
 		archive >> indexed;
@@ -175,7 +190,6 @@ void CFunction::Serialize(SFArchive& archive)
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << name;
 		archive << type;
 		archive << indexed;
@@ -198,7 +212,6 @@ void CFunction::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CFunction, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CFunction, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CFunction, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CFunction, "name", T_TEXT, ++fieldNum);
 	ADD_FIELD(CFunction, "type", T_TEXT, ++fieldNum);
 	ADD_FIELD(CFunction, "indexed", T_RADIO, ++fieldNum);
@@ -211,7 +224,6 @@ void CFunction::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CFunction, "schema");
 	HIDE_FIELD(CFunction, "deleted");
-	HIDE_FIELD(CFunction, "handle");
 
 	// EXISTING_CODE
 	HIDE_FIELD(CFunction, "indexed");
@@ -263,6 +275,15 @@ SFBool CFunction::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn,
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CFunction::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

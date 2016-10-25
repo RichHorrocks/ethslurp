@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "dapp.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CDapp, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CDapp, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CDapp::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CDapp::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -64,9 +70,6 @@ SFString nextDappChunk(const SFString& fieldIn, SFBool& force, const void *data)
 			break;
 		case 'g':
 			if ( fieldIn % "gitHub" ) return dap->gitHub;
-			break;
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(dap->handle);
 			break;
 		case 'l':
 			if ( fieldIn % "license" ) return dap->license;
@@ -110,9 +113,6 @@ SFBool CDapp::setValueByName(const SFString& fieldName, const SFString& fieldVal
 		case 'g':
 			if ( fieldName % "gitHub" ) { gitHub = fieldValue; return TRUE; }
 			break;
-		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
-			break;
 		case 'l':
 			if ( fieldName % "license" ) { license = fieldValue; return TRUE; }
 			if ( fieldName % "last_update" ) { last_update = fieldValue; return TRUE; }
@@ -151,7 +151,6 @@ void CDapp::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> dappName;
 		archive >> description;
 		archive >> site;
@@ -165,7 +164,6 @@ void CDapp::Serialize(SFArchive& archive)
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << dappName;
 		archive << description;
 		archive << site;
@@ -190,7 +188,6 @@ void CDapp::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CDapp, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CDapp, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CDapp, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CDapp, "dappName", T_TEXT, ++fieldNum);
 	ADD_FIELD(CDapp, "description", T_TEXT, ++fieldNum);
 	ADD_FIELD(CDapp, "site", T_TEXT, ++fieldNum);
@@ -205,7 +202,6 @@ void CDapp::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CDapp, "schema");
 	HIDE_FIELD(CDapp, "deleted");
-	HIDE_FIELD(CDapp, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -255,6 +251,15 @@ SFBool CDapp::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, voi
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CDapp::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

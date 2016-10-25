@@ -90,13 +90,14 @@ int main(int argc, char *argv[])
 	chart.stop        = BOND(BOND(cre_end));
 	chart.colWid      = 10;
 	chart.series      = "vote|transferFrom|approve|transfer";
+//	chart.series      = "vote|transferFrom|approve|transfer|function()|newProposal (non-split)|newProposal (split)|transferWithoutReward|getMyReward|retrieveDAOReward";
 	chart.seriesTypes = "column";
 	functionChart(chart);
 //	generateTable(chart);
 
 	chart.objectName  = "detailOperational";
 	chart.nameSuffix  = "_2";
-	chart.title       = "Remaining Days of Operational Period All Functions";
+	chart.title       = "Remaining Days of Operational Period - All Functions";
 	chart.subTitle    = AddOneDay(AddOneDay(cre_end)).Format(FMT_JSON) + " - " + opp_end.Format(FMT_JSON);
 	chart.start       = BOND(BOND(cre_end));
 	chart.stop        = opp_end;

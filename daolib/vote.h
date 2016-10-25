@@ -23,6 +23,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "utillib.h"
 #include "etherlib.h"
 #include "transaction.h"
@@ -66,6 +70,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CVote& vo);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -130,6 +135,7 @@ inline void CVote::Copy(const CVote& vo)
 
 	// EXISTING_CODE
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -147,14 +153,6 @@ inline SFString CVote::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CVote::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

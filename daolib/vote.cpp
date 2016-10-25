@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "vote.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CVote, CTransaction, NO_SCHEMA);
+IMPLEMENT_NODE(CVote, CTransaction, curVersion);
 
 //---------------------------------------------------------------------------
 void CVote::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CVote::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -149,7 +155,6 @@ void CVote::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CVote, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CVote, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CVote, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CVote, "voter", T_TEXT, ++fieldNum);
 	ADD_FIELD(CVote, "proposalID", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CVote, "votedYes", T_RADIO, ++fieldNum);
@@ -157,7 +162,6 @@ void CVote::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CVote, "schema");
 	HIDE_FIELD(CVote, "deleted");
-	HIDE_FIELD(CVote, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -207,6 +211,15 @@ SFBool CVote::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, voi
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CVote::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

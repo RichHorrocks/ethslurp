@@ -179,21 +179,17 @@ SFArchive& SFArchive::operator>>(CDoubleRect& rect)
 
 SFArchive& operator<<(SFArchive& archive, SFStringArray& array)
 {
-/*
 	archive << array.getCount();
 	for (int i=0;i<array.getCount();i++)
 		archive << array[i];
-*/
 	return archive;
 }
 
 SFArchive& operator>>(SFArchive& archive, SFStringArray& array)
 {
-/*
 	SFInt32 count;
 	archive >> count;
 	for (int i=0;i<count;i++)
 		archive >> array[i];
-*/
 	return archive;
 }

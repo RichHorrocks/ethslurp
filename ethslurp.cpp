@@ -74,6 +74,13 @@ SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 	CParameter::registerClass();
 	CAccount::registerClass();
 	CTransaction::registerClass();
+	CReceipt::registerClass();
+	CTrace::registerClass();
+	CLogEntry::registerClass();
+	CStructLog::registerClass();
+	HIDE_FIELD(CTransaction, "toContract");
+	HIDE_FIELD(CTransaction, "receipt");
+	HIDE_FIELD(CTransaction, "traces");
 
 	// If this is the first time we've ever run, build the config file
 	if (!establishFolders(config, version.toString()))
@@ -163,16 +170,10 @@ SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 	return TRUE;
 }
 
-//#define NEW_CODE
-
 //--------------------------------------------------------------------------------
 SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 {
-#ifdef NEW_CODE
-	START_TIMER();
-#else
 	double start = vrNow();
-#endif
 
 	// Do we have the data for this address cached?
 	SFString cacheFilename = cachePath(theAccount.addr+".bin");
@@ -216,6 +217,10 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 		// Keep reading until we get less than a full page
 		SFString contents;
 		SFBool done = FALSE;
+//#define NO_INTERNET
+#ifdef NO_INTERNET
+		done = TRUE;
+#endif
 		while (!done)
 		{
 			SFString url = SFString("https://api.etherscan.io/api?module=account&action=txlist&sort=asc") +
@@ -262,7 +267,9 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 
 		SFInt32 minBlock=0,maxBlock=0;
 		findBlockRange(contents, minBlock, maxBlock);
+#ifndef NO_INTERNET
 		outErr << "\n\tDownload contains blocks from " << minBlock << " to " << maxBlock << "\n";
+#endif
 
 		// Keep track of which last full page we've read
 		theAccount.lastPage = page;
@@ -276,6 +283,7 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 		while (p && *p)
 		{
 			CTransaction trans;SFInt32 nFields=0;
+			trans.pParent = &theAccount;
 			p = trans.parseJson(p,nFields);
 			if (nFields)
 			{
@@ -317,12 +325,8 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 
 	if (!isTesting)
 	{
-#ifdef NEW_CODE
-		STOP_TIMER("slurp");
-#else
 		double stop = vrNow();
 		double timeSpent = stop-start;
-#endif
 		fprintf(stderr, "\tLoaded %ld total records in %f seconds\n", theAccount.transactions.getCount(), timeSpent);
 		fflush(stderr);
 	}
@@ -333,11 +337,7 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 //--------------------------------------------------------------------------------
 SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 {
-#ifdef NEW_CODE
-	START_TIMER();
-#else
 	double start = vrNow();
-#endif
 
 	SFInt32 nFuncFilts=0;
 	SFString funcFilts[20];
@@ -407,12 +407,8 @@ SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 
 	if (!isTesting)
 	{
-#ifdef NEW_CODE
-		STOP_TIMER("filter");
-#else
 		double stop = vrNow();
 		double timeSpent = stop-start;
-#endif
 		fprintf(stderr, "\tFilter passed %ld visible records of %ld in %f seconds\n", theAccount.nVisible, theAccount.transactions.getCount(), timeSpent);
 		fflush(stderr);
 	}
@@ -423,36 +419,15 @@ SFBool CSlurperApp::Filter(CSlurpOptions& options, SFString& message)
 //---------------------------------------------------------------------------------------------------
 SFBool CSlurperApp::Display(CSlurpOptions& options, SFString& message)
 {
-#ifdef NEW_CODE
-	START_TIMER();
-#else
 	double start = vrNow();
-#endif
-
 	if (options.reverseSort)
 		theAccount.transactions.Sort(sortReverseChron);
 	theAccount.Format(outScreen, getFormatString(options, "file", FALSE));
 
-#if 0
-	// Do not write records that are not showing (i.e. delete them first)
-	SFArchive archive(FALSE, NO_SCHEMA, FALSE);
-	SFString fileName = options.archiveFile.Substitute(".txt",".bin");
-	if (archive.Lock(fileName, binaryWriteCreate, LOCK_CREATE))
-	{
-		theAccount.deleteNotShowing();
-		theAccount.transactions.Sort(sortTransactionsForWrite);
-		theAccount.Serialize(archive);
-		archive.Close();
-	}
-#endif
 	if (!isTesting)
 	{
-#ifdef NEW_CODE
-		STOP_TIMER("display");
-#else
 		double stop = vrNow();
 		double timeSpent = stop-start;
-#endif
 		fprintf(stderr, "\tExported %ld records in %f seconds             \n\n", theAccount.nVisible, timeSpent);
 		fflush(stderr);
 	}
@@ -486,8 +461,7 @@ SFString CSlurperApp::getFormatString(CSlurpOptions& options, const SFString& wh
 	ret = ret.Substitute("\\n","\n").Substitute("\\t","\t");
 
 	// some sanity checks
-	if (countOf('{',ret) != countOf('}',ret) ||
-		countOf('[',ret) != countOf(']',ret))
+	if (countOf('{',ret) != countOf('}',ret) || countOf('[',ret) != countOf(']',ret))
 	{
 		errMsg = SFString("Mismatched brackets in display string '") + formatName + "': '" + ret + "'. Quiting...\n";
 
@@ -661,15 +635,3 @@ int sortReverseChron(const void *rr1, const void *rr2)
         ret = tr2->timeStamp - tr1->timeStamp;         if (ret!=0) return (int)ret;
         return sortTransactionsForWrite(rr1,rr2);
 }
-
-#ifdef NEW_CODE
-void reportTimes(const SFString& func, double start, double stop, double timeSpent)
-{
-	SFString file = "/Users/jrush/src.GitHub/ethslurp/theData/performance/perf.txt";
-	SFTime now = Now();
-	CStringExportContext ctx;
-	ctx << asciiFileToString(file);
-	ctx << func << "\t" << now.Format(FMT_SORTALL) << "\t" << start << "\t" << stop << "\t" << timeSpent << "\n";
-	stringToAsciiFile(file, ctx.str);
-}
-#endif

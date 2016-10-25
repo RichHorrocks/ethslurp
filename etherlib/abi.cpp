@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "abi.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CAbi, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CAbi, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CAbi::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CAbi::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -61,21 +67,26 @@ SFString nextAbiChunk(const SFString& fieldIn, SFBool& force, const void *data)
 		case 'a':
 			if ( fieldIn % "abiByName" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<abi->abiByName.getCount();i++)
+				SFInt32 cnt = abi->abiByName.getCount();
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
 					ret += abi->abiByName[i].Format();
-				return ret;
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
 			}
 			if ( fieldIn % "abiByEncoding" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<abi->abiByEncoding.getCount();i++)
+				SFInt32 cnt = abi->abiByEncoding.getCount();
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
 					ret += abi->abiByEncoding[i].Format();
-				return ret;
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
 			}
-			break;
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(abi->handle);
 			break;
 	}
 
@@ -99,9 +110,6 @@ SFBool CAbi::setValueByName(const SFString& fieldName, const SFString& fieldValu
 			if ( fieldName % "abiByName" ) return TRUE;
 			if ( fieldName % "abiByEncoding" ) return TRUE;
 			break;
-		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
-			break;
 		default:
 			break;
 	}
@@ -123,13 +131,11 @@ void CAbi::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> abiByName;
 		archive >> abiByEncoding;
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << abiByName;
 		archive << abiByEncoding;
 
@@ -146,14 +152,12 @@ void CAbi::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CAbi, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CAbi, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CAbi, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAbi, "abiByName", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CAbi, "abiByEncoding", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CAbi, "schema");
 	HIDE_FIELD(CAbi, "deleted");
-	HIDE_FIELD(CAbi, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -203,6 +207,15 @@ SFBool CAbi::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CAbi::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

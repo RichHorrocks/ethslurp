@@ -23,6 +23,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "utillib.h"
 #include "parameter.h"
 
@@ -46,7 +50,6 @@ extern int isDuplicateFunction (const void *rr1, const void *rr2);
 class CFunction : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	SFString name;
 	SFString type;
 	SFBool indexed;
@@ -73,6 +76,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CFunction& fu);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -117,7 +121,6 @@ inline void CFunction::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 	name = EMPTY;
 	type = EMPTY;
 	indexed = 0;
@@ -138,7 +141,6 @@ inline void CFunction::Copy(const CFunction& fu)
 	Clear();
 
 	CBaseNode::Copy(fu);
-	handle = fu.handle;
 	name = fu.name;
 	type = fu.type;
 	indexed = fu.indexed;
@@ -151,6 +153,7 @@ inline void CFunction::Copy(const CFunction& fu)
 	// EXISTING_CODE
 	hasAddrs = fu.hasAddrs;
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -168,14 +171,6 @@ inline SFString CFunction::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CFunction::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

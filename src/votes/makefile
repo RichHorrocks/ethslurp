@@ -1,6 +1,6 @@
 top=../..
 
-cflags=-Wall -O2 -DLINUX -I. -I$(top)/utillib -I$(top)/etherlib -I$(top)/daolib
+cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I$(top)/utillib -I$(top)/etherlib -I$(top)/daolib
 libs=$(top)/*/*.a /usr/lib/libcurl.dylib
 
 product=voteCount

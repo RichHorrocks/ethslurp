@@ -23,6 +23,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "utillib.h"
 
 //--------------------------------------------------------------------------
@@ -45,7 +49,6 @@ extern int isDuplicateDapp (const void *rr1, const void *rr2);
 class CDapp : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	SFString dappName;
 	SFString description;
 	SFString site;
@@ -72,6 +75,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CDapp& da);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -116,7 +120,6 @@ inline void CDapp::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 	dappName = EMPTY;
 	description = EMPTY;
 	site = EMPTY;
@@ -138,7 +141,6 @@ inline void CDapp::Copy(const CDapp& da)
 	Clear();
 
 	CBaseNode::Copy(da);
-	handle = da.handle;
 	dappName = da.dappName;
 	description = da.description;
 	site = da.site;
@@ -152,6 +154,7 @@ inline void CDapp::Copy(const CDapp& da)
 
 	// EXISTING_CODE
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -169,14 +172,6 @@ inline SFString CDapp::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CDapp::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

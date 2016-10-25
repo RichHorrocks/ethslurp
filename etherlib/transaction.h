@@ -23,9 +23,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "utillib.h"
 #include "ethtypes.h"
 #include "function.h"
+#include "receipt.h"
+#include "trace.h"
 
 //--------------------------------------------------------------------------
 class CTransaction;
@@ -47,25 +53,28 @@ extern int isDuplicateTransaction (const void *rr1, const void *rr2);
 class CTransaction : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	SFHash blockHash;
 	SFInt32 blockNumber;
+	SFString creates;
 	SFInt32 confirmations;
 	SFAddress contractAddress;
 	SFString cumulativeGasUsed;
 	SFAddress from;
-	SFString gas;
+	SFInt32 gas;
 	SFString gasPrice;
 	SFString gasUsed;
 	SFHash hash;
 	SFString input;
 	SFBool isError;
 	SFBool isInternalTx;
-	SFString nonce;
+	SFInt32 nonce;
+	SFString raw;
 	SFInt32 timeStamp;
 	SFAddress to;
 	SFInt32 transactionIndex;
 	SFString value;
+	CReceipt receipt;
+	CTraceArray traces;
 
 public:
 					CTransaction  (void);
@@ -76,7 +85,6 @@ public:
 	DECLARE_NODE (CTransaction);
 
 	// EXISTING_CODE
-	SFBool   readBackLevel(SFArchive& archive);
 	SFString inputToFunction(void) const;
 	SFBool   isFunction(const SFString& func) const;
 	SFString getAddrList(char delim='\t') const;
@@ -91,6 +99,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CTransaction& tr);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	friend int sortTransactionsForWrite(const void *rr1, const void *rr2);
@@ -136,25 +145,28 @@ inline void CTransaction::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 	blockHash = EMPTY;
 	blockNumber = 0;
+	creates = EMPTY;
 	confirmations = 0;
 	contractAddress = EMPTY;
 	cumulativeGasUsed = EMPTY;
 	from = EMPTY;
-	gas = EMPTY;
+	gas = 0;
 	gasPrice = EMPTY;
 	gasUsed = EMPTY;
 	hash = EMPTY;
 	input = EMPTY;
 	isError = 0;
 	isInternalTx = 0;
-	nonce = EMPTY;
+	nonce = 0;
+	raw = EMPTY;
 	timeStamp = 0;
 	to = EMPTY;
 	transactionIndex = 0;
 	value = EMPTY;
+//	receipt = ??; /* unknown type: CReceipt */
+//	traces = ??; /* unknown type: CTraceArray */
 
 	// EXISTING_CODE
 	//SFString function
@@ -170,9 +182,9 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	Clear();
 
 	CBaseNode::Copy(tr);
-	handle = tr.handle;
 	blockHash = tr.blockHash;
 	blockNumber = tr.blockNumber;
+	creates = tr.creates;
 	confirmations = tr.confirmations;
 	contractAddress = tr.contractAddress;
 	cumulativeGasUsed = tr.cumulativeGasUsed;
@@ -185,10 +197,13 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	isError = tr.isError;
 	isInternalTx = tr.isInternalTx;
 	nonce = tr.nonce;
+	raw = tr.raw;
 	timeStamp = tr.timeStamp;
 	to = tr.to;
 	transactionIndex = tr.transactionIndex;
 	value = tr.value;
+	receipt = tr.receipt;
+	traces = tr.traces;
 
 	// EXISTING_CODE
 	m_transDate = tr.m_transDate;
@@ -196,6 +211,7 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	function = tr.function;
 	ether = tr.ether;
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -213,14 +229,6 @@ inline SFString CTransaction::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CTransaction::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

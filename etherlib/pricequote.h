@@ -23,6 +23,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "utillib.h"
 
 //--------------------------------------------------------------------------
@@ -45,7 +49,6 @@ extern int isDuplicatePricequote (const void *rr1, const void *rr2);
 class CPriceQuote : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	SFInt32 timeStamp;
 	float open;
 	float high;
@@ -71,6 +74,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CPriceQuote& pr);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -115,7 +119,6 @@ inline void CPriceQuote::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 	timeStamp = 0;
 	open = 0.0;
 	high = 0.0;
@@ -136,7 +139,6 @@ inline void CPriceQuote::Copy(const CPriceQuote& pr)
 	Clear();
 
 	CBaseNode::Copy(pr);
-	handle = pr.handle;
 	timeStamp = pr.timeStamp;
 	open = pr.open;
 	high = pr.high;
@@ -149,6 +151,7 @@ inline void CPriceQuote::Copy(const CPriceQuote& pr)
 	// EXISTING_CODE
 	date = pr.date;
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -166,14 +169,6 @@ inline SFString CPriceQuote::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CPriceQuote::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

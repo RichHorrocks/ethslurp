@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "account.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CAccount, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CAccount, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CAccount::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CAccount::Format(CExportContext& ctx, const SFString& fmtIn, void *data) co
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -66,7 +72,6 @@ SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *da
 			if ( fieldIn % "displayString" ) return acc->displayString;
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(acc->handle);
 			if ( fieldIn % "header" ) return acc->header;
 			break;
 		case 'l':
@@ -82,10 +87,14 @@ SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *da
 		case 't':
 			if ( fieldIn % "transactions" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<acc->transactions.getCount();i++)
+				SFInt32 cnt = acc->transactions.getCount();
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
 					ret += acc->transactions[i].Format();
-				return ret;
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
 			}
 			break;
 	}
@@ -107,14 +116,13 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 	switch (tolower(fieldName[0]))
 	{
 		case 'a':
-			if ( fieldName % "addr" ) { addr = fieldValue; return TRUE; }
+			if ( fieldName % "addr" ) { addr = toLower(fieldValue); return TRUE; }
 //			if ( fieldName % "abi" ) { abi = fieldValue; return TRUE; }
 			break;
 		case 'd':
 			if ( fieldName % "displayString" ) { displayString = fieldValue; return TRUE; }
 			break;
 		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			if ( fieldName % "header" ) { header = fieldValue; return TRUE; }
 			break;
 		case 'l':
@@ -153,7 +161,6 @@ void CAccount::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> addr;
 		archive >> header;
 		archive >> displayString;
@@ -166,7 +173,6 @@ void CAccount::Serialize(SFArchive& archive)
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << addr;
 		archive << header;
 		archive << displayString;
@@ -190,7 +196,6 @@ void CAccount::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CAccount, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CAccount, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CAccount, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAccount, "addr", T_TEXT, ++fieldNum);
 	ADD_FIELD(CAccount, "header", T_TEXT, ++fieldNum);
 	ADD_FIELD(CAccount, "displayString", T_TEXT, ++fieldNum);
@@ -204,7 +209,6 @@ void CAccount::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CAccount, "schema");
 	HIDE_FIELD(CAccount, "deleted");
-	HIDE_FIELD(CAccount, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -296,7 +300,6 @@ SFBool CAccount::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, 
 				outErr << (transactions.getCount()!=nVisible?" visible":"") << " records" << (isTesting?"\n":"\r"); outErr.Flush();
 			}
 
-			((CAccount*)this)->handle = transactions.getCount() - i;
 			((CTransaction*)&transactions[i])->pParent = this;
 			ctx << transactions[i].Format(displayString);
 			if (cnt>=nVisible)
@@ -309,6 +312,15 @@ SFBool CAccount::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, 
 	return TRUE;
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CAccount::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

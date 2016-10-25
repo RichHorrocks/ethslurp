@@ -27,9 +27,11 @@ SOFTWARE.
 #define LIGHT_WEIGHT 1
 
 //-------------------------------------------------------------------------
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <iostream>
 using namespace std;
@@ -46,15 +48,17 @@ using namespace std;
 //-------------------------------------------------------------------------
 #define FORCE_ANSI         0x10000 // needed for Format function for some reason
 #define FORCE_UNICODE      0x20000
-typedef struct tm          SF_TIMESTRUCT;
-typedef long               SFBool;
-typedef long               SFInt32;
-typedef unsigned long      SFUint32;
-typedef long long          SFInt64;
-typedef unsigned long long SFUint64;
-typedef float              SFFloat;
-typedef double             SFDouble;
-typedef unsigned char      uchar;
+
+//-------------------------------------------------------------------------
+using SF_TIMESTRUCT = struct tm;
+using SFBool = long;
+using SFInt32 = long;
+using SFUint32 = unsigned long;
+using SFInt64 = long long;
+using SFUint64 = unsigned long long;
+using SFFloat = float;
+using SFDouble = double;
+using uchar = unsigned char;
 
 //-------------------------------------------------------------------------
 #ifndef _MAX_PATH

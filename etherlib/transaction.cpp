@@ -22,14 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "transaction.h"
-#include "account.h"
-
+#include "etherlib.h"
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CTransaction, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CTransaction, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CTransaction::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -37,7 +36,13 @@ void CTransaction::Format(CExportContext& ctx, const SFString& fmtIn, void *data
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -64,6 +69,7 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "blockNumber" ) return asString(tra->blockNumber);
 			break;
 		case 'c':
+			if ( fieldIn % "creates" ) return tra->creates;
 			if ( fieldIn % "confirmations" ) return asString(tra->confirmations);
 			if ( fieldIn % "contractAddress" ) return tra->contractAddress;
 			if ( fieldIn % "cumulativeGasUsed" ) return tra->cumulativeGasUsed;
@@ -72,27 +78,47 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "from" ) return tra->from;
 			break;
 		case 'g':
-			if ( fieldIn % "gas" ) return tra->gas;
+			if ( fieldIn % "gas" ) return asString(tra->gas);
 			if ( fieldIn % "gasPrice" ) return tra->gasPrice;
 			if ( fieldIn % "gasUsed" ) return tra->gasUsed;
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(tra->handle);
 			if ( fieldIn % "hash" ) return tra->hash;
 			break;
 		case 'i':
-			if ( fieldIn % "input_nice" ) return toNice(tra->input);
 			if ( fieldIn % "input" ) return tra->input;
 			if ( fieldIn % "isError" ) return asString(tra->isError);
 			if ( fieldIn % "isInternalTx" ) return asString(tra->isInternalTx);
 			break;
 		case 'n':
-			if ( fieldIn % "nonce" ) return tra->nonce;
+			if ( fieldIn % "nonce" ) return asString(tra->nonce);
+			break;
+		case 'r':
+			if ( fieldIn % "raw" ) return tra->raw;
+			if ( fieldIn % "receipt")
+			{
+				expContext().noFrst=true;
+				SFString ret;
+				ret=tra->receipt.Format();
+				return ret;
+			}
 			break;
 		case 't':
 			if ( fieldIn % "timeStamp" ) return asString(tra->timeStamp);
 			if ( fieldIn % "to" ) return tra->to;
 			if ( fieldIn % "transactionIndex" ) return asString(tra->transactionIndex);
+			if ( fieldIn % "traces" )
+			{
+				SFInt32 cnt = tra->traces.getCount();
+				if (!cnt) return EMPTY;
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
+					ret += tra->traces[i].Format();
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
+			}
 			break;
 		case 'v':
 			if ( fieldIn % "value" ) return tra->value;
@@ -119,11 +145,13 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 		timeStamp = toLong(fieldValue);
 		m_transDate = dateFromTimeStamp(timeStamp);
 		return TRUE;
+
 	} else if ( fieldName % "input" )
 	{
 		input = fieldValue;
 		function = Format("[{FUNCTION}]");
 		return TRUE;
+
 	} else if ( fieldName % "value" )
 	{
 		value = fieldValue;
@@ -135,25 +163,25 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 	switch (tolower(fieldName[0]))
 	{
 		case 'b':
-			if ( fieldName % "blockHash" ) { blockHash = fieldValue; return TRUE; }
+			if ( fieldName % "blockHash" ) { blockHash = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "blockNumber" ) { blockNumber = toLong(fieldValue); return TRUE; }
 			break;
 		case 'c':
+			if ( fieldName % "creates" ) { creates = fieldValue; return TRUE; }
 			if ( fieldName % "confirmations" ) { confirmations = toLong(fieldValue); return TRUE; }
-			if ( fieldName % "contractAddress" ) { contractAddress = fieldValue; return TRUE; }
+			if ( fieldName % "contractAddress" ) { contractAddress = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "cumulativeGasUsed" ) { cumulativeGasUsed = fieldValue; return TRUE; }
 			break;
 		case 'f':
 			if ( fieldName % "from" ) { from = toLower(fieldValue); return TRUE; }
 			break;
 		case 'g':
-			if ( fieldName % "gas" ) { gas = fieldValue; return TRUE; }
+			if ( fieldName % "gas" ) { gas = toLong(fieldValue); return TRUE; }
 			if ( fieldName % "gasPrice" ) { gasPrice = fieldValue; return TRUE; }
 			if ( fieldName % "gasUsed" ) { gasUsed = fieldValue; return TRUE; }
 			break;
 		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
-			if ( fieldName % "hash" ) { hash = fieldValue; return TRUE; }
+			if ( fieldName % "hash" ) { hash = toLower(fieldValue); return TRUE; }
 			break;
 		case 'i':
 			if ( fieldName % "input" ) { input = fieldValue; return TRUE; }
@@ -161,12 +189,17 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 			if ( fieldName % "isInternalTx" ) { isInternalTx = toBool(fieldValue); return TRUE; }
 			break;
 		case 'n':
-			if ( fieldName % "nonce" ) { nonce = fieldValue; return TRUE; }
+			if ( fieldName % "nonce" ) { nonce = toLong(fieldValue); return TRUE; }
+			break;
+		case 'r':
+			if ( fieldName % "raw" ) { raw = fieldValue; return TRUE; }
+//			if ( fieldName % "receipt" ) { receipt = fieldValue; return TRUE; }
 			break;
 		case 't':
 			if ( fieldName % "timeStamp" ) { timeStamp = toLong(fieldValue); return TRUE; }
 			if ( fieldName % "to" ) { to = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "transactionIndex" ) { transactionIndex = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "traces" ) return TRUE;
 			break;
 		case 'v':
 			if ( fieldName % "value" ) { value = fieldValue; return TRUE; }
@@ -182,6 +215,8 @@ void CTransaction::finishParse()
 {
 	// EXISTING_CODE
 	m_transDate = dateFromTimeStamp(timeStamp);
+	if (pParent)
+		funcPtr = ((CAccount*)pParent)->abi.findFunctionByEncoding(input.Mid(2,8));
 	function = Format("[{FUNCTION}]");
 	ether = (double)strtold((const char*)Format("[{ETHER}]"),NULL);
 	// EXISTING_CODE
@@ -195,54 +230,53 @@ void CTransaction::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
-		if (handle != curVersion)
-		{
-			readBackLevel(archive);
-			return;
-		}
-
-		SFString tmp;
-		{ archive >> tmp; blockHash = uncompressHash(tmp); }
+		archive >> blockHash;
 		archive >> blockNumber;
+		archive >> creates;
 		archive >> confirmations;
 		archive >> contractAddress;
 		archive >> cumulativeGasUsed;
-		{ archive >> tmp; from = uncompressHash(tmp); }
+		archive >> from;
 		archive >> gas;
 		archive >> gasPrice;
 		archive >> gasUsed;
-		{ archive >> tmp; hash = uncompressHash(tmp); }
+		archive >> hash;
 		archive >> input;
 		archive >> isError;
 		archive >> isInternalTx;
 		archive >> nonce;
+		archive >> raw;
 		archive >> timeStamp;
-		{ archive >> tmp; to = uncompressHash(tmp); }
+		archive >> to;
 		archive >> transactionIndex;
 		archive >> value;
+		receipt.Serialize(archive);
+		archive >> traces;
 		finishParse();
 	} else
 	{
-		archive << curVersion;
-		archive << compressHash(blockHash);
+		archive << blockHash;
 		archive << blockNumber;
+		archive << creates;
 		archive << confirmations;
 		archive << contractAddress;
 		archive << cumulativeGasUsed;
-		archive << compressHash(from);
+		archive << from;
 		archive << gas;
 		archive << gasPrice;
 		archive << gasUsed;
-		archive << compressHash(hash);
+		archive << hash;
 		archive << input;
 		archive << isError;
 		archive << isInternalTx;
 		archive << nonce;
+		archive << raw;
 		archive << timeStamp;
-		archive << compressHash(to);
+		archive << to;
 		archive << transactionIndex;
 		archive << value;
+		receipt.Serialize(archive);
+		archive << traces;
 
 	}
 }
@@ -257,47 +291,49 @@ void CTransaction::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CTransaction, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CTransaction, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CTransaction, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CTransaction, "blockHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "blockNumber", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "creates", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "confirmations", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "contractAddress", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "cumulativeGasUsed", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "from", T_TEXT, ++fieldNum);
-	ADD_FIELD(CTransaction, "gas", T_TEXT, ++fieldNum);
-	ADD_FIELD(CTransaction, "gasPrice", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "gas", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "gasPrice", T_QNUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "gasUsed", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "hash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "input", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "isError", T_RADIO, ++fieldNum);
 	ADD_FIELD(CTransaction, "isInternalTx", T_RADIO, ++fieldNum);
-	ADD_FIELD(CTransaction, "nonce", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "nonce", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "raw", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "receipt", T_TEXT|TS_OBJECT, ++fieldNum);
 	ADD_FIELD(CTransaction, "timeStamp", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "to", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "traces", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CTransaction, "transactionIndex", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CTransaction, "value", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "value", T_QNUMBER, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CTransaction, "schema");
 	HIDE_FIELD(CTransaction, "deleted");
-	HIDE_FIELD(CTransaction, "handle");
 
 	// EXISTING_CODE
 	ADD_FIELD(CTransaction, "date", T_DATE, ++fieldNum);
 	ADD_FIELD(CTransaction, "ether", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "addr_list", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "function", T_TEXT, ++fieldNum);
-	ADD_FIELD(CTransaction, "recNum", T_NUMBER, ++fieldNum);
 
 	// Hide fields we don't want to show by default
+	HIDE_FIELD(CTransaction, "creates");
 //	HIDE_FIELD(CTransaction, "date");
 //	HIDE_FIELD(CTransaction, "ether");
 	HIDE_FIELD(CTransaction, "addr_list");
 	HIDE_FIELD(CTransaction, "confirmations");
-	HIDE_FIELD(CTransaction, "recNum");
 	HIDE_FIELD(CTransaction, "function");
 //	HIDE_FIELD(CTransaction, "isInternalTx");
 //	HIDE_FIELD(CTransaction, "isError");
+	HIDE_FIELD(CTransaction, "raw");
 	// EXISTING_CODE
 }
 
@@ -353,9 +389,8 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 		case 'f':
 			if ( fieldIn % "function" ) return tra->inputToFunction();
 			break;
-		case 'r':
-			if ( fieldIn % "recNum" ) return asString(tra->pParent ? tra->pParent->getHandle() : 0);
-			break;
+		case 'i':
+			if ( fieldIn % "input_nice" ) return toNice(tra->input);
 #if 1 //def NEW_CODE
 		case 's':
 			if ( fieldIn % "sh_date" ) return tra->m_transDate.Format("%m/%d/16 %H:%M");
@@ -384,32 +419,16 @@ SFBool CTransaction::handleCustomFormat(CExportContext& ctx, const SFString& fmt
 }
 
 //---------------------------------------------------------------------------
-// EXISTING_CODE
-//---------------------------------------------------------------------------
 SFBool CTransaction::readBackLevel(SFArchive& archive)
 {
-	archive >> blockHash;
-	archive >> blockNumber;
-	archive >> confirmations;
-	archive >> contractAddress;
-	archive >> cumulativeGasUsed;
-	archive >> from;
-	archive >> gas;
-	archive >> gasPrice;
-	archive >> gasUsed;
-	archive >> hash;
-	archive >> input;
-	archive >> isError;
-	archive >> isInternalTx;
-	archive >> nonce;
-	archive >> timeStamp;
-	archive >> to;
-	archive >> transactionIndex;
-	archive >> value;
-	finishParse();
-	return TRUE;
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
+//---------------------------------------------------------------------------
+// EXISTING_CODE
 //---------------------------------------------------------------------------
 SFString toNice(const SFString& in)
 {
@@ -452,9 +471,9 @@ int sortTransactionsForWrite(const void *rr1, const void *rr2)
 	CTransaction *tr2 = (CTransaction*)rr2;
 
 	SFInt32 ret;
-	ret = tr1->timeStamp - tr2->timeStamp;         if (ret!=0) return (int)ret;
-	ret = tr1->from.Compare(tr2->from);            if (ret!=0) return (int)ret;
-	ret = toLong(tr1->nonce) - toLong(tr2->nonce); if (ret!=0) return (int)ret;
+	ret = tr1->timeStamp - tr2->timeStamp; if (ret!=0) return (int)ret;
+	ret = tr1->from.Compare(tr2->from);    if (ret!=0) return (int)ret;
+	ret = tr1->nonce - tr2->nonce;         if (ret!=0) return (int)ret;
 
 	return (int)tr1->hash.Compare(tr2->hash);
 }
@@ -504,7 +523,7 @@ SFString parse(const SFString& params, int nItems, SFString *types)
 		else if ( t == "uint3"                      )   val =          toBigNum3   (params,item);
 		else if ( t == "bytes256"                   )   val =          toAscString (params,item);
 		else if ( t.Contains("int") &&   !isDynamic )   val =          toBigNum    (params,item);
-		else if ( t.Contains("bytes") && !isDynamic )   val =          toBytes     (params,item); 
+		else if ( t.Contains("bytes") && !isDynamic )   val =          toBytes     (params,item);
 		else if ( isDynamic                         )   val = "off:" + toBigNum    (params,item);
 		else                                            val = "unknown type: " + t;
 
@@ -596,7 +615,7 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 
 	} else if (which=="changeDomain")
 	{
-		//function changeDomain( uint domain, uint expires, uint price, address transfer ) 
+		//function changeDomain( uint domain, uint expires, uint price, address transfer )
 		SFString items[] = { "bytes256", "uint256", "uint256", "address", };
 		int nItems = sizeof(items) / sizeof(SFString);
 		return which + parse(params, nItems, items);
@@ -671,6 +690,13 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 	} else if (which=="SendEmail")
 	{
 		SFString items[] = { "string","string", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="mint")
+	{
+		//function mint(address _to, string _identity)
+		SFString items[] = { "address","string", };
 		int nItems = sizeof(items) / sizeof(SFString);
 		return which + parse(params, nItems, items);
 	}
@@ -802,4 +828,21 @@ SFString CTransaction::getAddrList(char delim) const
 {
 	return Strip((from + delim + to + delim + getAddrsFromInput(delim)), delim);
 }
+#if 0
+Piper Meriam shti
+totalSupply(uint256,supply);
+removeMinter(address who);
+indentityOf(bytes32 _id);
+destroy(bytes32 _id);
+ownerOf(bytes32 _id);
+isTokenOwner(address _owner);
+addMinter(address who);
+allowence(address _owner, address _spender);
+event Mint(address _to, bytes32 _id);
+event Destroy(bytes32 _id);
+event Transfer(address _from, address _to, uint256 _value);
+event Approval(address _owner, address_spender, uint256 _value);
+event MinterAdded(address who);
+event MinterRemoved(address who);
+#endif
 // EXISTING_CODE

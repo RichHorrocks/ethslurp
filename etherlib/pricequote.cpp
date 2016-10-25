@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "pricequote.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CPriceQuote, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CPriceQuote, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CPriceQuote::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CPriceQuote::Format(CExportContext& ctx, const SFString& fmtIn, void *data)
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -62,7 +68,6 @@ SFString nextPricequoteChunk(const SFString& fieldIn, SFBool& force, const void 
 			if ( fieldIn % "close" ) return asStringF(pri->close);
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(pri->handle);
 			if ( fieldIn % "high" ) return asStringF(pri->high);
 			break;
 		case 'l':
@@ -111,7 +116,6 @@ SFBool CPriceQuote::setValueByName(const SFString& fieldName, const SFString& fi
 			if ( fieldName % "close" ) { close = toFloat(fieldValue); return TRUE; }
 			break;
 		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
 			if ( fieldName % "high" ) { high = toFloat(fieldValue); return TRUE; }
 			break;
 		case 'l':
@@ -154,7 +158,6 @@ void CPriceQuote::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> timeStamp;
 		archive >> open;
 		archive >> high;
@@ -166,7 +169,6 @@ void CPriceQuote::Serialize(SFArchive& archive)
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << timeStamp;
 		archive << open;
 		archive << high;
@@ -189,7 +191,6 @@ void CPriceQuote::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CPriceQuote, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CPriceQuote, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CPriceQuote, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CPriceQuote, "timeStamp", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CPriceQuote, "open", T_FLOAT, ++fieldNum);
 	ADD_FIELD(CPriceQuote, "high", T_FLOAT, ++fieldNum);
@@ -202,7 +203,6 @@ void CPriceQuote::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CPriceQuote, "schema");
 	HIDE_FIELD(CPriceQuote, "deleted");
-	HIDE_FIELD(CPriceQuote, "handle");
 
 	// EXISTING_CODE
 	ADD_FIELD(CPriceQuote, "date", T_DATE, ++fieldNum);
@@ -256,6 +256,15 @@ SFBool CPriceQuote::handleCustomFormat(CExportContext& ctx, const SFString& fmtI
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CPriceQuote::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

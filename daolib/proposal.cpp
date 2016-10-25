@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "proposal.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CProposal, CTransaction, NO_SCHEMA);
+IMPLEMENT_NODE(CProposal, CTransaction, curVersion);
 
 //---------------------------------------------------------------------------
 void CProposal::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CProposal::Format(CExportContext& ctx, const SFString& fmtIn, void *data) c
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -175,7 +181,6 @@ void CProposal::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CProposal, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CProposal, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CProposal, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CProposal, "proposalID", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CProposal, "creator", T_TEXT, ++fieldNum);
 	ADD_FIELD(CProposal, "recipient", T_TEXT, ++fieldNum);
@@ -188,7 +193,6 @@ void CProposal::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CProposal, "schema");
 	HIDE_FIELD(CProposal, "deleted");
-	HIDE_FIELD(CProposal, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -238,6 +242,15 @@ SFBool CProposal::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn,
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CProposal::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

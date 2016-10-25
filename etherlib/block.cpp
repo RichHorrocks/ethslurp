@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "block.h"
-
+#include "etherlib.h"
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CBlock, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CBlock, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CBlock::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CBlock::Format(CExportContext& ctx, const SFString& fmtIn, void *data) cons
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -58,6 +64,9 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 
 	switch (tolower(fieldIn[0]))
 	{
+		case 'a':
+			if ( fieldIn % "author" ) return blo->author;
+			break;
 		case 'd':
 			if ( fieldIn % "difficulty" ) return blo->difficulty;
 			break;
@@ -69,7 +78,6 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "gasUsed" ) return blo->gasUsed;
 			break;
 		case 'h':
-			if ( fieldIn % "handle" ) return asString(blo->handle);
 			if ( fieldIn % "hash" ) return blo->hash;
 			break;
 		case 'l':
@@ -87,8 +95,23 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			break;
 		case 'r':
 			if ( fieldIn % "receiptRoot" ) return blo->receiptRoot;
+			if ( fieldIn % "receiptsRoot" ) return blo->receiptsRoot;
 			break;
 		case 's':
+			if ( fieldIn % "sealFields" )
+			{
+				SFInt32 cnt = blo->sealFields.getCount();
+				expContext().lev++;
+				for (int i=0;i<cnt;i++)
+				{
+					ret += indent();
+					ret += "\"" + blo->sealFields[i] + "\"";
+					ret += ((i<cnt-1) ? "," : "");
+					ret += "\n";
+				}
+				expContext().lev--;
+				return ret;
+			}
 			if ( fieldIn % "sha3Uncles" ) return blo->sha3Uncles;
 			if ( fieldIn % "size" ) return blo->size;
 			if ( fieldIn % "stateRoot" ) return blo->stateRoot;
@@ -98,9 +121,15 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "totalDifficulty" ) return blo->totalDifficulty;
 			if ( fieldIn % "transactions" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<blo->transactions.getCount();i++)
-					ret += blo->transactions[i].Format().Substitute("\n","\n\t");
+				SFInt32 cnt = blo->transactions.getCount();
+				expContext().lev++;
+				for (int i=0;i<cnt;i++)
+				{
+					ret += blo->transactions[i].Format();
+					if (i<cnt-1) ret += ",";
+					ret += "\n";
+				}
+				expContext().lev--;
 				return ret;
 			}
 			if ( fieldIn % "transactionsRoot" ) return blo->transactionsRoot;
@@ -108,8 +137,17 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 		case 'u':
 			if ( fieldIn % "uncles" )
 			{
-				return EMPTY;
-//				SFStringArray not returned
+				SFInt32 cnt = blo->uncles.getCount();
+				expContext().lev++;
+				for (int i=0;i<cnt;i++)
+				{
+					ret += indent();
+					ret += "\"" + blo->uncles[i] + "\"";
+					ret += ((i<cnt-1) ? "," : "");
+					ret += "\n";
+				}
+				expContext().lev--;
+				return ret;
 			}
 			break;
 	}
@@ -126,18 +164,54 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 SFBool CBlock::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
-	if (fieldName % "transactions")
+	if (fieldName % "uncles")
 	{
-		char *p = (char *)(const char*)fieldValue;
-		while (p && *p)
+		SFString str = fieldValue;
+		while (!str.IsEmpty())
 		{
-			CTransaction trans;SFInt32 nFields=0;
-			trans.timeStamp = toLong(timestamp);
-			p = trans.parseJson(p,nFields);
-			if (nFields)
-				transactions[transactions.getCount()] = trans;
+			SFString unc = nextTokenClear(str,',');
+			uncles[uncles.getCount()] = unc;
 		}
 		return TRUE;
+
+	} else if (fieldName % "sealFields")
+	{
+		SFString str = fieldValue;
+		while (!str.IsEmpty())
+		{
+			SFString sFld = nextTokenClear(str,',');
+			sealFields[sealFields.getCount()] = sFld;
+		}
+		return TRUE;
+
+	} else if (fieldName % "transactions")
+	{
+		// Transactions can come to us either as a JSON object (starts with '{') or a list
+		// of hashes (i.e. a string array).
+		if (fieldValue.Contains("{"))
+		{
+			char *p = (char *)(const char*)fieldValue;
+			while (p && *p)
+			{
+				CTransaction trans;SFInt32 nFields=0;
+				trans.timeStamp = toLong(timestamp);
+				p = trans.parseJson(p,nFields);
+				if (nFields)
+					transactions[transactions.getCount()] = trans;
+			}
+
+		} else
+		{
+			SFString str = fieldValue;
+			while (!str.IsEmpty())
+			{
+				CTransaction trans;
+				trans.hash = nextTokenClear(str,',');
+				transactions[transactions.getCount()] = trans;
+			}
+		}
+		return TRUE;
+
 #ifdef COMPRESS
 	} else if (fieldName % "logsBloom")
 	{
@@ -164,6 +238,9 @@ const char* STR_ZEROS=
 
 	switch (tolower(fieldName[0]))
 	{
+		case 'a':
+			if ( fieldName % "author" ) { author = toLower(fieldValue); return TRUE; }
+			break;
 		case 'd':
 			if ( fieldName % "difficulty" ) { difficulty = fieldValue; return TRUE; }
 			break;
@@ -175,26 +252,27 @@ const char* STR_ZEROS=
 			if ( fieldName % "gasUsed" ) { gasUsed = fieldValue; return TRUE; }
 			break;
 		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
-			if ( fieldName % "hash" ) { hash = fieldValue; return TRUE; }
+			if ( fieldName % "hash" ) { hash = toLower(fieldValue); return TRUE; }
 			break;
 		case 'l':
 			if ( fieldName % "logsBloom" ) { logsBloom = fieldValue; return TRUE; }
 			break;
 		case 'm':
-			if ( fieldName % "miner" ) { miner = fieldValue; return TRUE; }
+			if ( fieldName % "miner" ) { miner = toLower(fieldValue); return TRUE; }
 			break;
 		case 'n':
 			if ( fieldName % "nonce" ) { nonce = fieldValue; return TRUE; }
 			if ( fieldName % "number" ) { number = fieldValue; return TRUE; }
 			break;
 		case 'p':
-			if ( fieldName % "parentHash" ) { parentHash = fieldValue; return TRUE; }
+			if ( fieldName % "parentHash" ) { parentHash = toLower(fieldValue); return TRUE; }
 			break;
 		case 'r':
 			if ( fieldName % "receiptRoot" ) { receiptRoot = fieldValue; return TRUE; }
+			if ( fieldName % "receiptsRoot" ) { receiptsRoot = fieldValue; return TRUE; }
 			break;
 		case 's':
+			if ( fieldName % "sealFields" ) return TRUE;
 			if ( fieldName % "sha3Uncles" ) { sha3Uncles = fieldValue; return TRUE; }
 			if ( fieldName % "size" ) { size = fieldValue; return TRUE; }
 			if ( fieldName % "stateRoot" ) { stateRoot = fieldValue; return TRUE; }
@@ -206,7 +284,7 @@ const char* STR_ZEROS=
 			if ( fieldName % "transactionsRoot" ) { transactionsRoot = fieldValue; return TRUE; }
 			break;
 		case 'u':
-			if ( fieldName % "uncles" )
+			if ( fieldName % "uncles" ) return TRUE;
 			break;
 		default:
 			break;
@@ -229,51 +307,53 @@ void CBlock::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		SFString tmp;
-		archive >> handle;
-		ASSERT(handle==curVersion);
+		archive >> author;
 		archive >> difficulty;
 		archive >> extraData;
 		archive >> gasLimit;
 		archive >> gasUsed;
 		archive >> hash;
 		archive >> logsBloom;
-		{ archive >> tmp; miner = uncompressHash(tmp); }
+		archive >> miner;
 		archive >> nonce;
 		archive >> number;
-		{ archive >> tmp; parentHash = uncompressHash(tmp); }
-		{ archive >> tmp; receiptRoot = uncompressHash(tmp); }
+		archive >> parentHash;
+		archive >> receiptRoot;
+		archive >> receiptsRoot;
+		archive >> sealFields;
 		archive >> sha3Uncles;
 		archive >> size;
 		archive >> stateRoot;
 		archive >> timestamp;
 		archive >> totalDifficulty;
 		archive >> transactions;
-		{ archive >> tmp; transactionsRoot = uncompressHash(tmp); }
-//		archive >> uncles;
+		archive >> transactionsRoot;
+		archive >> uncles;
 		finishParse();
 	} else
 	{
-		archive << curVersion;
+		archive << author;
 		archive << difficulty;
 		archive << extraData;
 		archive << gasLimit;
 		archive << gasUsed;
 		archive << hash;
 		archive << logsBloom;
-		archive << compressHash(miner);
+		archive << miner;
 		archive << nonce;
 		archive << number;
-		archive << compressHash(parentHash);
-		archive << compressHash(receiptRoot);
+		archive << parentHash;
+		archive << receiptRoot;
+		archive << receiptsRoot;
+		archive << sealFields;
 		archive << sha3Uncles;
 		archive << size;
 		archive << stateRoot;
 		archive << timestamp;
 		archive << totalDifficulty;
 		archive << transactions;
-		archive << compressHash(transactionsRoot);
-//		archive << uncles;
+		archive << transactionsRoot;
+		archive << uncles;
 
 	}
 }
@@ -288,23 +368,25 @@ void CBlock::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CBlock, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CBlock, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CBlock, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CBlock, "difficulty", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "author", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "difficulty", T_QNUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "extraData", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "gasLimit", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "gasUsed", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "gasLimit", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CBlock, "gasUsed", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "hash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "logsBloom", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "miner", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "nonce", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "number", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "number", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "parentHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "receiptRoot", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "receiptsRoot", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "sealFields", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CBlock, "sha3Uncles", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "size", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "size", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "stateRoot", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "timestamp", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "totalDifficulty", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "timestamp", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CBlock, "totalDifficulty", T_QNUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "transactions", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CBlock, "transactionsRoot", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "uncles", T_TEXT|TS_ARRAY, ++fieldNum);
@@ -312,7 +394,6 @@ void CBlock::registerClass(void)
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CBlock, "schema");
 	HIDE_FIELD(CBlock, "deleted");
-	HIDE_FIELD(CBlock, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -362,6 +443,15 @@ SFBool CBlock::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, vo
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CBlock::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

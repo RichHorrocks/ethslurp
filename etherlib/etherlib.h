@@ -23,19 +23,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#define curVersion ((long)0x00000201)
-
 #include "ethtypes.h"
 #include "parameter.h"
 #include "function.h"
+#include "block.h"
 #include "abi.h"
 #include "transaction.h"
 #include "account.h"
-#include "block.h"
 #include "blockchain.h"
+#include "receipt.h"
+#include "logentry.h"
 #include "webapi.h"
 #include "dapp.h"
 #include "pricequote.h"
+#include "trace.h"
 
 //------------------------------------------------------------------------------
 extern SFString compressHash  (const SFString& hashIn);

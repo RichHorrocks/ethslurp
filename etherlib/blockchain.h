@@ -1,4 +1,3 @@
-#if 0
 #ifndef _BLOCKCHAIN_H_
 #define _BLOCKCHAIN_H_
 /*--------------------------------------------------------------------------------
@@ -24,6 +23,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
+#include "block.h"
 #include "etherlib.h"
 
 //--------------------------------------------------------------------------
@@ -46,7 +50,6 @@ extern int isDuplicateBlockchain (const void *rr1, const void *rr2);
 class CBlockChain : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	CBlockArray blocks;
 
 public:
@@ -64,6 +67,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CBlockChain& bl);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -108,7 +112,6 @@ inline void CBlockChain::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 //	blocks = ??; /* unknown type: CBlockArray */
 
 	// EXISTING_CODE
@@ -121,11 +124,11 @@ inline void CBlockChain::Copy(const CBlockChain& bl)
 	Clear();
 
 	CBaseNode::Copy(bl);
-	handle = bl.handle;
 	blocks = bl.blocks;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -146,14 +149,6 @@ inline SFString CBlockChain::getValueByName(const SFString& fieldName) const
 }
 
 //---------------------------------------------------------------------------
-inline SFInt32 CBlockChain::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
-}
-
-//---------------------------------------------------------------------------
 extern SFString nextBlockchainChunk(const SFString& fieldIn, SFBool& force, const void *data);
 
 //---------------------------------------------------------------------------
@@ -167,5 +162,4 @@ extern SFString nextBlockchainChunk_custom(const SFString& fieldIn, SFBool& forc
 // EXISTING_CODE
 // EXISTING_CODE
 
-#endif
 #endif

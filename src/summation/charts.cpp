@@ -1,5 +1,6 @@
 //------------------------------------------------------------------------------
 #include "charts.h"
+#include "accumulator.h"
 
 //------------------------------------------------------------------------------
 extern SFInt32 nBuckets;
@@ -21,7 +22,7 @@ SFString CChartData::resolveChart(const SFString& data, const SFString& dates, S
 	}
 	//	if (chart.showPrice())
 	//		axes += getAxis(1,true,5,25,5,chart.axisRange); // mulitple of four, so above division results in matching yAxis markers
-	
+
 	SFString output = STR_THECHART;
 	output.Replace   ("[DATE_ARRAY]",   dates);
 	output.Replace   ("[VALUE_ARRAYS]", data);
@@ -48,14 +49,14 @@ void CChartData::sortFunctionMap(void) const
 	list.Replace("|price:0","");
 	list.Replace("|price","");
 	list.Replace("|price:1","");
-	
+
 	// set them all so we know which ones were set explicitly
 	for (int i=0;i<nItems;i++)
 	{
 		funcMap[i].sortOrder = -1;
 		funcMap[i].showing = FALSE;
 	}
-	
+
 	// now, assign the ones the user wants to assign
 	SFInt32 cnt=0;
 	while (!list.IsEmpty())
@@ -68,7 +69,7 @@ void CChartData::sortFunctionMap(void) const
 			item->showing = TRUE;
 		}
 	}
-	
+
 	// now, set each unassigned sortOrder to not less than the last sorted item
 	for (int i=0;i<nItems;i++)
 	{
@@ -78,7 +79,7 @@ void CChartData::sortFunctionMap(void) const
 			funcMap[i].showing = FALSE;
 		}
 	}
-	
+
 	// now, sort it
 	qsort(funcMap, nItems, sizeof(CFunctionMap), sortBySortOrder);
 }
@@ -98,7 +99,7 @@ SFString CChartData::getDateLine(SFInt32& firstBucket, SFInt32& lastBucket) cons
 		}
 	}
 	dateCtx << " ],";
-	
+
 	// otherwise, we miss one
 	lastBucket++;
 	return dateCtx.str;
@@ -196,6 +197,120 @@ SFString getAxis(SFInt32 id, SFBool opp, SFInt32 min, SFInt32 max, SFInt32 step,
 }
 
 //------------------------------------------------------------------------------
+extern SFInt32 byFuncGrpPerDay    [N_COUNTERS][MAX_BUCKETS];
+extern SFInt32 byFuncNamePerDay   [N_COUNTERS][MAX_BUCKETS];
+extern SFInt32 byFuncNamePerPeriod[N_COUNTERS][MAX_BUCKETS];
+extern SFTime  labels                         [MAX_BUCKETS];
+
+//------------------------------------------------------------------------------
+extern SFInt32 nBuckets;
+
+//------------------------------------------------------------------------------
+void groupChart(const CChartData& chart)
+{
+	SFInt32 nAxes = 2;
+	SFInt32 nSeries=0;
+	SFInt32 start = GRP_FIRST;
+	SFInt32 end   = GRP_LAST;
+
+	SFInt32 firstBucket=1000000,lastBucket=-1;
+	SFString dateLine = chart.getDateLine(firstBucket, lastBucket);
+
+	SFInt32 largest[2]={0,25};
+	SFInt32 smallest[2]={0,5};
+	CStringExportContext dataCtx;
+
+	for (SFInt32 i=start;i<end;i++) // we do not show OTHER group
+	{
+		if (i==GRP_OTHER || i==GRP_ADMIN)
+			continue;
+
+		if (byFuncGrpPerDay[i][MAX_BUCKETS-1] > 25)
+		{ // only show functions with non-zero total
+			SFString name = getGroupName(i);
+			dataCtx << "\t/" << "/ " << name << "\n";
+			dataCtx << "\t[ ";
+			for (SFInt32 j=firstBucket;j<lastBucket;j++)
+			{
+				SFInt32 value = byFuncGrpPerDay[i][j];
+				smallest[0]=MIN(smallest[0],value);
+				largest[0]=MAX(largest[0],value);
+				dataCtx << value << ",";
+			}
+			dataCtx << " ],\n\n";
+			((CChartData*)&chart)->seriesNames[nSeries++] = name; // order matters
+		}
+	}
+	dataCtx << chart.getPriceLine(labels[firstBucket], labels[lastBucket], 0);
+	*((SFInt32*)&chart.nSeries)=nSeries;
+
+	SFString output = chart.resolveChart(dataCtx.str, dateLine, nAxes, largest, smallest);
+	stringToAsciiFile(chart.objectName + "Chart" + chart.nameSuffix + ".js", output);
+}
+
+//------------------------------------------------------------------------------
+void functionChart(const CChartData& chart)
+{
+	chart.sortFunctionMap();
+	SFInt32 nAxes = countOf(':',chart.series)+1;
+
+	SFInt32  nSeries=0;
+
+	SFInt32 firstBucket=1000000,lastBucket=-1;
+	SFString dateLine = chart.getDateLine(firstBucket, lastBucket);
+
+	SFInt32 largest[2]={0,25};
+	SFInt32 smallest[2]={0,5};
+	CStringExportContext dataCtx;
+
+	// Now we create the function table
+	CAccumulator *accums = new CAccumulator[(FNC_LAST-FNC_FIRST)*2]; // More than we need
+	if (accums)
+	{
+		SFInt32 nAccums=0;
+		for (SFInt32 i=0;i<FNC_LAST-FNC_FIRST;i++)
+		{
+			accums[nAccums].map = &funcMap[i];
+			for (SFInt32 j=firstBucket;j<lastBucket;j++)
+			{
+				SFInt32 index = funcMap[i].funcID;
+				index = getFunctionIndex(funcMap[i].funcName)-FNC_FIRST;
+				SFInt32 value = byFuncNamePerDay[index][j];
+				accums[nAccums].values[j-firstBucket+1] = value;
+				accums[nAccums].values[IN_TOTO]        += value;
+			}
+			nAccums++;
+		}
+
+		for (int i=0;i<nAccums;i++)
+		{
+			if (accums[i].map->showing)
+			{
+				SFString name = accums[i].map->funcName;
+				dataCtx << "\t/" << "/ " << name << "\n";
+				dataCtx << "\t[ ";
+				for (SFInt32 j=firstBucket;j<lastBucket;j++)
+				{
+					SFInt32 idex = j-firstBucket+1;
+					SFInt32 value = accums[i].values[idex];
+					smallest[0]=MIN(smallest[0],value);
+					largest[0]=MAX(largest[0],value);
+					dataCtx << value << ",";
+				}
+				dataCtx << " ],\n\n";
+				((CChartData*)&chart)->seriesNames[nSeries++] = name; // order matters
+			}
+		}
+		delete [] accums;
+	}
+	dataCtx << chart.getPriceLine(labels[firstBucket], labels[lastBucket], 0);
+	*((SFInt32*)&chart.nSeries)=nSeries;
+
+	SFString output = chart.resolveChart(dataCtx.str, dateLine, nAxes, largest, smallest);
+	stringToAsciiFile(chart.objectName + "Chart" + chart.nameSuffix + ".js", output);
+}
+
+//------------------------------------------------------------------------------
 const char *STR_THECHART=
 "var objectName{S}    =   '#[OBJECT_NAME]Chart{S}';\n"
 "var chartTitle{S}    =   '[CHART_TITLE]';\n"
@@ -264,33 +379,4 @@ const char* STR_CHART_SERIES_1=
 const char* STR_CHART_SERIES_2=
 "\t\t\t{name:seriesNames{S}[{N}],data:yValues{S}[{N}],tooltip:{valueSuffix:suffix{S}[{N}]},type:type{S}[{N}],yAxis:1,},\n";
 
-//------------------------------------------------------------------------------
-const char* STR_FUNC_TABLE=
-"table#dataTables-example.table.table-striped.table-bordered.table-hover(width='100%')\n"
-"\tthead\n"
-"\t\ttr\n"
-"\t\t\tth(colspan=\"4\")\n"
-"\t\t\tth(colspan=\"4\") <center>Periods</center>\n"
-"\t\ttr\n"
-"\t\t\tth Ord\n"
-"\t\t\tth Functional Group\n"
-"\t\t\tth Function Name\n"
-"\t\t\tth Total\n"
-"\t\t\tth Creation\n"
-"\t\t\tth Operational\n"
-"\t\t\tth Post-Hack\n"
-"\t\t\tth Recovery\n"
-"\ttbody\n"
-"[{ROWS}]";
 
-//------------------------------------------------------------------------------
-const char* STR_FUNC_ROW=
-"\t\ttr.{T}\n"
-"\t\t\ttd(align=\"right\") {ORD}\n"
-"\t\t\ttd {GRP}\n"
-"\t\t\ttd {FNC}\n"
-"\t\t\ttd(align=\"right\") {CNT}\n"
-"\t\t\ttd(align=\"right\") {C_CNT}\n"
-"\t\t\ttd(align=\"right\") {O_CNT}\n"
-"\t\t\ttd(align=\"right\") {P_CNT}\n"
-"\t\t\ttd(align=\"right\") {R_CNT}\n";

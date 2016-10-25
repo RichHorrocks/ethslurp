@@ -1,11 +1,15 @@
-cflags=-Wall -O2 -DLINUX
+cflags=-std=c++11 -Wall -O2 -DLINUX
 
 product=utillib.a
 
 src= \
 attribute.cpp \
 basenode.cpp \
+bigint.cpp \
+biglib.cpp \
+biguint.cpp \
 config.cpp \
+codeWriter.cpp \
 curl_code.cpp \
 database.cpp \
 dates.cpp \
@@ -29,6 +33,7 @@ sfstring.cpp \
 sftime.cpp \
 sftimeofday.cpp \
 sftimespan.cpp \
+sha3.cpp \
 version.cpp \
 visitor.cpp
 

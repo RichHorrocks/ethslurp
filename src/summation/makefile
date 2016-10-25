@@ -1,6 +1,6 @@
 top=../..
 
-cflags=-Wall -O2 -DLINUX -I. -I$(top)/etherlib -I$(top)/daolib -I$(top)/utillib 
+cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I$(top)/etherlib -I$(top)/daolib -I$(top)/utillib 
 libs=$(top)/*/*.a /usr/lib/libcurl.dylib
 dao=0xbb9bc244d798123fde783fcc1c72d3bb8c189413
 #dao=0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8
@@ -9,10 +9,11 @@ exec=summation
 product=objs/$(exec)
 dest=.
 src= \
-summation.cpp \
+accumulator.cpp \
 charts.cpp \
 funcMap.cpp \
-accumulator.cpp
+summation.cpp \
+tables.cpp
 
 #-------------------------------------------------
 # probably don't have to change below this line

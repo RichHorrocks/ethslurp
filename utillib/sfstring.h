@@ -831,9 +831,10 @@ inline SFString formatFloat(double f, SFInt32 decimals=10)
 #define fmtFloatp(f,p) (const char*)formatFloat(f,p)
 
 //------------------------------------------------------------------------------
+extern unsigned long long hex2Long(const SFString& inHex);
 extern SFString hex2String(const SFString& inHex);
 extern SFString string2Hex(const SFString& inAscii);
-extern char hex2Ascii(char *str);
+extern unsigned char hex2Ascii(char *str);
 
 #define WIERD_NUM (-20206)
 

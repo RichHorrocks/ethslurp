@@ -1,4 +1,4 @@
-cflags=-Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
+cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
 libs=*/*.a /usr/lib/libcurl.dylib
 
 product=ethslurp
@@ -39,7 +39,7 @@ test: all
 back:
 	@rm -fR theData/backup
 	@cp -pR ~/.ethslurp theData/backup
-	@rm -fR theData/backup/slurps
+#	@rm -fR theData/backup/slurps
 
 $(product): $(objects) $(libs)
 	g++ -o $(product) $(objects) $(libs)
@@ -60,4 +60,5 @@ clean:
 	@cd utillib; make clean; cd ..
 	@cd etherlib; make clean; cd ..
 	@cd daolib; make clean; cd ..
+	@cd src/ethprice; make clean; cd ../..
 	-@$(RM) -f $(product) $(objs)/*.o $(objs)/*.a 2> /dev/null

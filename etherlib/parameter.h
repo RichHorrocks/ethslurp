@@ -23,6 +23,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
 #include "utillib.h"
 
 //--------------------------------------------------------------------------
@@ -46,7 +50,6 @@ class CFunction;
 class CParameter : public CBaseNode
 {
 public:
-	SFInt32 handle;
 	SFString name;
 	SFString type;
 
@@ -65,6 +68,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CParameter& pa);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -109,7 +113,6 @@ inline void CParameter::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
 	name = EMPTY;
 	type = EMPTY;
 
@@ -123,12 +126,12 @@ inline void CParameter::Copy(const CParameter& pa)
 	Clear();
 
 	CBaseNode::Copy(pa);
-	handle = pa.handle;
 	name = pa.name;
 	type = pa.type;
 
 	// EXISTING_CODE
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -146,14 +149,6 @@ inline SFString CParameter::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CParameter::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

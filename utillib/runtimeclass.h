@@ -104,14 +104,13 @@ public: \
 //------------------------------------------------------------
 #define DECLARE_NODE(CLASS_NAME) \
 	        DECLARE_NODE_BASE          (CLASS_NAME) \
-	virtual SFInt32  getHandle         (void) const; \
 	virtual SFString getValueByName    (const SFString& fieldName) const; \
 	virtual SFBool   setValueByName    (const SFString& fieldName, const SFString& fieldValue); \
 	virtual void     Serialize         (SFArchive& archive); \
 	virtual void     finishParse       (void); \
-    virtual SFBool   handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data=NULL) const; \
-    virtual void     Format            (CExportContext& ctx, const SFString& fmtIn, void *data=NULL) const; \
-    virtual SFString Format            (const SFString& fmtIn=nullString) const { CStringExportContext ctx;Format(ctx, fmtIn, NULL);return ctx.str;} \
+	virtual SFBool   handleCustomFormat(CExportContext& ctx, const SFString& fmtIn, void *data=NULL) const; \
+	virtual void     Format            (CExportContext& ctx, const SFString& fmtIn, void *data=NULL) const; \
+	virtual SFString Format            (const SFString& fmtIn=nullString) const { CStringExportContext ctx;Format(ctx, fmtIn, NULL);return ctx.str;} \
 	        SFString getClassName      (void) const; \
 	static  void     registerClass     (void);
 
@@ -130,6 +129,10 @@ public: \
 //------------------------------------------------------------
 #define HIDE_FIELD(CLASS_NAME, FIELD_NAME) \
 	{ CFieldData *f = GETRUNTIME_CLASS(CLASS_NAME)->FindField(FIELD_NAME); if(f) f->setHidden(TRUE); }
+
+//------------------------------------------------------------
+#define UNHIDE_FIELD(CLASS_NAME, FIELD_NAME) \
+	{ CFieldData *f = GETRUNTIME_CLASS(CLASS_NAME)->FindField(FIELD_NAME); if(f) f->setHidden(FALSE); }
 
 //------------------------------------------------------------
 // Archive array containers
@@ -177,6 +180,5 @@ inline SFArchive& operator>>(SFArchive& archive, LIST_CLASS& array) \
 
 //---------------------------------------------------------------------------
 extern SFString nextBasenodeChunk(const SFString& fieldIn, SFBool force, const CBaseNode *node);
-extern SFString addIcon(ghRuntimeClass *pClass);
 
 #endif

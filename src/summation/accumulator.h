@@ -2,6 +2,7 @@
 #define _H_ACCUMLATOR_
 
 //-----------------------------------------------------------
+#include "tables.h"
 #include "charts.h"
 #include "funcMap.h"
 

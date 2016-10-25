@@ -23,7 +23,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  --------------------------------------------------------------------------------*/
-#include "etherlib.h"
+/*
+ * This file was generated with makeClass. Edit only those parts of the code inside
+ * of 'EXISTING_CODE' tags.
+ */
+#include "utillib.h"
+#include "transaction.h"
 
 //--------------------------------------------------------------------------
 class CBlock;
@@ -45,18 +50,20 @@ extern int isDuplicateBlock (const void *rr1, const void *rr2);
 class CBlock : public CBaseNode
 {
 public:
-	SFInt32 handle;
+	SFAddress author;
 	SFString difficulty;
 	SFString extraData;
 	SFString gasLimit;
 	SFString gasUsed;
-	SFHash   hash;
+	SFHash hash;
 	SFString logsBloom;
-	SFString miner;
+	SFAddress miner;
 	SFString nonce;
 	SFString number;
-	SFHash   parentHash;
-	SFHash   receiptRoot;
+	SFHash parentHash;
+	SFString receiptRoot;
+	SFString receiptsRoot;
+	SFStringArray sealFields;
 	SFString sha3Uncles;
 	SFString size;
 	SFString stateRoot;
@@ -81,6 +88,7 @@ protected:
 	void			Clear      		(void);
 	void			Init      		(void);
 	void			Copy      		(const CBlock& bl);
+	SFBool                  readBackLevel           (SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -125,7 +133,7 @@ inline void CBlock::Init(void)
 {
 	CBaseNode::Init();
 
-	handle = 0;
+	author = EMPTY;
 	difficulty = EMPTY;
 	extraData = EMPTY;
 	gasLimit = EMPTY;
@@ -137,6 +145,8 @@ inline void CBlock::Init(void)
 	number = EMPTY;
 	parentHash = EMPTY;
 	receiptRoot = EMPTY;
+	receiptsRoot = EMPTY;
+//	sealFields = ??; /* unknown type: SFStringArray */
 	sha3Uncles = EMPTY;
 	size = EMPTY;
 	stateRoot = EMPTY;
@@ -156,7 +166,7 @@ inline void CBlock::Copy(const CBlock& bl)
 	Clear();
 
 	CBaseNode::Copy(bl);
-	handle = bl.handle;
+	author = bl.author;
 	difficulty = bl.difficulty;
 	extraData = bl.extraData;
 	gasLimit = bl.gasLimit;
@@ -168,6 +178,8 @@ inline void CBlock::Copy(const CBlock& bl)
 	number = bl.number;
 	parentHash = bl.parentHash;
 	receiptRoot = bl.receiptRoot;
+	receiptsRoot = bl.receiptsRoot;
+	sealFields = bl.sealFields;
 	sha3Uncles = bl.sha3Uncles;
 	size = bl.size;
 	stateRoot = bl.stateRoot;
@@ -179,6 +191,7 @@ inline void CBlock::Copy(const CBlock& bl)
 
 	// EXISTING_CODE
 	// EXISTING_CODE
+	finishParse();
 }
 
 //--------------------------------------------------------------------------
@@ -196,14 +209,6 @@ inline SFString CBlock::getValueByName(const SFString& fieldName) const
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return Format("[{"+toUpper(fieldName)+"}]");
-}
-
-//---------------------------------------------------------------------------
-inline SFInt32 CBlock::getHandle(void) const
-{
-	// EXISTING_CODE
-	// EXISTING_CODE
-	return handle;
 }
 
 //---------------------------------------------------------------------------

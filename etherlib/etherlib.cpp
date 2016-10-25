@@ -9,6 +9,11 @@ SFString compressHash(const SFString& hashIn)
 #ifndef COMPRESS
 	return hashIn;
 #else
+#error
+	// Special case because this compresses in '0x' which is the signal for non-compressed (do not remove)
+	if (hashIn.startsWith("0x3078"))
+		return hashIn;
+
 	SFString hashOut;
 	char *s = (char *)(const char*)hashIn;
 	s+=2; // skip '0x'
@@ -34,6 +39,7 @@ SFString uncompressHash(const SFString& hashIn)
 #ifndef COMPRESS
 	return hashIn;
 #else
+#error
 	if (hashIn.startsWith("0x"))
 		return hashIn;
 

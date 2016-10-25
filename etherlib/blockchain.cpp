@@ -1,4 +1,3 @@
-#if 0
 /*--------------------------------------------------------------------------------
  The MIT License (MIT)
 
@@ -23,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "blockchain.h"
-
+#include "account.h"
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CBlockChain, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CBlockChain, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CBlockChain::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -37,7 +36,13 @@ void CBlockChain::Format(CExportContext& ctx, const SFString& fmtIn, void *data)
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+        SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -62,14 +67,15 @@ SFString nextBlockchainChunk(const SFString& fieldIn, SFBool& force, const void 
 		case 'b':
 			if ( fieldIn % "blocks" )
 			{
-				SFString ret = "\n";
-				for (int i=0;i<blo->blocks.getCount();i++)
+				SFInt32 cnt = blo->blocks.getCount();
+				SFString ret = "[\n";
+				for (int i=0;i<cnt;i++)
+				{
 					ret += blo->blocks[i].Format();
-				return ret;
+					ret += ((i<cnt-1) ? ",\n" : "\n");
+				}
+				return ret+"    ]";
 			}
-			break;
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(blo->handle);
 			break;
 	}
 
@@ -92,9 +98,6 @@ SFBool CBlockChain::setValueByName(const SFString& fieldName, const SFString& fi
 		case 'b':
 			if ( fieldName % "blocks" ) return TRUE;
 			break;
-		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
-			break;
 		default:
 			break;
 	}
@@ -116,12 +119,10 @@ void CBlockChain::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> blocks;
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << blocks;
 
 	}
@@ -137,13 +138,11 @@ void CBlockChain::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CBlockChain, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CBlockChain, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CBlockChain, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CBlockChain, "blocks", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CBlockChain, "schema");
 	HIDE_FIELD(CBlockChain, "deleted");
-	HIDE_FIELD(CBlockChain, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -196,6 +195,14 @@ SFBool CBlockChain::handleCustomFormat(CExportContext& ctx, const SFString& fmtI
 }
 
 //---------------------------------------------------------------------------
+SFBool CBlockChain::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
+}
+
+//---------------------------------------------------------------------------
 // EXISTING_CODE
 // EXISTING_CODE
-#endif

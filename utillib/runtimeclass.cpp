@@ -169,9 +169,6 @@ SFString nextBasenodeChunk(const SFString& fieldIn, SFBool force, const CBaseNod
 		case 'd':
 			if ( fieldIn % "deleted" ) return asString(node->isDeleted());;
 			break;
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(node->getHandle());
-			break;
 		case 'n':
 			if ( fieldIn % "null" ) return "<x>";
 			break;

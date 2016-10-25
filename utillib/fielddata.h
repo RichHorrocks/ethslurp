@@ -152,7 +152,8 @@ public:
 			return m_fieldName.Left(m_fieldName.Find("|"));
 		return m_fieldName;
 	}
-
+	SFBool isObject(void) const;
+	SFBool isArray(void) const;
 	SFString getControl   (void) const;
 
 	SFString getGroupName (void) const { return m_groupName; }
@@ -344,6 +345,8 @@ typedef SFArrayBase<CFieldData> CFieldArray;
 #define TS_DATE             (1<<12)
 #define TS_SEARCH           (1<<13)
 #define TS_ARRAY            (1<<14)
+#define TS_NUMERAL          (1<<15)
+#define TS_OBJECT           (1<<16)
 
 //-------------------------------------------------------------------------
 // Field types
@@ -363,9 +366,10 @@ typedef SFArrayBase<CFieldData> CFieldArray;
 #define T_EMAIL             ( 11 | TS_SEARCH | TS_SORT)
 #define T_HALFTEXT          ( 12 | TS_SEARCH | TS_SORT)
 #define T_SHORTTEXT         ( 13 | TS_SEARCH | TS_SORT)
-#define T_NUMBER            ( 14 | TS_SEARCH | TS_SORT)
+#define T_NUMBER            ( 14 | TS_SEARCH | TS_SORT | TS_NUMERAL)
 #define T_FLOAT             T_NUMBER
 #define T_DOUBLE            T_NUMBER
+#define T_QNUMBER           ( T_NUMBER | (1<<30))
 #define T_NOTES             ( 15 | TS_SEARCH | TS_SORT)
 #define T_ICONLIST          ( 16 | TS_SEARCH | TS_SORT)
 #define T_ONOFF             ( 17 | TS_SEARCH | TS_SORT)
@@ -499,5 +503,17 @@ typedef SFInt32 (*OTHER_ID_FUNC) (const SFString& token);
 extern  void      setOtherIDFunc (OTHER_ID_FUNC func);
 
 extern const char* IDS_WRD_RESET;
+
+//-------------------------------------------------------------------------
+inline SFBool CFieldData::isArray(void) const
+{
+	return getFieldType()&TS_ARRAY;
+}
+
+//-------------------------------------------------------------------------
+inline SFBool CFieldData::isObject(void) const
+{
+	return getFieldType()&TS_OBJECT;
+}
 
 #endif

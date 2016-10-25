@@ -22,13 +22,13 @@
  SOFTWARE.
  --------------------------------------------------------------------------------*/
 /*
- * This file was generated with makeClass. Edit only those parts inside
+ * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
 #include "parameter.h"
 
 //---------------------------------------------------------------------------
-IMPLEMENT_NODE(CParameter, CBaseNode, NO_SCHEMA);
+IMPLEMENT_NODE(CParameter, CBaseNode, curVersion);
 
 //---------------------------------------------------------------------------
 void CParameter::Format(CExportContext& ctx, const SFString& fmtIn, void *data) const
@@ -36,7 +36,13 @@ void CParameter::Format(CExportContext& ctx, const SFString& fmtIn, void *data) 
 	if (!isShowing())
 		return;
 
-	SFString fmt = (fmtIn.IsEmpty() ? defaultFormat() : fmtIn);
+	if (fmtIn.IsEmpty())
+	{
+		ctx << toJson();
+		return;
+	}
+
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 
@@ -58,9 +64,6 @@ SFString nextParameterChunk(const SFString& fieldIn, SFBool& force, const void *
 
 	switch (tolower(fieldIn[0]))
 	{
-		case 'h':
-			if ( fieldIn % "handle" ) return asString(par->handle);
-			break;
 		case 'n':
 			if ( fieldIn % "name" ) return par->name;
 			break;
@@ -85,9 +88,6 @@ SFBool CParameter::setValueByName(const SFString& fieldName, const SFString& fie
 
 	switch (tolower(fieldName[0]))
 	{
-		case 'h':
-			if ( fieldName % "handle" ) { handle = toLong(fieldValue); return TRUE; }
-			break;
 		case 'n':
 			if ( fieldName % "name" ) { name = fieldValue; return TRUE; }
 			break;
@@ -115,13 +115,11 @@ void CParameter::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
-		archive >> handle;
 		archive >> name;
 		archive >> type;
 		finishParse();
 	} else
 	{
-		archive << handle;
 		archive << name;
 		archive << type;
 
@@ -138,14 +136,12 @@ void CParameter::registerClass(void)
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CParameter, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CParameter, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
-	ADD_FIELD(CParameter, "handle", T_NUMBER|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CParameter, "name", T_TEXT, ++fieldNum);
 	ADD_FIELD(CParameter, "type", T_TEXT, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CParameter, "schema");
 	HIDE_FIELD(CParameter, "deleted");
-	HIDE_FIELD(CParameter, "handle");
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -195,6 +191,15 @@ SFBool CParameter::handleCustomFormat(CExportContext& ctx, const SFString& fmtIn
 	// EXISTING_CODE
 	// EXISTING_CODE
 	return FALSE;
+}
+
+//---------------------------------------------------------------------------
+SFBool CParameter::readBackLevel(SFArchive& archive)
+{
+	SFBool done=FALSE;
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return done;
 }
 
 //---------------------------------------------------------------------------

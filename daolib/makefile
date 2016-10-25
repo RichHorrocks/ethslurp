@@ -1,4 +1,4 @@
-cflags=-Wall -O2 -DLINUX -I../utillib -I../etherlib -I../ -I./
+cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../etherlib -I../ -I./
 
 product=daolib.a
 

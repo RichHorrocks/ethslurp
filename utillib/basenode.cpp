@@ -130,38 +130,6 @@ ghRuntimeClass* CBaseNode::getRuntimeClass() const
 }
 
 //--------------------------------------------------------------------------------
-SFString addIcon(ghRuntimeClass *pClass)
-{
-	CBaseNode *node = pClass->CreateObject();
-	SFString fmt = SFString("[<table><td><td>Add ") + toLower(SFString(pClass->getClassNamePtr()).Mid(1,100)) + ": {ADD}</td></tr></table>]";
-	SFString ret = node->Format(fmt);
-	delete node;
-	return ret;
-}
-
-//--------------------------------------------------------------------------------
-SFString CBaseNode::defaultFormat(void) const
-{
-	SFString ret;
-	CFieldList *fieldList = getRuntimeClass()->GetFieldList();
-	if (fieldList)
-	{
-		LISTPOS lPos = fieldList->SFList<CFieldData *>::GetHeadPosition();
-		while (lPos)
-		{
-			CFieldData *field = fieldList->GetNextItem(lPos);
-			if (!field->isHidden())
-				ret += "["+toProper(field->getFieldName())+": {"+toUpper(field->getFieldName())+"}\n]";
-		}
-	} else
-	{
-		fprintf(stderr,"No fieldList. Did you register the class? Quitting...\n");
-		exit(0);
-	}
-	return ret;
-}
-
-//--------------------------------------------------------------------------------
 char *CBaseNode::parseCSV(char *s, SFInt32& nFields, const SFString *fields)
 {
 	nFields = 0;
@@ -239,8 +207,21 @@ char *CBaseNode::parseText(char *s, SFInt32& nFields, const SFString *fields)
 }
 
 //--------------------------------------------------------------------------------
+char *CBaseNode::parseJson(char *s)
+{
+	SFInt32 nFields=0;
+	return parseJson(s, nFields);
+}
+
+//SFString tbs;
+//--------------------------------------------------------------------------------
 char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 {
+//	tbs+="\t";
+//	printf("--------------------------\n%s\n-----------------------------\n", s);
+//	fflush(stdout);
+//	printf("--------------------------\n%s\n-----------------------------\n", (const char*)SFString(s).Mid(SFString(s).Find("{"),300));
+//	printf("--------------------------\n%s\n-----------------------------\n", (const char*)SFString(s).Right(300));
 	typedef enum { OUTSIDE=0, IN_NAME, IN_VALUE } parseState;
 	parseState state = OUTSIDE;
 
@@ -265,7 +246,7 @@ char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 			{
 				state = IN_VALUE;
 				*s = '\0';
-				//			printf("fn: %-10.10s fv: %-40.40s ---> %-60.60s\n" , fieldName, fieldVal, (s+1));
+//printf("fn: %-10.10s fv: %-40.40s ---> %-60.60s\n" , fieldName, fieldVal, (s+1));
 			}
 			s++;
 			break;
@@ -275,15 +256,48 @@ char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 			if (*s=='[') // array skip to end of array
 			{
 				fieldVal++;
-				while (*s && *s!=']')
+				s++;
+				bool done = false;int lev=1;
+				while (s && *s && !done)
+				{
+					if (*s == '[')
+					{
+						lev++;
+
+					} else if (lev==1 && *s == ']')
+					{
+						done=true;
+						s--; // remove the closing bracket
+
+					} else if (*s == ']')
+					{
+						lev--;
+					}
 					s++;
+				}
 			} else
 			{
-				while (*s && *s!=',' && *s!='}')
+				bool done = false;int lev=1;
+				while (s && *s && !done)
+				{
+					if (*s == '{')
+					{
+						lev++;
+
+					} else if (lev==1 && (*s == ',' || *s == '}'))
+					{
+						done=true;
+						s--;
+
+					} else if (*s == '}')
+					{
+						lev--;
+					}
 					s++;
+				}
 			}
 			*s = '\0';
-//			printf("fn: %-10.10s fv: %-40.40s ---> %-60.60s\n" , fieldName, fieldVal, (s+1));
+//			printf("%sfn: %-20.20s fv: %-60.60s ---> %-40.40s\n" , (const char*)tbs,fieldName, fieldVal, (s+1));fflush(stdout);
 			nFields += this->setValueByName(fieldName, fieldVal);
 			fieldName = NULL;
 			fieldVal = NULL;
@@ -294,11 +308,13 @@ char *CBaseNode::parseJson(char *s, SFInt32& nFields)
 			if (s && *s && (*s=='{'||*s==']'))
 			{
 				finishParse();
+//				tbs.Replace("\t","");
 				return s;
 			}
 			break;
 		}
 	}
+//	tbs.Replace("\t","");
 	finishParse();
 	return NULL;
 }
@@ -308,7 +324,6 @@ char *cleanUpJson(char *s)
 {
 	if (!s)
 		return s;
-
 	char *l = s, *start = s;
 	while (*s)
 	{
@@ -347,3 +362,108 @@ SFBool CBaseNode::SerializeHeader(SFArchive& archive)
 	return TRUE;
 }
 
+//---------------------------------------------------------------------------
+static CExportOptions expC;
+CExportOptions& expContext(void)
+{
+	return expC;
+}
+
+//---------------------------------------------------------------------------
+void incIndent(void)
+{
+	expC.lev++;
+}
+
+//---------------------------------------------------------------------------
+void decIndent(void)
+{
+	expC.lev--;
+}
+
+//---------------------------------------------------------------------------
+SFString indent(void)
+{
+	return SFString(expC.tab,expC.spcs*expC.lev);
+}
+
+extern SFString decBigNum(const SFString& str);
+//--------------------------------------------------------------------------------
+SFString CBaseNode::toJson(void) const
+{
+	CExportOptions& opts = expContext();
+
+	const CFieldList *fieldList = getRuntimeClass()->GetFieldList();
+	if (!fieldList)
+	{
+		fprintf(stderr,"No fieldList in %s. Did you register the class? Quitting...\n", (const char*)getRuntimeClass()->m_ClassName);
+		exit(0);
+	}
+
+	SFString newLine(opts.nl);
+	SFString ret;
+
+	SFBool first=true;
+	if (!expContext().noFrst)
+		ret += indent();
+	expContext().noFrst=false;
+	ret += "{";
+	LISTPOS lPos = fieldList->SFList<CFieldData *>::GetHeadPosition();
+	while (lPos)
+	{
+		incIndent();
+		CFieldData *fld = fieldList->GetNextItem(lPos);
+		SFString val = getValueByName(fld->getFieldName());
+		if (!fld->isHidden() && (!val.IsEmpty() || fld->isArray()))
+		{
+			if (!first) ret += ",\n"; else ret += "\n";
+			first=false;
+			ret += indent();
+			ret += "\"" + fld->getFieldName() + "\"";
+			ret += ": ";
+			if (fld->isArray() && val.IsEmpty())
+			{
+				ret += "[]";
+
+			} else if (fld->isArray())
+			{
+				ret += "[\n" + val + indent() + "]";
+
+			} else if (fld->isObject())
+			{
+				ret += val;
+
+			} else if (fld->getFieldType() == T_NUMBER || fld->getFieldType() == T_QNUMBER)
+			{
+				ret += "\"" + decBigNum(val) + "\"";
+
+			} else
+			{
+				ret += "\"" + val + "\"";
+			}
+		}
+		decIndent();
+	}
+	ret += "\n";
+	ret += indent() + "}";
+	return ret;
+}
+
+#include "biglib.h"
+SFString decBigNum(const SFString& str)
+{
+	string s = (const char*)((str.startsWith("0x")?str.Mid(2,1000):str));
+	SFString ret = to_string(hex2BigUint(s)).c_str();
+	SFInt32 len = ret.GetLength();
+	     if (len>29) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+29";
+	else if (len>28) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+28";
+	else if (len>27) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+27";
+	else if (len>26) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+26";
+	else if (len>25) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+25";
+	else if (len>24) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+24";
+	else if (len>23) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+23";
+	else if (len>22) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+22";
+	else if (len>21) ret = ret.Left(1) + "." + StripTrailing(ret.Mid(1,10000),'0') + "e+21";
+	ret.Replace(".e+","e+");
+	return ret;
+}

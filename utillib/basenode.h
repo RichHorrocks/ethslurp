@@ -29,6 +29,27 @@ SOFTWARE.
 class SFArchive;
 
 //----------------------------------------------------------------------------
+class CExportOptions
+{
+public:
+	SFInt32 lev, spcs;
+	SFBool noFrst;
+	char tab, nl;
+	bool quoteNums;
+	CExportOptions(void)
+		{
+			noFrst=false;
+			lev=0; spcs=4;
+			tab=' '; nl='\n';
+			quoteNums=false;
+		}
+};
+extern CExportOptions& expContext(void);
+extern void            incIndent (void);
+extern void            decIndent (void);
+extern SFString        indent    (void);
+
+//----------------------------------------------------------------------------
 class CBaseNode
 {
 private:
@@ -55,13 +76,13 @@ public:
 
 	virtual SFBool   isKindOf        (const ghRuntimeClass* pClass) const;
 	virtual char    *parseJson       (char *s, SFInt32& nFields);
+	virtual char    *parseJson       (char *s);
 	virtual char    *parseCSV        (char *s, SFInt32& nFields, const SFString *fields);
 	virtual char    *parseText       (char *s, SFInt32& nFields, const SFString *fields);
-	virtual SFString defaultFormat   (void) const;
+	virtual SFString toJson          (void) const;
 
 	DECLARE_NODE_BASE(CBaseNode)
 
-	virtual SFInt32  getHandle      (void) const = 0;
 	virtual SFString getValueByName (const SFString& fieldName) const = 0;
 	virtual SFBool   setValueByName (const SFString& fieldName, const SFString& fieldValue) = 0;
 	virtual void     Serialize      (SFArchive& archive) = 0;

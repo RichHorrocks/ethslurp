@@ -1,5 +1,5 @@
-cflags=-Wall -O2 -DLINUX -DCOMPRESS -I../utillib -I../ -I./
-#cflags=-Wall -O2 -DLINUX -I../utillib -I../ -I./
+#cflags=-std=c++11- Wall -O2 -DLINUX -DCOMPRESS -I../utillib -I../ -I./
+cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../ -I./
 
 product=etherlib.a
 
@@ -9,10 +9,15 @@ account.cpp \
 block.cpp \
 dapp.cpp \
 function.cpp \
+logentry.cpp \
 parameter.cpp \
 pricequote.cpp \
+receipt.cpp \
 transaction.cpp \
+trace.cpp \
+structlog.cpp \
 webapi.cpp \
+rpc.cpp \
 etherlib.cpp
 
 #blockchain.cpp \

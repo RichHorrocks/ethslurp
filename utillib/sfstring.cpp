@@ -1329,11 +1329,31 @@ SFBool IsValidEmail(const SFString& email)
 }
 
 //----------------------------------------------------------------------------
+unsigned long long hex2Long(const SFString& inHex)
+{
+	SFString hex = toLower(inHex.startsWith("0x")?inHex.Mid(2,1000):inHex);
+	hex.Reverse();
+	char *s = (char *)(const char*)hex;
+
+	unsigned long long ret = 0,mult=1;
+	while (*s)
+	{
+		int val = *s - '0';
+		if (*s >= 'a' && *s <= 'f')
+			val = *s - 'a' + 10;
+		ret += (mult * val);
+		s++;mult*=16;
+	}
+
+	return ret;
+}
+
+//----------------------------------------------------------------------------
 // convert %dd hex values back to characters
 //----------------------------------------------------------------------------
-char hex2Ascii(char *str)
+unsigned char hex2Ascii(char *str)
 {
-	char c;
+	unsigned char c;
 	c =  (char)((str[0] >= 'A' ? ((str[0]&0xDF)-'A')+10 : (str[0]-'0')));
 	c *= 16;
 	c = (char)(c + (str[1] >= 'A' ? ((str[1]&0xDF)-'A')+10 : (str[1]-'0')));

@@ -3,6 +3,8 @@
 *.lo
 *.o
 *.obj
+objs
+objs/*
 
 # Mac junk
 *.xcodeproj
@@ -11,23 +13,12 @@ ethslurp
 api_key
 TODO.txt
 abis
-theData
+theData/*
 docs
 docs/*
-src/ethprice/*
-src/balances/*
-src/blockChunk/*
-src/curator_watch/*
-src/summation/junk/*
-src/dapps/*
-src/ethfunc/*
-src/ethrlp/*
-src/getABIs/*
-src/getEvents/*
-src/jsonparser/*
-src/otherJunk/*
-src/votes/*
-src/withdraw_watch/*
+data
+data/*
+src/*/*
 
 # Precompiled Headers
 *.gch
