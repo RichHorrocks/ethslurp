@@ -18,7 +18,11 @@ docs
 docs/*
 data
 data/*
+src
+src/*
 src/*/*
+email
+email/*
 
 # Precompiled Headers
 *.gch
