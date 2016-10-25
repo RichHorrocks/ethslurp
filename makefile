@@ -16,7 +16,6 @@ all:
 	@cd utillib; make; cd ..
 	@cd etherlib; make; cd ..
 	@cd daolib; make; cd ..
-	@cd src/ethprice; make; cd ../..
 	@echo "$(product) build started"
 	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	@make $(product)
@@ -60,5 +59,4 @@ clean:
 	@cd utillib; make clean; cd ..
 	@cd etherlib; make clean; cd ..
 	@cd daolib; make clean; cd ..
-	@cd src/ethprice; make clean; cd ../..
 	-@$(RM) -f $(product) $(objs)/*.o $(objs)/*.a 2> /dev/null
