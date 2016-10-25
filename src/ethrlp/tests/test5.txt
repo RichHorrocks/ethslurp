@@ -1,2 +1,0 @@
-05. ethrlp <long string> (convert to ascii)
-This is a test of the emergancy broadcast system.
