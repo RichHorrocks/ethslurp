@@ -1,7 +1,7 @@
 #ifndef _BIGLIB_H_
 #define _BIGLIB_H_
 
-#include <string>
+#include <string.h>
 #include <iostream>
 #include "biguint.h"
 #include "bigint.h"

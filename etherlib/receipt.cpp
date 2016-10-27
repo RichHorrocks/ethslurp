@@ -257,19 +257,6 @@ int sortReceiptByID  (const void *rr1, const void *rr2) { return sortReceipt("re
 //---------------------------------------------------------------------------
 SFString nextReceiptChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CReceiptNotify *re = (CReceiptNotify*)data;
-	const CReceipt *rec = re->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(re)
-#pragma unused(rec)
-
 	return EMPTY;
 }
 

@@ -199,7 +199,7 @@ SFInt32 CSlurpOptions::parseArguments(SFString& command)
 			if (isTesting)
 				outScreen << "Testing only for open command:\n" << asciiFileToString(configPath("ethslurp.conf")) << "\n";
 			else
-				system("pico ~/.ethslurp/ethslurp.conf");
+				if (system("pico ~/.ethslurp/ethslurp.conf")) {}; // do not remove. The test just silences compiler warnings
 			exit(0);
 
 		} else if (arg == "-c" || arg == "-clear")

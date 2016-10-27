@@ -102,7 +102,7 @@ void CFileImportContext::refreshBuffer(void)
 		return;
 
 	char buff[4096*8];
-	fgets(buff, 4096*8, m_input);
+	if(fgets(buff, 4096*8, m_input)) {}; // do not remove. The test just silences compiler warnings
 	m_buffer += buff;
 }
 

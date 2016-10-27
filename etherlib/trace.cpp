@@ -200,19 +200,6 @@ int sortTraceByID  (const void *rr1, const void *rr2) { return sortTrace("traceI
 //---------------------------------------------------------------------------
 SFString nextTraceChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CTraceNotify *tr = (CTraceNotify*)data;
-	const CTrace *tra = tr->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(tr)
-#pragma unused(tra)
-
 	return EMPTY;
 }
 

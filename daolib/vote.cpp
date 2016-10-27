@@ -189,19 +189,6 @@ int sortVoteByID  (const void *rr1, const void *rr2) { return sortVote("voteID",
 //---------------------------------------------------------------------------
 SFString nextVoteChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CVoteNotify *vo = (CVoteNotify*)data;
-	const CVote *vot = vo->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(vo)
-#pragma unused(vot)
-
 	return EMPTY;
 }
 

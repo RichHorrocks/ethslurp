@@ -165,19 +165,6 @@ int sortCreatetokenproxyByID  (const void *rr1, const void *rr2) { return sortCr
 //---------------------------------------------------------------------------
 SFString nextCreatetokenproxyChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CCreateTokenProxyNotify *cr = (CCreateTokenProxyNotify*)data;
-	const CCreateTokenProxy *cre = cr->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(cr)
-#pragma unused(cre)
-
 	return EMPTY;
 }
 

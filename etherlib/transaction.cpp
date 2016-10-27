@@ -404,9 +404,6 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 			break;
 	}
 
-#pragma unused(tr)
-#pragma unused(tra)
-
 	return EMPTY;
 }
 

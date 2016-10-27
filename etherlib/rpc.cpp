@@ -1,3 +1,4 @@
+#if 0
 #include <stdio.h>
 #include "rpc.h"
 
@@ -111,3 +112,4 @@ RPCSession::RPCSession(const SFString& _path) : m_ipcSocket(_path)
 {
 }
 
+#endif

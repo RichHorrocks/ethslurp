@@ -185,19 +185,6 @@ int sortAbiByID  (const void *rr1, const void *rr2) { return sortAbi("abiID", ""
 //---------------------------------------------------------------------------
 SFString nextAbiChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CAbiNotify *ab = (CAbiNotify*)data;
-	const CAbi *abi = ab->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(ab)
-#pragma unused(abi)
-
 	return EMPTY;
 }
 

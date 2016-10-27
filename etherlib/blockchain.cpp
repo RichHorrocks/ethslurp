@@ -170,19 +170,6 @@ int sortBlockchainByID  (const void *rr1, const void *rr2) { return sortBlockcha
 //---------------------------------------------------------------------------
 SFString nextBlockchainChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CBlockChainNotify *bl = (CBlockChainNotify*)data;
-	const CBlockChain *blo = bl->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(bl)
-#pragma unused(blo)
-
 	return EMPTY;
 }
 

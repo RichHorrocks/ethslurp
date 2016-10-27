@@ -244,9 +244,6 @@ SFString nextPricequoteChunk_custom(const SFString& fieldIn, SFBool& force, cons
 			break;
 	}
 
-#pragma unused(pr)
-#pragma unused(pri)
-
 	return EMPTY;
 }
 

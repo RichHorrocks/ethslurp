@@ -253,19 +253,6 @@ int sortFunctionByID  (const void *rr1, const void *rr2) { return sortFunction("
 //---------------------------------------------------------------------------
 SFString nextFunctionChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CFunctionNotify *fu = (CFunctionNotify*)data;
-	const CFunction *fun = fu->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(fu)
-#pragma unused(fun)
-
 	return EMPTY;
 }
 

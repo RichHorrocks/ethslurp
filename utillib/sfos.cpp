@@ -61,7 +61,7 @@ int SFos::copyFile_Special( const SFString& fromIn, const SFString& toIn )
 	const SFString copyCmd = "cp -pf";
 
 	SFString command = copyCmd + " " + from + " " + to;
-	system((const char *)command);
+	if (system((const char *)command)) {}; // do not remove. The test just silences compiler warnings
 	return (int)fileExists(to);
 }
 
@@ -98,7 +98,7 @@ int SFos::copyFile( const SFString& fromIn, const SFString& toIn )
 		return 0;
 
 	SFString command = copyCmd + " " + from + " " + to;
-	system((const char *)command);
+	if (system((const char *)command)) {}; // do not remove. The test just silences compiler warnings
 	return (int)fileExists(to);
 }
 
@@ -206,7 +206,7 @@ SFString SFos::doCommand(const SFString& tmpPathIn, const SFString& cmd)
 
 	SFString c = cmd;
 	SFString filename = makeValidName(tmpPath + "cw_" + nextTokenClear(c, ' '));
-	system((const char *)(cmd + ">" + filename));
+	if (system((const char *)(cmd + ">" + filename))) {}; // do not remove. The test just silences compiler warnings
 
 	// Check twice for existance since the previous command creates the file but may take some time
 	waitForCreate(filename);
@@ -257,7 +257,7 @@ static SFInt32  sTZ        = 0;
 SFString getCWD(const SFString& filename)
 {
 	char buffer[_MAX_PATH];
-	::getcwd(buffer, _MAX_PATH);
+	if (::getcwd(buffer, _MAX_PATH)) {}; // do not remove. The test just silences compiler warnings
 	SFString folder = buffer;
 	if (!folder.endsWith('/'))
 		folder += "/";

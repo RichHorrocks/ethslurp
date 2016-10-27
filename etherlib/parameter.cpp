@@ -169,19 +169,6 @@ int sortParameterByID  (const void *rr1, const void *rr2) { return sortParameter
 //---------------------------------------------------------------------------
 SFString nextParameterChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CParameterNotify *pa = (CParameterNotify*)data;
-	const CParameter *par = pa->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(pa)
-#pragma unused(par)
-
 	return EMPTY;
 }
 

@@ -1,4 +1,3 @@
-#cflags=-std=c++11- Wall -O2 -DLINUX -DCOMPRESS -I../utillib -I../ -I./
 cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../ -I./
 
 product=etherlib.a
@@ -6,6 +5,7 @@ product=etherlib.a
 src= \
 abi.cpp \
 account.cpp \
+blockchain.cpp \
 block.cpp \
 dapp.cpp \
 function.cpp \
@@ -19,8 +19,6 @@ structlog.cpp \
 webapi.cpp \
 rpc.cpp \
 etherlib.cpp
-
-#blockchain.cpp \
 
 #-------------------------------------------------
 # probably don't have to change below this line

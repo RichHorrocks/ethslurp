@@ -287,19 +287,6 @@ int sortStructlogByID  (const void *rr1, const void *rr2) { return sortStructlog
 //---------------------------------------------------------------------------
 SFString nextStructlogChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CStructLogNotify *st = (CStructLogNotify*)data;
-	const CStructLog *str = st->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(st)
-#pragma unused(str)
-
 	return EMPTY;
 }
 

@@ -229,19 +229,6 @@ int sortDappByID  (const void *rr1, const void *rr2) { return sortDapp("dappID",
 //---------------------------------------------------------------------------
 SFString nextDappChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CDappNotify *da = (CDappNotify*)data;
-	const CDapp *dap = da->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(da)
-#pragma unused(dap)
-
 	return EMPTY;
 }
 

@@ -220,19 +220,6 @@ int sortProposalByID  (const void *rr1, const void *rr2) { return sortProposal("
 //---------------------------------------------------------------------------
 SFString nextProposalChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CProposalNotify *pr = (CProposalNotify*)data;
-	const CProposal *pro = pr->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(pr)
-#pragma unused(pro)
-
 	return EMPTY;
 }
 

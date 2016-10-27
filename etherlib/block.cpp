@@ -421,19 +421,6 @@ int sortBlockByID  (const void *rr1, const void *rr2) { return sortBlock("blockI
 //---------------------------------------------------------------------------
 SFString nextBlockChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CBlockNotify *bl = (CBlockNotify*)data;
-	const CBlock *blo = bl->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(bl)
-#pragma unused(blo)
-
 	return EMPTY;
 }
 

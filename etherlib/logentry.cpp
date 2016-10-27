@@ -222,19 +222,6 @@ int sortLogentryByID  (const void *rr1, const void *rr2) { return sortLogentry("
 //---------------------------------------------------------------------------
 SFString nextLogentryChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CLogEntryNotify *lo = (CLogEntryNotify*)data;
-	const CLogEntry *log = lo->getDataPtr();
-	switch (tolower(fieldIn[0]))
-	{
-		// EXISTING_CODE
-		// EXISTING_CODE
-		default:
-			break;
-	}
-
-#pragma unused(lo)
-#pragma unused(log)
-
 	return EMPTY;
 }
 

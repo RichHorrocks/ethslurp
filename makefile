@@ -1,5 +1,7 @@
+curl_lib=/usr/lib/libcurl.dylib
+#curl_lib=/usr/lib/x86_64-linux-gnu/libcurl.so.4
 cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
-libs=*/*.a /usr/lib/libcurl.dylib
+libs=*/*.a $(curl_lib)
 
 product=ethslurp
 src= \
