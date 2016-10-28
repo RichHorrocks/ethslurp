@@ -34,16 +34,4 @@ Check out Great Hill Corporation on <a href="https://www.facebook.com/GreatHillC
 
 ### Building from source
 
-Currently we have no binaries to download, therefore you must build from source. We think there is only a single dependency in our code for the 'curl' libraries.
-
-On Ubuntu you may run this command to get 'curl':
-
-```
-apt-get install libcurl4-gnutls-dev
-```
-
-On the Mac, this may be a good start:
-
-```
-http://macappstore.org/curl/
-```
+Please see the INSTALL.md file for more information.
