@@ -1,32 +1,25 @@
 # EthSlurp - Installation and Build Instructions
 
-Thanks for downloading EthSlurp.
-
 Follow these instructions to compile and use our software.
 
     1. Open a command prompt or terminal window on your system.
-
     2. Change to the folder containing this file.
-
     3. From the command prompt enter 'make clean' then 'make'.
 
 It should be as simple as that.
 
-#------------------
 # Running EthSlurp
-#------------------
-To run the software navigate to the same folder as above and enter:
 
-    ./ethslurp version
+To run the software, navigate to the same folder as above and enter:
 
-If the version string appears, the software is ready to go.
+    ./ethslurp --version
 
-At any time you may enter -h to see the program's help
-screen. If you wish, you may copy or move the executable
-to any folder in your $PATH.
+If the version string appears, the software is ready to go. At any time you may enter --help to see the program's help
+screen. If you wish, you may copy or move the executable to any folder in your $PATH.
+
+# Installing curl
+
+https://github.com/Great-Hill-Corporation/ethslurp/issues/87#issuecomment-256775010
+
 
 Good luck.
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-info@greathill.com
-http://www.ethslurp.com
