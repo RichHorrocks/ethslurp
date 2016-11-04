@@ -299,7 +299,7 @@ free_encoded_abi(encodedABI);
 //outErr << "----------------------------------------------------\n";
 #endif
 
-#if 0
+#if 1
 	outErr << "\tLoading abi file: " << abiFilename << "...\n";
 	SFString contents = asciiFileToString(abiFilename);
 	ASSERT(!contents.IsEmpty());
