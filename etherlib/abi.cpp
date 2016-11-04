@@ -266,6 +266,14 @@ void CAbi::clearABI(void)
 	abiByEncoding.Clear();
 }
 
+//#define VERY_NEW_CODE
+#ifdef VERY_NEW_CODE
+extern "C" {
+	const char*get_encoded_abi(const char*path);
+	void free_encoded_abi(const char* abi);
+}
+#endif
+
 //---------------------------------------------------------------------------
 void CAbi::loadABI(const SFString& addr)
 {
@@ -282,6 +290,16 @@ extern SFString configPath(const SFString& part);
 	if (!SFos::fileExists(abiFilename))
 		return;
 
+#ifdef VERY_NEW_CODE
+//outErr << "----------------------------------------------------\n";
+const char* encodedABI = get_encoded_abi((const char*)abiFilename);
+outErr << "\tThe rust string: " << encodedABI << "\n";
+printf("\t0x%llx\n", (long long)encodedABI);outErr.Flush();
+free_encoded_abi(encodedABI);
+//outErr << "----------------------------------------------------\n";
+#endif
+
+#if 0
 	outErr << "\tLoading abi file: " << abiFilename << "...\n";
 	SFString contents = asciiFileToString(abiFilename);
 	ASSERT(!contents.IsEmpty());
@@ -297,6 +315,7 @@ extern SFString configPath(const SFString& part);
 			if (!SFos::fileExists(ethabi))
 			{
 				outErr << "/usr/local/bin/ethabi command not found. Cannot parse functions.\n";
+
 			} else if (func.type == "function")
 			{
 				SFString cmd = ethabi + " encode function \"" + abiFilename + "\" " + func.name.Substitute("(","\\(").Substitute(")","\\)"); // when we call ethabi, we want the full function declaration (if it's present)
@@ -323,6 +342,7 @@ extern SFString configPath(const SFString& part);
 	for (int i=0;i<abiByEncoding.getCount();i++)
 		if (abiByEncoding[i].type == "function" && verbose)
 			outErr << abiByEncoding[i].Format("[\"{NAME}|][{ENCODING}\"]").Substitute("\n"," ") << "\n";
+#endif
 #endif
 }
 // EXISTING_CODE

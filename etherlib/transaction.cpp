@@ -387,7 +387,8 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 			}
 			break;
 		case 'f':
-			if ( fieldIn % "function" ) return tra->inputToFunction();
+			if ( fieldIn % "function" )
+				return tra->inputToFunction();
 			break;
 		case 'i':
 			if ( fieldIn % "input_nice" ) return toNice(tra->input);
@@ -538,31 +539,6 @@ SFString parse(const SFString& params, int nItems, SFString *types)
 	}
 	return ret;
 }
-
-/*
-variable:
-	if contains []
-	if == bytes
-	if == string
-
-fixed:
-	address		left	160	no
-	bool		left	1	yes
-	int8		left	8	yes
-	int16		left	16	yes
-	int32		left 	32	yes
-	int256		left	256	yes
-	uint8		left	8	yes
-	uint16		left	16	yes
-	uint32		left	32	yes
-	uint256		left	256	yes
-	bytes8		right	8	no
-	bytes16		right	16	no
-	bytes32		right	32	no
-
-non-canonical:
-	uint
-*/
 
 //---------------------------------------------------------------------------
 SFString parseParams(const CTransaction* trans, const SFString& which, const SFString& params)
@@ -825,21 +801,4 @@ SFString CTransaction::getAddrList(char delim) const
 {
 	return Strip((from + delim + to + delim + getAddrsFromInput(delim)), delim);
 }
-#if 0
-Piper Meriam shti
-totalSupply(uint256,supply);
-removeMinter(address who);
-indentityOf(bytes32 _id);
-destroy(bytes32 _id);
-ownerOf(bytes32 _id);
-isTokenOwner(address _owner);
-addMinter(address who);
-allowence(address _owner, address _spender);
-event Mint(address _to, bytes32 _id);
-event Destroy(bytes32 _id);
-event Transfer(address _from, address _to, uint256 _value);
-event Approval(address _owner, address_spender, uint256 _value);
-event MinterAdded(address who);
-event MinterRemoved(address who);
-#endif
 // EXISTING_CODE

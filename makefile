@@ -1,7 +1,8 @@
+#abi_lib=libethabi.a
 curl_lib=/usr/lib/libcurl.dylib
 #curl_lib=/usr/lib/x86_64-linux-gnu/libcurl.so.4
 cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
-libs=*/*.a $(curl_lib)
+libs=$(curl_lib) $(abi_lib) */*.a
 
 product=ethslurp
 src= \
@@ -43,7 +44,7 @@ back:
 #	@rm -fR theData/backup/slurps
 
 $(product): $(objects) $(libs)
-	g++ -o $(product) $(objects) $(libs)
+	$(CXX) -o $(product) $(objects) $(libs)
 	@strip $(product)
 
 $(objects): | objs
