@@ -1,3 +1,5 @@
+[![Code Climate](https://codeclimate.com/github/Great-Hill-Corporation/ethslurp/badges/gpa.svg)](https://codeclimate.com/github/Great-Hill-Corporation/ethslurp)
+
 # ethslurp
 Drink the blockchain (http://ethslurp.com)
 
