@@ -1,5 +1,9 @@
 cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
-libs=*/*.a -lcurl
+
+# for mac builds
+libs=*/*.a /usr/lib/libcurl.dylib
+# for ubuntu builds
+#libs=*/*.a -lcurl
 
 product=ethslurp
 src= \
