@@ -25,6 +25,6 @@ SOFTWARE.
 --------------------------------------------------------------------------------*/
 #include "utillib.h"
 
-extern SFString  urlToString(const SFString& url);
+extern SFString  urlToString(const SFString& url=EMPTY);
 
 #endif
