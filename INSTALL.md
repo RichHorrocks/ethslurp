@@ -19,13 +19,23 @@ screen. If you wish, you may copy or move the executable to any folder in your $
 
 ### Building the Software from Source
 
-Currently we have no binaries to download, therefore you must build from source. We think there is only a single dependency in our code for the 'curl' libraries.
+Currently we have no binaries to download, therefore you must build from source.
+
+Start with this command line command:
+
+    git clone http://github.com/Great-Hill-Corporation/ethslurp
+
+Then
+
+    cd ethslurp
+
+We think there is only a single dependency in our code for the 'curl' libraries.
 
 On Ubuntu, run this command to install 'curl' on your system:
 
     apt-get install libcurl4-gnutls-dev
 
-Once 'curl' is installed, you must find 'curl' on your system. Please see this comment for more information on linking to 'curl' on your system: https://github.com/Great-Hill-Corporation/ethslurp/issues/87#issuecomment-256775010
+Once 'curl' is installed, you must edit the makefile so that the build finds the curl library. Please see this comment for more information on linking to 'curl' on your system: https://github.com/Great-Hill-Corporation/ethslurp/issues/87#issuecomment-256775010
 
 On the Mac, this link may help you get started:
 
