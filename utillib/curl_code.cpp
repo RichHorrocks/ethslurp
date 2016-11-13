@@ -32,22 +32,14 @@ class URL_FILE;
 
 // exported functions
 extern URL_FILE *url_fopen  ( const char *url, const char *operation );
-extern int       url_fclose ( URL_FILE *file );
 extern int       url_feof   ( URL_FILE *file );
-extern size_t    url_fread  ( void *ptr, size_t size, size_t nmemb, URL_FILE *file );
 extern char     *url_fgets  ( char *ptr, size_t size, URL_FILE *file );
-extern void      url_rewind ( URL_FILE *file );
 
 //---------------------------------------------------------------------------------------------------
 class URL_FILE
 {
 public:
-	SFInt32 type;     /* type of handle */
-	union {
-		CURL *curl;
-		FILE *file;
-	} handle;                   /* handle */
-
+	CURL *curl;
 	char *buffer;               /* buffer to store cached data*/
 	size_t buffer_len;          /* currently allocated buffers length */
 	size_t buffer_pos;          /* end of data in buffer*/
@@ -56,7 +48,7 @@ public:
 
 //---------------------------------------------------------------------------------------------------
 /* we use a global one for convenience */
-CURLM *multi_handle;
+CURLM *multi_handle=0;
 
 //---------------------------------------------------------------------------------------------------
 /* curl calls this routine to get more data */
@@ -180,7 +172,6 @@ static int use_buffer(URL_FILE *file,int want)
 }
 
 //---------------------------------------------------------------------------------------------------
-#define CFTYPE_NONE 0
 #define CFTYPE_FILE 1
 #define CFTYPE_CURL 2
 
@@ -199,137 +190,44 @@ URL_FILE *url_fopen(const char *url,const char *operation)
 
 	memset(file, 0, sizeof(URL_FILE));
 
-	if((file->handle.file=fopen(url,operation)))
-		file->type = CFTYPE_FILE; /* marked as URL */
+	file->curl = curl_easy_init();
 
-	else {
-		file->type = CFTYPE_CURL; /* marked as URL */
-		file->handle.curl = curl_easy_init();
+	curl_easy_setopt(file->curl, CURLOPT_URL, url);
+	curl_easy_setopt(file->curl, CURLOPT_WRITEDATA, file);
+	curl_easy_setopt(file->curl, CURLOPT_VERBOSE, 0L);
+	curl_easy_setopt(file->curl, CURLOPT_WRITEFUNCTION, write_callback);
 
-		curl_easy_setopt(file->handle.curl, CURLOPT_URL, url);
-		curl_easy_setopt(file->handle.curl, CURLOPT_WRITEDATA, file);
-		curl_easy_setopt(file->handle.curl, CURLOPT_VERBOSE, 0L);
-		curl_easy_setopt(file->handle.curl, CURLOPT_WRITEFUNCTION, write_callback);
+	if (!multi_handle)
+		multi_handle = curl_multi_init();
 
-		if(!multi_handle)
-			multi_handle = curl_multi_init();
+	curl_multi_add_handle(multi_handle, file->curl);
 
-		curl_multi_add_handle(multi_handle, file->handle.curl);
+	/* lets start the fetch */
+	curl_multi_perform(multi_handle, &file->still_running);
 
-		/* lets start the fetch */
-		curl_multi_perform(multi_handle, &file->still_running);
+	if((file->buffer_pos == 0) && (!file->still_running)) {
+		/* if still_running is 0 now, we should return NULL */
 
-		if((file->buffer_pos == 0) && (!file->still_running)) {
-			/* if still_running is 0 now, we should return NULL */
+		/* make sure the easy handle is not in the multi handle anymore */
+		curl_multi_remove_handle(multi_handle, file->curl);
 
-			/* make sure the easy handle is not in the multi handle anymore */
-			curl_multi_remove_handle(multi_handle, file->handle.curl);
+		/* cleanup */
+		curl_easy_cleanup(file->curl);
 
-			/* cleanup */
-			curl_easy_cleanup(file->handle.curl);
+		free(file);
 
-			free(file);
-
-			file = NULL;
-		}
+		file = NULL;
 	}
 	return file;
-}
-
-//---------------------------------------------------------------------------------------------------
-int url_fclose(URL_FILE *file)
-{
-	int ret=0;/* default is good return */
-
-	switch(file->type) {
-		case CFTYPE_FILE:
-			ret=fclose(file->handle.file); /* passthrough */
-			break;
-
-		case CFTYPE_CURL:
-			/* make sure the easy handle is not in the multi handle anymore */
-			curl_multi_remove_handle(multi_handle, file->handle.curl);
-
-			/* cleanup */
-			curl_easy_cleanup(file->handle.curl);
-			break;
-
-		default: /* unknown or supported type - oh dear */
-			ret=EOF;
-			errno=EBADF;
-			break;
-	}
-
-	if(file->buffer)
-		free(file->buffer);/* free any allocated buffer space */
-
-	free(file);
-
-	return ret;
 }
 
 //---------------------------------------------------------------------------------------------------
 int url_feof(URL_FILE *file)
 {
 	int ret=0;
-
-	switch(file->type) {
-		case CFTYPE_FILE:
-			ret=feof(file->handle.file);
-			break;
-
-		case CFTYPE_CURL:
-			if((file->buffer_pos == 0) && (!file->still_running))
-				ret = 1;
-			break;
-
-		default: /* unknown or supported type - oh dear */
-			ret=-1;
-			errno=EBADF;
-			break;
-	}
+	if((file->buffer_pos == 0) && (!file->still_running))
+		ret = 1;
 	return ret;
-}
-
-//---------------------------------------------------------------------------------------------------
-size_t url_fread(void *ptr, size_t size, size_t nmemb, URL_FILE *file)
-{
-	size_t want;
-
-	switch(file->type) {
-		case CFTYPE_FILE:
-			want=fread(ptr,size,nmemb,file->handle.file);
-			break;
-
-		case CFTYPE_CURL:
-			want = nmemb * size;
-
-			fill_buffer(file,want);
-
-			/* check if theres data in the buffer - if not fill_buffer()
-			 * either errored or EOF */
-			if(!file->buffer_pos)
-				return 0;
-
-			/* ensure only available data is considered */
-			if(file->buffer_pos < want)
-				want = file->buffer_pos;
-
-			/* xfer data to caller */
-			memcpy(ptr, file->buffer, want);
-
-			use_buffer(file,(int)want);
-
-			want = want / size;     /* number of items */
-			break;
-
-		default: /* unknown or supported type - oh dear */
-			want=0;
-			errno=EBADF;
-			break;
-
-	}
-	return want;
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -338,97 +236,54 @@ char *url_fgets(char *ptr, size_t size, URL_FILE *file)
 	size_t want = size - 1;/* always need to leave room for zero termination */
 	size_t loop;
 
-	switch(file->type) {
-		case CFTYPE_FILE:
-			ptr = fgets(ptr,(int)size,file->handle.file);
+	fill_buffer(file,want);
+
+	/* check if theres data in the buffer - if not fill either errored or
+	 * EOF */
+	if(!file->buffer_pos)
+		return NULL;
+
+	/* ensure only available data is considered */
+	if(file->buffer_pos < want)
+		want = file->buffer_pos;
+
+	/*buffer contains data */
+	/* look for newline or eof */
+	for(loop=0;loop < want;loop++) {
+		if(file->buffer[loop] == '\n') {
+			want=loop+1;/* include newline */
 			break;
-
-		case CFTYPE_CURL:
-			fill_buffer(file,want);
-
-			/* check if theres data in the buffer - if not fill either errored or
-			 * EOF */
-			if(!file->buffer_pos)
-				return NULL;
-
-			/* ensure only available data is considered */
-			if(file->buffer_pos < want)
-				want = file->buffer_pos;
-
-			/*buffer contains data */
-			/* look for newline or eof */
-			for(loop=0;loop < want;loop++) {
-				if(file->buffer[loop] == '\n') {
-					want=loop+1;/* include newline */
-					break;
-				}
-			}
-
-			/* xfer data to caller */
-			memcpy(ptr, file->buffer, want);
-			ptr[want]=0;/* allways null terminate */
-
-			use_buffer(file,(int)want);
-
-			break;
-
-		default: /* unknown or supported type - oh dear */
-			ptr=NULL;
-			errno=EBADF;
-			break;
+		}
 	}
+
+	/* xfer data to caller */
+	memcpy(ptr, file->buffer, want);
+	ptr[want]=0;/* allways null terminate */
+
+	use_buffer(file,(int)want);
 
 	return ptr;/*success */
 }
 
 //---------------------------------------------------------------------------------------------------
-void url_rewind(URL_FILE *file)
-{
-	switch(file->type) {
-		case CFTYPE_FILE:
-			rewind(file->handle.file); /* passthrough */
-			break;
-
-		case CFTYPE_CURL:
-			/* halt transaction */
-			curl_multi_remove_handle(multi_handle, file->handle.curl);
-
-			/* restart */
-			curl_multi_add_handle(multi_handle, file->handle.curl);
-
-			/* ditch buffer - write will recreate - resets stream pos*/
-			if(file->buffer)
-				free(file->buffer);
-
-			file->buffer=NULL;
-			file->buffer_pos=0;
-			file->buffer_len=0;
-
-			break;
-
-		default: /* unknown or supported type - oh dear */
-			break;
-	}
-}
-
-//---------------------------------------------------------------------------------------------------
 SFString urlToString(const SFString& url)
 {
-    SFString ret;
-
 	URL_FILE *handle = url_fopen((const char*)url, "r");
-    if (handle)
-    {
-        char buffer[2048];
-        while (!url_feof(handle))
-        {
-            url_fgets(buffer,sizeof(buffer),handle);
-            ret += buffer;
-        }
-        url_fclose(handle);
-    } else
-    {
-        ret = "Could not open URL: " + url + "\n";
-    }
-    return ret;
+	if (!handle)
+		return "Could not open URL: " + url + "\n";
+
+	SFString ret;
+	char buffer[2048];
+	while (!url_feof(handle))
+	{
+		url_fgets(buffer,sizeof(buffer),handle);
+		ret += buffer;
+	}
+
+	curl_multi_remove_handle(multi_handle, handle->curl);
+	curl_easy_cleanup(handle->curl);
+	if(handle->buffer)
+		free(handle->buffer);/* free any allocated buffer space */
+	free(handle);
+	return ret;
 }

@@ -301,8 +301,7 @@ SFBool CSlurperApp::Slurp(CSlurpOptions& options, SFString& message)
 			}
 		}
 		if (!isTesting && nNewBlocks) { outErr << "\tFound new transaction at block " << lastBlock << ". Importing...\n"; outErr.Flush(); }
-		theAccount.lastBlock = lastBlock;
-
+		theAccount.lastBlock = MAX(theAccount.lastBlock, lastBlock);
 		// Write the data if we got new data
 		SFInt32 newRecords = (theAccount.transactions.getCount() - origCount);
 		if (newRecords)
