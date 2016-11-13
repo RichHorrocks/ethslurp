@@ -1,12 +1,5 @@
 # EthSlurp - Installation and Build Instructions
 
-To run the software, navigate to the same folder as above and enter:
-
-    ./ethslurp --version
-
-If the version string appears, the software is ready to go. At any time you may enter --help to see the program's help
-screen. If you wish, you may copy or move the executable to any folder in your $PATH.
-
 ### Building the Software from Source
 
 To build the software, use these commands:
@@ -17,7 +10,7 @@ To build the software, use these commands:
     make clean
     make
 
-### Potential build errors
+### Potential Build Errors
 
 On Ubuntu, you may have to install 'curl' on your system:
 
@@ -29,4 +22,11 @@ On the Mac, this link may help you get started:
 
     http://macappstore.org/curl/
 
-Good luck.
+### Running the Software
+
+To run the software, navigate to the same folder as above and enter:
+
+    ./ethslurp --version
+
+If the version string appears, the software is ready to go. At any time you may enter --help to see the program's help
+screen. If you wish, you may copy or move the executable to any folder in your $PATH.
