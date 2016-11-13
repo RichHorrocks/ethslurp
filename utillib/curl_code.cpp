@@ -51,7 +51,7 @@ CURL *getCurl(bool cleanup=false)
 size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	string result;
-	int i=0;
+	size_t i=0;
 	for (i=0;i<nmemb;i++)
 		result += ptr[i];
 	result[i] = '\0';
