@@ -1,8 +1,5 @@
-#abi_lib=libethabi.a
-curl_lib=-lcurl
-#curl_lib=/usr/lib/x86_64-linux-gnu/libcurl.so.4
 cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I./utillib -I./etherlib -I./daolib
-libs=$(curl_lib) $(abi_lib) */*.a
+libs=*/*.a -lcurl
 
 product=ethslurp
 src= \
