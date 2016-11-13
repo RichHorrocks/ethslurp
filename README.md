@@ -34,4 +34,4 @@ Check out Great Hill Corporation on <a href="https://www.facebook.com/GreatHillC
 
 ### Building from source
 
-Please see the INSTALL.md file for more information.
+Please see the <a href="https://github.com/Great-Hill-Corporation/ethslurp/blob/master/INSTALL.md">INSTALL.md</a> file for more information.
