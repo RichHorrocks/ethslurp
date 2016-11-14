@@ -274,75 +274,90 @@ extern "C" {
 }
 #endif
 
+extern SFString configPath(const SFString& part);
+
+//---------------------------------------------------------------------------
+SFString abis[1000][2];
+SFInt32 nAbis=0;
+SFString findEncoding(const SFString& addr, CFunction& func)
+{
+	if (!nAbis)
+	{
+		SFString contents = asciiFileToString(configPath("abis/"+addr+".abi"));
+		while (!contents.IsEmpty())
+		{
+			abis[nAbis][1] = nextTokenClear(contents,'\n');
+			abis[nAbis][0] = nextTokenClear(abis[nAbis][1],'|');
+			nAbis++;
+		}
+	}
+
+	for (int i=0;i<nAbis;i++)
+		if (abis[i][0] == func.name)
+			return abis[i][1];
+	return EMPTY;
+}
+
+//---------------------------------------------------------------------------
+SFBool getEncoding(const SFString& abiFilename, const SFString& addr, CFunction& func)
+{
+	if (func.type != "function")
+		return FALSE;
+
+	SFString fullName = func.name; // we need the signature for ethabi
+	func.name     = nextTokenClear(func.name,'('); // Cleanup because we only need the name, not the signature
+	func.encoding = findEncoding(addr, func);
+	if (func.encoding.IsEmpty() && SFos::fileExists("/usr/local/bin/ethabi"))
+	{
+		// When we call ethabi, we want the full function declaration (if it's present)
+		SFString cmd = "/usr/local/bin/ethabi encode function \"" + abiFilename + "\" " + fullName.Substitute("(","\\(").Substitute(")","\\)");
+		func.encoding = SFos::doCommand(cmd);
+	}
+	return !func.encoding.IsEmpty();
+}
+
 //---------------------------------------------------------------------------
 void CAbi::loadABI(const SFString& addr)
 {
 	// Already loaded?
-#if 1 //NEW_CODE
-	if (abiByName.getCount())
-#else
-	if (abiByEncoding.getCount())
-#endif
+	if (abiByName.getCount() && abiByEncoding.getCount())
 		return;
 
-extern SFString configPath(const SFString& part);
 	SFString abiFilename = 	configPath("abis/"+addr+".json");
 	if (!SFos::fileExists(abiFilename))
 		return;
 
-#ifdef VERY_NEW_CODE
-//outErr << "----------------------------------------------------\n";
-const char* encodedABI = get_encoded_abi((const char*)abiFilename);
-outErr << "\tThe rust string: " << encodedABI << "\n";
-printf("\t0x%llx\n", (long long)encodedABI);outErr.Flush();
-free_encoded_abi(encodedABI);
-//outErr << "----------------------------------------------------\n";
-#endif
-
-#if 1
 	outErr << "\tLoading abi file: " << abiFilename << "...\n";
 	SFString contents = asciiFileToString(abiFilename);
 	ASSERT(!contents.IsEmpty());
 
+	SFString abis;
 	char *p = cleanUpJson((char *)(const char*)contents);
 	while (p && *p)
 	{
 		CFunction func;SFInt32 nFields=0;
 		p = func.parseJson(p,nFields);
-		if (nFields)
+		if (nFields && getEncoding(abiFilename, addr, func))
 		{
-			SFString ethabi = "/usr/local/bin/ethabi";
-			if (!SFos::fileExists(ethabi))
-			{
-				outErr << "/usr/local/bin/ethabi command not found. Cannot parse functions.\n";
+			abiByName     [ abiByName.getCount     () ] = func;
+			abiByEncoding [ abiByEncoding.getCount () ] = func;
+			abis += func.Format("[{NAME}]|[{ENCODING}]\n");
+		}
+	}
+	if (!SFos::fileExists(configPath("abis/"+addr+".abi")))
+		stringToAsciiFile(configPath("abis/"+addr+".abi"),abis);
 
-			} else if (func.type == "function")
+	abiByName    .Sort( sortFuncTableByName     );
+	abiByEncoding.Sort( sortFuncTableByEncoding );
+	if (verbose)
+	{
+		for (int i=0;i<abiByName.getCount();i++)
+		{
+			if (abiByName[i].type == "function")
 			{
-				SFString cmd = ethabi + " encode function \"" + abiFilename + "\" " + func.name.Substitute("(","\\(").Substitute(")","\\)"); // when we call ethabi, we want the full function declaration (if it's present)
-				SFString result = SFos::doCommand(cmd);
-				func.encoding = result;
-				func.name = nextTokenClear(func.name,'('); // when we search, we only want the name
-#if 1 //NEW_CODE
-				abiByName[abiByName.getCount()] = func;
-#endif
-				abiByEncoding[abiByEncoding.getCount()] = func;
+				outErr << abiByName[i].Format("[\"{NAME}|][{ENCODING}\"]").Substitute("\n"," ") << "\n";
 			}
 		}
 	}
-
-#if 1 //NEW_CODE
-	abiByName.Sort(sortFuncTableByName);
-#endif
-	abiByEncoding.Sort(sortFuncTableByEncoding);
-#if 1 //NEW_CODE
-	for (int i=0;i<abiByName.getCount();i++)
-		if (abiByName[i].type == "function" && verbose)
-			outErr << abiByName[i].Format("[\"{NAME}|][{ENCODING}\"]").Substitute("\n"," ") << "\n";
-#else
-	for (int i=0;i<abiByEncoding.getCount();i++)
-		if (abiByEncoding[i].type == "function" && verbose)
-			outErr << abiByEncoding[i].Format("[\"{NAME}|][{ENCODING}\"]").Substitute("\n"," ") << "\n";
-#endif
-#endif
 }
 // EXISTING_CODE

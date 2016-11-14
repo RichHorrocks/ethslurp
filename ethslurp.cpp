@@ -158,6 +158,8 @@ SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 	{
 		theAccount.transactions.Clear();
 		theAccount = CAccount();
+extern SFInt32 nAbis;
+		nAbis=0;
 	}
 
 	// We are ready to slurp
