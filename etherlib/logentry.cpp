@@ -69,29 +69,28 @@ SFString nextLogentryChunk(const SFString& fieldIn, SFBool& force, const void *d
 			break;
 		case 'b':
 			if ( fieldIn % "blockHash" ) return log->blockHash;
-			if ( fieldIn % "blockNumber" ) return asString(log->blockNumber);
+			if ( fieldIn % "blockNumber" ) return "0x"+asHex8(log->blockNumber);
 			break;
 		case 'd':
 			if ( fieldIn % "data" ) return log->data;
 			break;
 		case 'l':
-			if ( fieldIn % "logIndex" ) return asString(log->logIndex);
+			if ( fieldIn % "logIndex" ) return "0x"+asHex8(log->logIndex);
 			break;
 		case 't':
 			if ( fieldIn % "topics" )
 			{
 				SFInt32 cnt = log->topics.getCount();
-				if (!cnt) return EMPTY;
-				SFString ret = "[\n";
+				SFString ret;
 				for (int i=0;i<cnt;i++)
 				{
-					ret += log->topics[i];
-					ret += ((i<cnt-1) ? ",\n" : "\n");
+					ret += "\"" + log->topics[i] + "\"";
+					if (i<cnt-1) ret += ", ";
 				}
-				return ret+"    ]";
+				return ret;
 			}
 			if ( fieldIn % "transactionHash" ) return log->transactionHash;
-			if ( fieldIn % "transactionIndex" ) return asString(log->transactionIndex);
+			if ( fieldIn % "transactionIndex" ) return "0x"+asHex8(log->transactionIndex);
 			break;
 	}
 
@@ -107,6 +106,16 @@ SFString nextLogentryChunk(const SFString& fieldIn, SFBool& force, const void *d
 SFBool CLogEntry::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
+	if (fieldName % "topics")
+        {
+		SFString str = fieldValue;
+		while (!str.IsEmpty())
+		{
+			SFString topic = nextTokenClear(str,',');
+			topics[topics.getCount()] = topic;
+		}
+		return TRUE;
+	}
 	// EXISTING_CODE
 
 	switch (tolower(fieldName[0]))
@@ -116,18 +125,18 @@ SFBool CLogEntry::setValueByName(const SFString& fieldName, const SFString& fiel
 			break;
 		case 'b':
 			if ( fieldName % "blockHash" ) { blockHash = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "blockNumber" ) { blockNumber = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "blockNumber" ) { blockNumber = thing(fieldValue); return TRUE; }
 			break;
 		case 'd':
 			if ( fieldName % "data" ) { data = fieldValue; return TRUE; }
 			break;
 		case 'l':
-			if ( fieldName % "logIndex" ) { logIndex = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "logIndex" ) { logIndex = thing(fieldValue); return TRUE; }
 			break;
 		case 't':
 			if ( fieldName % "topics" ) return TRUE;
 			if ( fieldName % "transactionHash" ) { transactionHash = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "transactionIndex" ) { transactionIndex = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "transactionIndex" ) { transactionIndex = thing(fieldValue); return TRUE; }
 			break;
 		default:
 			break;

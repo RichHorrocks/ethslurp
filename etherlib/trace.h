@@ -54,6 +54,7 @@ public:
 	SFInt32 gas;
 	SFString returnValue;
 	CStructLogArray structLogs;
+	CStructLog last;
 
 public:
 					CTrace  (void);
@@ -118,6 +119,7 @@ inline void CTrace::Init(void)
 	gas = 0;
 	returnValue = EMPTY;
 //	structLogs = ??; /* unknown type: CStructLogArray */
+//	last = ??; /* unknown type: CStructLog */
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -132,6 +134,7 @@ inline void CTrace::Copy(const CTrace& tr)
 	gas = tr.gas;
 	returnValue = tr.returnValue;
 	structLogs = tr.structLogs;
+	last = tr.last;
 
 	// EXISTING_CODE
 	// EXISTING_CODE

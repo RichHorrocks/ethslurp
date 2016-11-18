@@ -67,6 +67,9 @@ SFString nextTraceChunk(const SFString& fieldIn, SFBool& force, const void *data
 		case 'g':
 			if ( fieldIn % "gas" ) return asString(tra->gas);
 			break;
+		case 'l':
+			if ( fieldIn % "last" ) return tra->last.Format();
+			break;
 		case 'r':
 			if ( fieldIn % "returnValue" ) return tra->returnValue;
 			break;
@@ -105,7 +108,9 @@ SFBool CTrace::setValueByName(const SFString& fieldName, const SFString& fieldVa
 		{
 			CStructLog sl;SFInt32 nFields=0;
 			p = sl.parseJson(p,nFields);
-			structLogs[structLogs.getCount()] = sl;
+			if (sl.op % "call")
+				structLogs[structLogs.getCount()] = sl;
+			last = sl;
 		}
 		return TRUE;
 	}
@@ -116,6 +121,9 @@ SFBool CTrace::setValueByName(const SFString& fieldName, const SFString& fieldVa
 		case 'g':
 			if ( fieldName % "gas" ) { gas = toLong(fieldValue); return TRUE; }
 			break;
+//		case 'l':
+//			if ( fieldName % "last" ) { last = fieldValue; return TRUE; }
+//			break;
 		case 'r':
 			if ( fieldName % "returnValue" ) { returnValue = fieldValue; return TRUE; }
 			break;
@@ -146,12 +154,14 @@ void CTrace::Serialize(SFArchive& archive)
 		archive >> gas;
 		archive >> returnValue;
 		archive >> structLogs;
+		last.Serialize(archive);
 		finishParse();
 	} else
 	{
 		archive << gas;
 		archive << returnValue;
 		archive << structLogs;
+		last.Serialize(archive);
 
 	}
 }
@@ -169,6 +179,7 @@ void CTrace::registerClass(void)
 	ADD_FIELD(CTrace, "gas", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTrace, "returnValue", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTrace, "structLogs", T_TEXT|TS_ARRAY, ++fieldNum);
+	ADD_FIELD(CTrace, "last", T_TEXT, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CTrace, "schema");

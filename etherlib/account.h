@@ -132,7 +132,7 @@ inline void CAccount::Init(void)
 	displayString = EMPTY;
 	pageSize = 0;
 	lastPage = 0;
-	lastBlock = 0;
+	lastBlock = -1;
 	nVisible = 0;
 //	abi = ??; /* unknown type: CAbi */
 //	transactions = ??; /* unknown type: CTransactionArray */

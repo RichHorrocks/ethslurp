@@ -42,4 +42,16 @@ SOFTWARE.
 extern SFString compressHash  (const SFString& hashIn);
 extern SFString uncompressHash(const SFString& hashIn);
 
+//---------------------------------------------------------------------------------------------------
+inline SFUint32 thing(const SFString& str)
+{
+	return str.startsWith("0x") ? (SFUint32)hex2Long(str) : toLong(str);
+}
+
+inline SFString outThing(SFInt32 n)
+{
+//	return "0x"+asHex8(n);
+	return asString(n);
+}
+
 #endif

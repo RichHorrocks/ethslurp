@@ -43,6 +43,7 @@ public:
 	virtual CExportContext& operator<<(char c);
 	virtual CExportContext& operator<<(long dw);
 	virtual CExportContext& operator<<(unsigned int ui);
+	virtual CExportContext& operator<<(unsigned long ui);
 	virtual CExportContext& operator<<(int i);
 	virtual CExportContext& operator<<(float f);
 	virtual CExportContext& operator<<(double f);

@@ -58,6 +58,7 @@ public:
 	SFAddress from;
 	SFInt32 gasUsed;
 	CLogEntryArray logs;
+	SFString logsBloom;
 	SFString root;
 	SFAddress to;
 	SFHash transactionHash;
@@ -130,6 +131,7 @@ inline void CReceipt::Init(void)
 	from = EMPTY;
 	gasUsed = 0;
 //	logs = ??; /* unknown type: CLogEntryArray */
+	logsBloom = EMPTY;
 	root = EMPTY;
 	to = EMPTY;
 	transactionHash = EMPTY;
@@ -152,6 +154,7 @@ inline void CReceipt::Copy(const CReceipt& re)
 	from = re.from;
 	gasUsed = re.gasUsed;
 	logs = re.logs;
+	logsBloom = re.logsBloom;
 	root = re.root;
 	to = re.to;
 	transactionHash = re.transactionHash;

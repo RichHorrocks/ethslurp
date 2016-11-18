@@ -43,6 +43,12 @@ CImportContext& CImportContext::operator>>(long& dw)
 	return *this;
 }
 
+CImportContext& CImportContext::operator>>(unsigned long& dw)
+{
+	dw = (unsigned long)toLong(getNextToken(DEF_DELIMITER));
+	return *this;
+}
+
 CImportContext& CImportContext::operator>>(float& f)
 {
 	f = (float)atof(getNextToken(DEF_DELIMITER));
