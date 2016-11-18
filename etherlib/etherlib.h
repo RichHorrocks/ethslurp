@@ -45,13 +45,15 @@ extern SFString uncompressHash(const SFString& hashIn);
 //---------------------------------------------------------------------------------------------------
 inline SFUint32 thing(const SFString& str)
 {
+//outErr << str << " : " << toLong(str) << " : " << (SFUint32)hex2Long(str) << "\n";
 	return str.startsWith("0x") ? (SFUint32)hex2Long(str) : toLong(str);
 }
 
-inline SFString outThing(SFInt32 n)
+inline SFString outThing(SFUint32 n)
 {
 //	return "0x"+asHex8(n);
-	return asString(n);
+//outErr << "outThing: " << n << " : " << "0x"+asHex8(n) << " : " << asStringU(n) << "\n";
+	return asStringU(n);
 }
 
 #endif

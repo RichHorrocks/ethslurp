@@ -164,7 +164,11 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 	{
 		case 'b':
 			if ( fieldName % "blockHash" ) { blockHash = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "blockNumber" ) { blockNumber = thing(fieldValue); return TRUE; }
+			if ( fieldName % "blockNumber" ) {
+//outErr << "transaction: " << fieldValue << "\n";
+blockNumber = thing(fieldValue);
+//outErr << "transaction: " << blockNumber << "\n";
+ return TRUE; }
 			break;
 		case 'c':
 			if ( fieldName % "creates" ) { creates = fieldValue; return TRUE; }

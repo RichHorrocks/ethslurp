@@ -462,6 +462,8 @@ SFString CBaseNode::toJson(void) const
 #include "biglib.h"
 SFString decBigNum(const SFString& str)
 {
+	if (str.GetLength()<9)
+		return str;
 	string s = (const char*)((str.startsWith("0x")?str.Mid(2,1000):str));
 	SFString ret = to_string(hex2BigUint(s)).c_str();
 	SFInt32 len = ret.GetLength();
