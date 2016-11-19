@@ -57,6 +57,7 @@ public:
 	SFString gasUsed;
 	SFHash hash;
 	SFString logsBloom;
+	SFHash mixHash;
 	SFAddress miner;
 	SFString nonce;
 	SFString number;
@@ -140,6 +141,7 @@ inline void CBlock::Init(void)
 	gasUsed = EMPTY;
 	hash = EMPTY;
 	logsBloom = EMPTY;
+	mixHash = EMPTY;
 	miner = EMPTY;
 	nonce = EMPTY;
 	number = EMPTY;
@@ -173,6 +175,7 @@ inline void CBlock::Copy(const CBlock& bl)
 	gasUsed = bl.gasUsed;
 	hash = bl.hash;
 	logsBloom = bl.logsBloom;
+	mixHash = bl.mixHash;
 	miner = bl.miner;
 	nonce = bl.nonce;
 	number = bl.number;

@@ -66,31 +66,32 @@ SFString nextReceiptChunk(const SFString& fieldIn, SFBool& force, const void *da
 	{
 		case 'b':
 			if ( fieldIn % "blockHash" ) return rec->blockHash;
-			if ( fieldIn % "blockNumber" ) return asString(rec->blockNumber);
+			if ( fieldIn % "blockNumber" ) return "0x"+asHex8(rec->blockNumber);
 			break;
 		case 'c':
 			if ( fieldIn % "contractAddress" ) return rec->contractAddress;
-			if ( fieldIn % "cumulativeGasUsed" ) return asString(rec->cumulativeGasUsed);
+			if ( fieldIn % "cumulativeGasUsed" ) return "0x"+asHex8(rec->cumulativeGasUsed);
 			break;
 		case 'f':
 			if ( fieldIn % "from" ) return rec->from;
 			break;
 		case 'g':
-			if ( fieldIn % "gasUsed" ) return asString(rec->gasUsed);
+			if ( fieldIn % "gasUsed" ) return "0x"+asHex8(rec->gasUsed);
 			break;
 		case 'l':
 			if ( fieldIn % "logs" )
 			{
 				SFInt32 cnt = rec->logs.getCount();
 				if (!cnt) return EMPTY;
-				SFString ret = "[\n";
+				SFString ret;
 				for (int i=0;i<cnt;i++)
 				{
 					ret += rec->logs[i].Format();
 					ret += ((i<cnt-1) ? ",\n" : "\n");
 				}
-				return ret+"    ]";
+				return ret;
 			}
+			if ( fieldIn % "logsBloom" ) return rec->logsBloom;
 			break;
 		case 'r':
 			if ( fieldIn % "root" ) return rec->root;
@@ -98,7 +99,7 @@ SFString nextReceiptChunk(const SFString& fieldIn, SFBool& force, const void *da
 		case 't':
 			if ( fieldIn % "to" ) return rec->to;
 			if ( fieldIn % "transactionHash" ) return rec->transactionHash;
-			if ( fieldIn % "transactionIndex" ) return asString(rec->transactionIndex);
+			if ( fieldIn % "transactionIndex" ) return "0x"+asHex8(rec->transactionIndex);
 			break;
 	}
 
@@ -132,20 +133,21 @@ SFBool CReceipt::setValueByName(const SFString& fieldName, const SFString& field
 	{
 		case 'b':
 			if ( fieldName % "blockHash" ) { blockHash = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "blockNumber" ) { blockNumber = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "blockNumber" ) { blockNumber = thing(fieldValue); return TRUE; }
 			break;
 		case 'c':
 			if ( fieldName % "contractAddress" ) { contractAddress = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "cumulativeGasUsed" ) { cumulativeGasUsed = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "cumulativeGasUsed" ) { cumulativeGasUsed = thing(fieldValue); return TRUE; }
 			break;
 		case 'f':
 			if ( fieldName % "from" ) { from = toLower(fieldValue); return TRUE; }
 			break;
 		case 'g':
-			if ( fieldName % "gasUsed" ) { gasUsed = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "gasUsed" ) { gasUsed = thing(fieldValue); return TRUE; }
 			break;
 		case 'l':
 			if ( fieldName % "logs" ) return TRUE;
+			if ( fieldName % "logsBloom" ) { logsBloom = fieldValue; return TRUE; }
 			break;
 		case 'r':
 			if ( fieldName % "root" ) { root = fieldValue; return TRUE; }
@@ -153,7 +155,7 @@ SFBool CReceipt::setValueByName(const SFString& fieldName, const SFString& field
 		case 't':
 			if ( fieldName % "to" ) { to = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "transactionHash" ) { transactionHash = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "transactionIndex" ) { transactionIndex = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "transactionIndex" ) { transactionIndex = thing(fieldValue); return TRUE; }
 			break;
 		default:
 			break;
@@ -183,6 +185,7 @@ void CReceipt::Serialize(SFArchive& archive)
 		archive >> from;
 		archive >> gasUsed;
 		archive >> logs;
+		archive >> logsBloom;
 		archive >> root;
 		archive >> to;
 		archive >> transactionHash;
@@ -197,6 +200,7 @@ void CReceipt::Serialize(SFArchive& archive)
 		archive << from;
 		archive << gasUsed;
 		archive << logs;
+		archive << logsBloom;
 		archive << root;
 		archive << to;
 		archive << transactionHash;
@@ -222,6 +226,7 @@ void CReceipt::registerClass(void)
 	ADD_FIELD(CReceipt, "from", T_TEXT, ++fieldNum);
 	ADD_FIELD(CReceipt, "gasUsed", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CReceipt, "logs", T_TEXT|TS_ARRAY, ++fieldNum);
+	ADD_FIELD(CReceipt, "logsBloom", T_TEXT, ++fieldNum);
 	ADD_FIELD(CReceipt, "root", T_TEXT, ++fieldNum);
 	ADD_FIELD(CReceipt, "to", T_TEXT, ++fieldNum);
 	ADD_FIELD(CReceipt, "transactionHash", T_TEXT, ++fieldNum);

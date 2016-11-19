@@ -36,6 +36,7 @@ public:
 
 	virtual CImportContext& operator>>(char& c);
 	virtual CImportContext& operator>>(long& dw);
+	virtual CImportContext& operator>>(unsigned long& dw);
 	virtual CImportContext& operator>>(float& f);
 	virtual CImportContext& operator>>(double& f);
 	virtual CImportContext& operator>>(char* &str);

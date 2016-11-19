@@ -26,7 +26,7 @@ SOFTWARE.
 #include <curl/curl.h>
 
 //-------------------------------------------------------------------------
-CURL *getCurl(bool cleanup=false)
+CURL *getCurl_internal(bool cleanup=false)
 {
         static CURL *curl = NULL;
         if (!curl) {
@@ -48,7 +48,7 @@ CURL *getCurl(bool cleanup=false)
 }
 
 //-------------------------------------------------------------------------
-size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
+size_t write_callback_internal(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	string result;
 	size_t i=0;
@@ -68,15 +68,15 @@ SFString urlToString(const SFString& url)
 {
 	if (url.IsEmpty())
 	{
-		getCurl(true);
+		getCurl_internal(true);
 		return EMPTY;
 	}
 
 	string result;
-	curl_easy_setopt(getCurl(), CURLOPT_URL,           (const char*)url);
-	curl_easy_setopt(getCurl(), CURLOPT_WRITEDATA,     &result);
-	curl_easy_setopt(getCurl(), CURLOPT_WRITEFUNCTION, write_callback);
-        CURLcode res = curl_easy_perform(getCurl());
+	curl_easy_setopt(getCurl_internal(), CURLOPT_URL,           (const char*)url);
+	curl_easy_setopt(getCurl_internal(), CURLOPT_WRITEDATA,     &result);
+	curl_easy_setopt(getCurl_internal(), CURLOPT_WRITEFUNCTION, write_callback_internal);
+        CURLcode res = curl_easy_perform(getCurl_internal());
         if (res != CURLE_OK)
         {
                 fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));

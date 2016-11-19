@@ -69,6 +69,15 @@ CExportContext& CExportContext::operator<<(unsigned int ui)
 }
 
 //-------------------------------------------------------------
+CExportContext& CExportContext::operator<<(unsigned long ul)
+{
+	char val[10];
+	sprintf(val, (fmt.IsEmpty() ? "%ld" : (const char*)fmt), ul);
+	Output(val);
+	return *this;
+}
+
+//-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(int i)
 {
 	char val[10];

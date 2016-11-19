@@ -66,7 +66,7 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 	{
 		case 'b':
 			if ( fieldIn % "blockHash" ) return tra->blockHash;
-			if ( fieldIn % "blockNumber" ) return asString(tra->blockNumber);
+			if ( fieldIn % "blockNumber" ) return outThing(tra->blockNumber);
 			break;
 		case 'c':
 			if ( fieldIn % "creates" ) return tra->creates;
@@ -78,7 +78,7 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "from" ) return tra->from;
 			break;
 		case 'g':
-			if ( fieldIn % "gas" ) return asString(tra->gas);
+			if ( fieldIn % "gas" ) return outThing(tra->gas);
 			if ( fieldIn % "gasPrice" ) return tra->gasPrice;
 			if ( fieldIn % "gasUsed" ) return tra->gasUsed;
 			break;
@@ -91,11 +91,12 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 			if ( fieldIn % "isInternalTx" ) return asString(tra->isInternalTx);
 			break;
 		case 'n':
-			if ( fieldIn % "nonce" ) return asString(tra->nonce);
+			if ( fieldIn % "nonce" ) return outThing(tra->nonce);
 			break;
 		case 'r':
+			if ( fieldIn % "r" ) return tra->r;
 			if ( fieldIn % "raw" ) return tra->raw;
-			if ( fieldIn % "receipt")
+			if ( fieldIn % "receipt" )
 			{
 				expContext().noFrst=true;
 				SFString ret;
@@ -103,24 +104,23 @@ SFString nextTransactionChunk(const SFString& fieldIn, SFBool& force, const void
 				return ret;
 			}
 			break;
+		case 's':
+			if ( fieldIn % "s" ) return tra->s;
+			break;
 		case 't':
 			if ( fieldIn % "timeStamp" ) return asString(tra->timeStamp);
 			if ( fieldIn % "to" ) return tra->to;
 			if ( fieldIn % "transactionIndex" ) return asString(tra->transactionIndex);
-			if ( fieldIn % "traces" )
+			if ( fieldIn % "trace" )
 			{
-				SFInt32 cnt = tra->traces.getCount();
-				if (!cnt) return EMPTY;
-				SFString ret = "[\n";
-				for (int i=0;i<cnt;i++)
-				{
-					ret += tra->traces[i].Format();
-					ret += ((i<cnt-1) ? ",\n" : "\n");
-				}
-				return ret+"    ]";
+				expContext().noFrst=true;
+				SFString ret;
+				ret=tra->trace.Format();
+				return ret;
 			}
 			break;
 		case 'v':
+			if ( fieldIn % "v" ) return tra->v;
 			if ( fieldIn % "value" ) return tra->value;
 			break;
 	}
@@ -164,7 +164,11 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 	{
 		case 'b':
 			if ( fieldName % "blockHash" ) { blockHash = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "blockNumber" ) { blockNumber = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "blockNumber" ) {
+//outErr << "transaction: " << fieldValue << "\n";
+blockNumber = thing(fieldValue);
+//outErr << "transaction: " << blockNumber << "\n";
+ return TRUE; }
 			break;
 		case 'c':
 			if ( fieldName % "creates" ) { creates = fieldValue; return TRUE; }
@@ -176,7 +180,7 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 			if ( fieldName % "from" ) { from = toLower(fieldValue); return TRUE; }
 			break;
 		case 'g':
-			if ( fieldName % "gas" ) { gas = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "gas" ) { gas = thing(fieldValue); return TRUE; }
 			if ( fieldName % "gasPrice" ) { gasPrice = fieldValue; return TRUE; }
 			if ( fieldName % "gasUsed" ) { gasUsed = fieldValue; return TRUE; }
 			break;
@@ -189,19 +193,24 @@ SFBool CTransaction::setValueByName(const SFString& fieldName, const SFString& f
 			if ( fieldName % "isInternalTx" ) { isInternalTx = toBool(fieldValue); return TRUE; }
 			break;
 		case 'n':
-			if ( fieldName % "nonce" ) { nonce = toLong(fieldValue); return TRUE; }
+			if ( fieldName % "nonce" ) { nonce = thing(fieldValue); return TRUE; }
 			break;
 		case 'r':
+			if ( fieldName % "r" ) { r = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "raw" ) { raw = fieldValue; return TRUE; }
 //			if ( fieldName % "receipt" ) { receipt = fieldValue; return TRUE; }
+			break;
+		case 's':
+			if ( fieldName % "s" ) { s = toLower(fieldValue); return TRUE; }
 			break;
 		case 't':
 			if ( fieldName % "timeStamp" ) { timeStamp = toLong(fieldValue); return TRUE; }
 			if ( fieldName % "to" ) { to = toLower(fieldValue); return TRUE; }
-			if ( fieldName % "transactionIndex" ) { transactionIndex = toLong(fieldValue); return TRUE; }
-			if ( fieldName % "traces" ) return TRUE;
+			if ( fieldName % "transactionIndex" ) { transactionIndex = thing(fieldValue); return TRUE; }
+//			if ( fieldName % "trace" ) { trace = fieldValue; return TRUE; }
 			break;
 		case 'v':
+			if ( fieldName % "v" ) { v = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "value" ) { value = fieldValue; return TRUE; }
 			break;
 		default:
@@ -245,13 +254,16 @@ void CTransaction::Serialize(SFArchive& archive)
 		archive >> isError;
 		archive >> isInternalTx;
 		archive >> nonce;
+		archive >> r;
 		archive >> raw;
+		archive >> s;
 		archive >> timeStamp;
 		archive >> to;
 		archive >> transactionIndex;
+		archive >> v;
 		archive >> value;
 		receipt.Serialize(archive);
-		archive >> traces;
+		trace.Serialize(archive);
 		finishParse();
 	} else
 	{
@@ -270,13 +282,16 @@ void CTransaction::Serialize(SFArchive& archive)
 		archive << isError;
 		archive << isInternalTx;
 		archive << nonce;
+		archive << r;
 		archive << raw;
+		archive << s;
 		archive << timeStamp;
 		archive << to;
 		archive << transactionIndex;
+		archive << v;
 		archive << value;
 		receipt.Serialize(archive);
-		archive << traces;
+		trace.Serialize(archive);
 
 	}
 }
@@ -299,20 +314,23 @@ void CTransaction::registerClass(void)
 	ADD_FIELD(CTransaction, "cumulativeGasUsed", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "from", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "gas", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CTransaction, "gasPrice", T_QNUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "gasPrice", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "gasUsed", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "hash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "input", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "isError", T_RADIO, ++fieldNum);
 	ADD_FIELD(CTransaction, "isInternalTx", T_RADIO, ++fieldNum);
 	ADD_FIELD(CTransaction, "nonce", T_NUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "r", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "raw", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "receipt", T_TEXT|TS_OBJECT, ++fieldNum);
+	ADD_FIELD(CTransaction, "s", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "timeStamp", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "to", T_TEXT, ++fieldNum);
-	ADD_FIELD(CTransaction, "traces", T_TEXT|TS_ARRAY, ++fieldNum);
+	ADD_FIELD(CTransaction, "trace", T_TEXT|TS_OBJECT, ++fieldNum);
 	ADD_FIELD(CTransaction, "transactionIndex", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CTransaction, "value", T_QNUMBER, ++fieldNum);
+	ADD_FIELD(CTransaction, "v", T_TEXT, ++fieldNum);
+	ADD_FIELD(CTransaction, "value", T_NUMBER, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CTransaction, "schema");
@@ -334,6 +352,11 @@ void CTransaction::registerClass(void)
 //	HIDE_FIELD(CTransaction, "isInternalTx");
 //	HIDE_FIELD(CTransaction, "isError");
 	HIDE_FIELD(CTransaction, "raw");
+	HIDE_FIELD(CTransaction, "receipt");
+	HIDE_FIELD(CTransaction, "trace");
+	HIDE_FIELD(CTransaction, "r");
+	HIDE_FIELD(CTransaction, "s");
+	HIDE_FIELD(CTransaction, "v");
 	// EXISTING_CODE
 }
 

@@ -137,6 +137,11 @@ SFString nextStructlogChunk(const SFString& fieldIn, SFBool& force, const void *
 SFBool CStructLog::setValueByName(const SFString& fieldName, const SFString& fieldValue)
 {
 	// EXISTING_CODE
+#define LIGHT
+#ifdef LIGHT
+	if (fieldName % "memory" || fieldName % "stack" || fieldName % "storage")
+		return TRUE;
+#else
 	if (fieldName % "memory")
 	{
 //		outScreen << "MEMORY: " << fieldValue << "\n";
@@ -164,6 +169,7 @@ SFBool CStructLog::setValueByName(const SFString& fieldName, const SFString& fie
 		while (!val.IsEmpty())
 			storage[storage.getCount()] = nextTokenClear(val,',');
 	}
+#endif
 	// EXISTING_CODE
 
 	switch (tolower(fieldName[0]))

@@ -84,6 +84,7 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "logsBloom" ) return blo->logsBloom;
 			break;
 		case 'm':
+			if ( fieldIn % "mixHash" ) return blo->mixHash;
 			if ( fieldIn % "miner" ) return blo->miner;
 			break;
 		case 'n':
@@ -122,6 +123,14 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "transactions" )
 			{
 				SFInt32 cnt = blo->transactions.getCount();
+//#define ONE_LINE
+#ifdef ONE_LINE
+				for (int i=0;i<cnt;i++)
+				{
+					ret += "\"" + blo->transactions[i].hash + "\"";
+					if (i<cnt-1) ret += ", ";
+				}
+#else
 				expContext().lev++;
 				for (int i=0;i<cnt;i++)
 				{
@@ -130,6 +139,7 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 					ret += "\n";
 				}
 				expContext().lev--;
+#endif
 				return ret;
 			}
 			if ( fieldIn % "transactionsRoot" ) return blo->transactionsRoot;
@@ -138,6 +148,7 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "uncles" )
 			{
 				SFInt32 cnt = blo->uncles.getCount();
+				if (cnt==1) return "\"" + blo->uncles[0] + "\"";
 				expContext().lev++;
 				for (int i=0;i<cnt;i++)
 				{
@@ -258,6 +269,7 @@ const char* STR_ZEROS=
 			if ( fieldName % "logsBloom" ) { logsBloom = fieldValue; return TRUE; }
 			break;
 		case 'm':
+			if ( fieldName % "mixHash" ) { mixHash = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "miner" ) { miner = toLower(fieldValue); return TRUE; }
 			break;
 		case 'n':
@@ -314,6 +326,7 @@ void CBlock::Serialize(SFArchive& archive)
 		archive >> gasUsed;
 		archive >> hash;
 		archive >> logsBloom;
+		archive >> mixHash;
 		archive >> miner;
 		archive >> nonce;
 		archive >> number;
@@ -339,6 +352,7 @@ void CBlock::Serialize(SFArchive& archive)
 		archive << gasUsed;
 		archive << hash;
 		archive << logsBloom;
+		archive << mixHash;
 		archive << miner;
 		archive << nonce;
 		archive << number;
@@ -369,12 +383,13 @@ void CBlock::registerClass(void)
 	ADD_FIELD(CBlock, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
 	ADD_FIELD(CBlock, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CBlock, "author", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "difficulty", T_QNUMBER, ++fieldNum);
+	ADD_FIELD(CBlock, "difficulty", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "extraData", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "gasLimit", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "gasUsed", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "hash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "logsBloom", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "mixHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "miner", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "nonce", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "number", T_NUMBER, ++fieldNum);
@@ -386,7 +401,7 @@ void CBlock::registerClass(void)
 	ADD_FIELD(CBlock, "size", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "stateRoot", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "timestamp", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CBlock, "totalDifficulty", T_QNUMBER, ++fieldNum);
+	ADD_FIELD(CBlock, "totalDifficulty", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "transactions", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CBlock, "transactionsRoot", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "uncles", T_TEXT|TS_ARRAY, ++fieldNum);

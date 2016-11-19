@@ -68,13 +68,16 @@ public:
 	SFBool isError;
 	SFBool isInternalTx;
 	SFInt32 nonce;
+	SFHash r;
 	SFString raw;
+	SFHash s;
 	SFInt32 timeStamp;
 	SFAddress to;
 	SFInt32 transactionIndex;
+	SFHash v;
 	SFString value;
 	CReceipt receipt;
-	CTraceArray traces;
+	CTrace trace;
 
 public:
 					CTransaction  (void);
@@ -160,13 +163,16 @@ inline void CTransaction::Init(void)
 	isError = 0;
 	isInternalTx = 0;
 	nonce = 0;
+	r = EMPTY;
 	raw = EMPTY;
+	s = EMPTY;
 	timeStamp = 0;
 	to = EMPTY;
 	transactionIndex = 0;
+	v = EMPTY;
 	value = EMPTY;
 //	receipt = ??; /* unknown type: CReceipt */
-//	traces = ??; /* unknown type: CTraceArray */
+//	trace = ??; /* unknown type: CTrace */
 
 	// EXISTING_CODE
 	//SFString function
@@ -197,13 +203,16 @@ inline void CTransaction::Copy(const CTransaction& tr)
 	isError = tr.isError;
 	isInternalTx = tr.isInternalTx;
 	nonce = tr.nonce;
+	r = tr.r;
 	raw = tr.raw;
+	s = tr.s;
 	timeStamp = tr.timeStamp;
 	to = tr.to;
 	transactionIndex = tr.transactionIndex;
+	v = tr.v;
 	value = tr.value;
 	receipt = tr.receipt;
-	traces = tr.traces;
+	trace = tr.trace;
 
 	// EXISTING_CODE
 	m_transDate = tr.m_transDate;

@@ -427,15 +427,25 @@ SFString CBaseNode::toJson(void) const
 
 			} else if (fld->isArray())
 			{
-				ret += "[\n" + val + indent() + "]";
+				ret += "[";
+				ret += (val.Contains("\n") ? "\n" + val + indent() : val);
+				ret += "]";
 
 			} else if (fld->isObject())
 			{
 				ret += val;
 
-			} else if (fld->getFieldType() == T_NUMBER || fld->getFieldType() == T_QNUMBER)
+			} else if (fld->getFieldType() == T_QNUMBER)
 			{
 				ret += "\"" + decBigNum(val) + "\"";
+
+			} else if (fld->getFieldType() == T_NUMBER)
+			{
+				ret += decBigNum(val);
+
+			} else if (val == "null")
+			{
+				ret += val;
 
 			} else
 			{
@@ -452,6 +462,8 @@ SFString CBaseNode::toJson(void) const
 #include "biglib.h"
 SFString decBigNum(const SFString& str)
 {
+	if (str.GetLength()<9)
+		return str;
 	string s = (const char*)((str.startsWith("0x")?str.Mid(2,1000):str));
 	SFString ret = to_string(hex2BigUint(s)).c_str();
 	SFInt32 len = ret.GetLength();
