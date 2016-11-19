@@ -137,7 +137,7 @@ void CBlockChain::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CBlockChain, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CBlockChain, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CBlockChain, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CBlockChain, "blocks", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like

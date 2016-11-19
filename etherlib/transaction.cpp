@@ -305,7 +305,7 @@ void CTransaction::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CTransaction, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CTransaction, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CTransaction, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CTransaction, "blockHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "blockNumber", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "creates", T_TEXT, ++fieldNum);
@@ -318,8 +318,8 @@ void CTransaction::registerClass(void)
 	ADD_FIELD(CTransaction, "gasUsed", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "hash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "input", T_TEXT, ++fieldNum);
-	ADD_FIELD(CTransaction, "isError", T_RADIO, ++fieldNum);
-	ADD_FIELD(CTransaction, "isInternalTx", T_RADIO, ++fieldNum);
+	ADD_FIELD(CTransaction, "isError", T_BOOL, ++fieldNum);
+	ADD_FIELD(CTransaction, "isInternalTx", T_BOOL, ++fieldNum);
 	ADD_FIELD(CTransaction, "nonce", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTransaction, "r", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTransaction, "raw", T_TEXT, ++fieldNum);

@@ -190,7 +190,7 @@ void CPriceQuote::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CPriceQuote, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CPriceQuote, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CPriceQuote, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CPriceQuote, "timeStamp", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CPriceQuote, "open", T_FLOAT, ++fieldNum);
 	ADD_FIELD(CPriceQuote, "high", T_FLOAT, ++fieldNum);

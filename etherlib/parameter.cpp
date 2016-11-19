@@ -135,7 +135,7 @@ void CParameter::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CParameter, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CParameter, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CParameter, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CParameter, "name", T_TEXT, ++fieldNum);
 	ADD_FIELD(CParameter, "type", T_TEXT, ++fieldNum);
 

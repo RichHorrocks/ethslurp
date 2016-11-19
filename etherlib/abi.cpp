@@ -151,7 +151,7 @@ void CAbi::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CAbi, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CAbi, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CAbi, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAbi, "abiByName", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CAbi, "abiByEncoding", T_TEXT|TS_ARRAY, ++fieldNum);
 

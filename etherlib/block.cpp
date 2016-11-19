@@ -381,7 +381,7 @@ void CBlock::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CBlock, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CBlock, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CBlock, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CBlock, "author", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "difficulty", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "extraData", T_TEXT, ++fieldNum);

@@ -195,11 +195,11 @@ void CAccount::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CAccount, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CAccount, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CAccount, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CAccount, "addr", T_TEXT, ++fieldNum);
 	ADD_FIELD(CAccount, "header", T_TEXT, ++fieldNum);
 	ADD_FIELD(CAccount, "displayString", T_TEXT, ++fieldNum);
-	ADD_FIELD(CAccount, "pageSize", T_RADIO, ++fieldNum);
+	ADD_FIELD(CAccount, "pageSize", T_BOOL, ++fieldNum);
 	ADD_FIELD(CAccount, "lastPage", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CAccount, "lastBlock", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CAccount, "nVisible", T_NUMBER, ++fieldNum);

@@ -252,9 +252,9 @@ void CStructLog::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CStructLog, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CStructLog, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CStructLog, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CStructLog, "depth", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CStructLog, "error", T_RADIO, ++fieldNum);
+	ADD_FIELD(CStructLog, "error", T_BOOL, ++fieldNum);
 	ADD_FIELD(CStructLog, "gas", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CStructLog, "gasCost", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CStructLog, "memory", T_TEXT|TS_ARRAY, ++fieldNum);

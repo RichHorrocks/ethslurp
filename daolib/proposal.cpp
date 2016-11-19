@@ -180,7 +180,7 @@ void CProposal::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CProposal, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CProposal, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CProposal, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CProposal, "proposalID", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CProposal, "creator", T_TEXT, ++fieldNum);
 	ADD_FIELD(CProposal, "recipient", T_TEXT, ++fieldNum);
@@ -188,7 +188,7 @@ void CProposal::registerClass(void)
 	ADD_FIELD(CProposal, "data", T_TEXT, ++fieldNum);
 	ADD_FIELD(CProposal, "debatePeriod", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CProposal, "description", T_TEXT, ++fieldNum);
-	ADD_FIELD(CProposal, "isSplit", T_RADIO, ++fieldNum);
+	ADD_FIELD(CProposal, "isSplit", T_BOOL, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CProposal, "schema");

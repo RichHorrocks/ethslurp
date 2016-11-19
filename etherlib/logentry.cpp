@@ -191,7 +191,7 @@ void CLogEntry::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CLogEntry, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CLogEntry, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CLogEntry, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CLogEntry, "address", T_TEXT, ++fieldNum);
 	ADD_FIELD(CLogEntry, "blockHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CLogEntry, "blockNumber", T_NUMBER, ++fieldNum);

@@ -25,27 +25,9 @@ SOFTWARE.
 --------------------------------------------------------------------------------*/
 #include "list.h"
 #include "html.h"
-#include "permission.h"
-
 class CConfig;
 
-#define MODE_EDIT    1
-#define MODE_VIEW    2
-#define TRASH        ((SFUint32)-10)
-
-// Do not change these values
-#define E_NO_EDIT		    (1<<12)
-#define E_NO_REQUIRED		(1<<13)
-#define E_NO_CUSTOMIZE		(1<<14)
-#define E_NO_DEFAULT		(1<<15)
-#define E_NO_ACCESS_LEVEL	(1<<16)
-
-#define NOT_A_FIELD			(E_NO_DEFAULT | E_NO_ACCESS_LEVEL | E_NO_REQUIRED )
-
-#define LONG_STRING_LEN     256
-#define MID_STRING_LEN      128
-#define PHONE_STRING_LEN    32
-#define USERID_STRING_LEN   64
+#define NOT_A_FIELD	1
 
 //-------------------------------------------------------------------------
 class CFieldData
@@ -316,193 +298,29 @@ public:
 	const CFieldData *getFieldByName       (const SFString& name) const;
 };
 
-#undef E_PENDING // windows defines this but we need it for something more useful
-
-#define E_NO_EDIT		  (1<<12)
-#define E_NO_REQUIRED	  (1<<13)
-#define E_NO_CUSTOMIZE	  (1<<14)
-#define E_NO_DEFAULT	  (1<<15)
-#define E_NO_ACCESS_LEVEL (1<<16)
-#define E_NO_ROW          (1<<17)
-#define E_371_BIT		  (1<<20) // field was added at version 3.7.1
-#define E_RESERVED_1      (1<<21) // field was added at future upgrade
-#define E_RESERVED_2      (1<<22) // field was added at future upgrade
-#define E_RESERVED_3      (1<<23) // field was added at future upgrade
-#define E_RESERVED_4      (1<<24) // field was added at future upgrade
-#define TYPE_USER         (1<<25)
-#define TYPE_GROUP        (1<<26)
-#define TYPE_CONTACT      (1<<27)
-#define TYPE_USER_453     (1<<28)
-
-#define NOT_A_FIELD		  (E_NO_DEFAULT | E_NO_ACCESS_LEVEL | E_NO_REQUIRED )
-#define E_EXPORT_ONLY     (E_NO_DEFAULT | E_NO_ACCESS_LEVEL | E_NO_REQUIRED | E_NO_EDIT)
-#define E_INVISIBLE_FIELD (E_NO_DEFAULT | E_NO_ACCESS_LEVEL | E_NO_REQUIRED | E_NO_CUSTOMIZE | E_NO_EDIT )
-
 typedef SFArrayBase<CFieldData> CFieldArray;
 
 #define TS_LABEL            (1<<10)
-#define TS_SORT             (1<<11)
 #define TS_DATE             (1<<12)
-#define TS_SEARCH           (1<<13)
 #define TS_ARRAY            (1<<14)
 #define TS_NUMERAL          (1<<15)
 #define TS_OBJECT           (1<<16)
 
-//-------------------------------------------------------------------------
-// Field types
-#define T_NONE              (  0 | TS_LABEL  )
-#define T_PROMPT            (  1 | TS_LABEL  )
-#define T_LABEL             (  2 | TS_LABEL  )
-#define T_BUTTON            (  3 | TS_LABEL  )
+#define T_DATE              (  4 | TS_DATE )
+#define T_TIME              (  5 | TS_DATE )
 
-#define T_DATE              (  4 | TS_DATE   | TS_SORT)
-#define T_TIME              (  5 | TS_DATE   | TS_SORT)
-
-#define T_USERID            (  6 | TS_SEARCH | TS_SORT)
-#define T_MULTILINE         (  7 | TS_SEARCH | TS_SORT)
-#define T_DROPDOWN          (  8 | TS_SEARCH | TS_SORT)
-#define T_PHONE             (  9 | TS_SEARCH | TS_SORT)
-#define T_TEXT              ( 10 | TS_SEARCH | TS_SORT)
-#define T_EMAIL             ( 11 | TS_SEARCH | TS_SORT)
-#define T_HALFTEXT          ( 12 | TS_SEARCH | TS_SORT)
-#define T_SHORTTEXT         ( 13 | TS_SEARCH | TS_SORT)
-#define T_NUMBER            ( 14 | TS_SEARCH | TS_SORT | TS_NUMERAL)
+#define T_TEXT              ( 10 )
+#define T_BOOL              ( 12 )
+#define T_NUMBER            ( 14 | TS_NUMERAL )
 #define T_FLOAT             T_NUMBER
 #define T_DOUBLE            T_NUMBER
 #define T_QNUMBER           ( T_NUMBER | (1<<30))
-#define T_NOTES             ( 15 | TS_SEARCH | TS_SORT)
-#define T_ICONLIST          ( 16 | TS_SEARCH | TS_SORT)
-#define T_ONOFF             ( 17 | TS_SEARCH | TS_SORT)
-#define T_CHECKSRCH         ( 18 | TS_SEARCH | TS_SORT)
-#define T_SELSEARCH         ( 19 | TS_SEARCH | TS_SORT)
-
-#define T_COLOR             ( 20 )
-#define T_SELECTION         ( 21 )
-#define T_CHECKBOX          ( 22 )
-#define T_RADIO             ( 23 )
-#define T_PERMISSION        ( 24 )
-#define T_PASSWORD          ( 25 )
-#define T_LONGPASSWORD      ( 26 )
-#define T_CONTROL           ( 27 )
-#define T_SCRIPT            ( 28 )
-#define T_FILEUPLOAD        ( 29 )
-
-//-------------------------------------------------------------------------
-inline SFBool isLabelType(SFInt32 type)
-{
-	return (type & TS_LABEL);
-}
-
-//-------------------------------------------------------------------------
-inline SFBool isDateType(SFInt32 type)
-{
-	return (type & TS_DATE);
-}
-
-//-------------------------------------------------------------------------
-inline SFBool isSearchable(SFInt32 type)
-{
-	return (type & TS_SEARCH);
-}
-
-//-------------------------------------------------------------------------
-inline SFBool isSortable(SFInt32 type)
-{
-	return (type & TS_SORT);
-}
-
-//-------------------------------------------------------------------------
-inline SFBool isCheckbox(SFInt32 type)
-{
-	return (type == T_CHECKSRCH || type == T_CHECKBOX);
-}
-
-//-------------------------------------------------------------------------
-inline SFBool isSelection(SFInt32 type)
-{
-	return (type == T_SELSEARCH || type == T_SELECTION);
-}
-
-//-------------------------------------------------------------------------
-#define FIELD_IDS                 0
-#define FIELD_TYPES               1
-#define FIELD_SIZES               2
-#define FIELD_EDITSIZES           3
-
-//-------------------------------------------------------------------------
-// access levels (do not change these PUBLIC/PRIVATE are aliases for TRUE/FALSE in field->m_access
-#define ACCESS_PUBLIC             (0x0)
-#define ACCESS_PRIVATE            (0x1)
-#define ACCESS_PRIVATEWHENMERGED  (0x2)
-#define ACCESS_GROUPONLY          (0x4)
-
-//-------------------------------------------------------------------------
-// access levels
-#define ALLOW_ALL                 0
-#define ALLOW_LOGGED              1
-#define ALLOW_OWNER               2
-#define ALLOW_NONE                3
-
-//-------------------------------------------------------------------------
-// sort order
-#define SORTORDER_REVCHRON        0
-#define SORTORDER_CHRON           1
-
-//-------------------------------------------------------------------------
-// owner modification
-#define OWNERCHANGE_NOONE         SFString("none")
-#define OWNERCHANGE_ANYONE        SFString("anyone")
-#define OWNERCHANGE_ADMINS        SFString("admins")
-#define OWNERCHANGE_SUPER         SFString("super")
-
-//--------------------------------------------------------
-extern SFString getSelectString     (CSelectionData *data);
-extern SFString getSelectString     (SELFUNC func, const SFString& name, const SFString& selected, SFInt32 disabled, const SFString& onChange, const void *dataPtr, SFInt32 extraInt);
-
-extern SFString getRadioString      (const SFString& name, const SFString& label, SFInt32 val, SFBool checked, SFInt32 disabled=FALSE, const SFString& onChange=nullString);
-extern SFString getCheckboxString   (const SFString& name, SFBool val, const SFString& prompt=nullString, const SFString& onClickStr=nullString, SFBool disabled=FALSE);
-
-extern SFBool   onOffChoose         (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   sortOrderChoose     (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-
-extern SFBool   alignChoose         (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   relSizeChoose       (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   borderChoose        (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   colorChoose         (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   allowChangeChoose   (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-
-extern SFBool   fontChoose          (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   iconChoose          (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   reminderChoose      (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   permChoose          (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   specPermChoose      (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   durationChooseNoMax (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   durationChooseMax   (SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   prefixChoose		(SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   suffixChoose		(SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   regionChoose		(SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   countryChoose		(SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-extern SFBool   genderChoose		(SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
-
-extern SFString getReminderString   (SFInt32 minutes);
-extern SFString getTimeSelectString (const SFString& name, const SFTime& date, SFBool disabled, SFInt32 step);
-
-//-------------------------------------------------------------------------
-extern SFString ALTERNATE_FIELDMAP;
-extern SFString ALTERNATE_FIELDMAP2;
-extern SFString ALTERNATE_FIELDMAP3;
 
 //-------------------------------------------------------------------------
 inline void CFieldData::setFieldID(SFInt32 id)
 {
 	m_fieldID = id;
 }
-
-//-------------------------------------------------------------------------
-typedef SFInt32 (*OTHER_ID_FUNC) (const SFString& token);
-extern  void      setOtherIDFunc (OTHER_ID_FUNC func);
-
-extern const char* IDS_WRD_RESET;
 
 //-------------------------------------------------------------------------
 inline SFBool CFieldData::isArray(void) const

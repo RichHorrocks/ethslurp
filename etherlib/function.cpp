@@ -211,12 +211,12 @@ void CFunction::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CFunction, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CFunction, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CFunction, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CFunction, "name", T_TEXT, ++fieldNum);
 	ADD_FIELD(CFunction, "type", T_TEXT, ++fieldNum);
-	ADD_FIELD(CFunction, "indexed", T_RADIO, ++fieldNum);
-	ADD_FIELD(CFunction, "anonymous", T_RADIO, ++fieldNum);
-	ADD_FIELD(CFunction, "constant", T_RADIO, ++fieldNum);
+	ADD_FIELD(CFunction, "indexed", T_BOOL, ++fieldNum);
+	ADD_FIELD(CFunction, "anonymous", T_BOOL, ++fieldNum);
+	ADD_FIELD(CFunction, "constant", T_BOOL, ++fieldNum);
 	ADD_FIELD(CFunction, "encoding", T_TEXT, ++fieldNum);
 	ADD_FIELD(CFunction, "inputs", T_TEXT|TS_ARRAY, ++fieldNum);
 	ADD_FIELD(CFunction, "outputs", T_TEXT|TS_ARRAY, ++fieldNum);

@@ -218,7 +218,7 @@ void CReceipt::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CReceipt, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CReceipt, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CReceipt, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CReceipt, "blockHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CReceipt, "blockNumber", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CReceipt, "contractAddress", T_TEXT, ++fieldNum);

@@ -154,10 +154,10 @@ void CVote::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CVote, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CVote, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CVote, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CVote, "voter", T_TEXT, ++fieldNum);
 	ADD_FIELD(CVote, "proposalID", T_NUMBER, ++fieldNum);
-	ADD_FIELD(CVote, "votedYes", T_RADIO, ++fieldNum);
+	ADD_FIELD(CVote, "votedYes", T_BOOL, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like
 	HIDE_FIELD(CVote, "schema");

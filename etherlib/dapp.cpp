@@ -187,7 +187,7 @@ void CDapp::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CDapp, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CDapp, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CDapp, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CDapp, "dappName", T_TEXT, ++fieldNum);
 	ADD_FIELD(CDapp, "description", T_TEXT, ++fieldNum);
 	ADD_FIELD(CDapp, "site", T_TEXT, ++fieldNum);

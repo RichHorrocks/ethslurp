@@ -175,7 +175,7 @@ void CTrace::registerClass(void)
 
 	SFInt32 fieldNum=1000;
 	ADD_FIELD(CTrace, "schema",  T_NUMBER|TS_LABEL, ++fieldNum);
-	ADD_FIELD(CTrace, "deleted", T_RADIO|TS_LABEL,  ++fieldNum);
+	ADD_FIELD(CTrace, "deleted", T_BOOL|TS_LABEL,  ++fieldNum);
 	ADD_FIELD(CTrace, "gas", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CTrace, "returnValue", T_TEXT, ++fieldNum);
 	ADD_FIELD(CTrace, "structLogs", T_TEXT|TS_ARRAY, ++fieldNum);
