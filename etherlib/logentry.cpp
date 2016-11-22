@@ -131,7 +131,11 @@ SFBool CLogEntry::setValueByName(const SFString& fieldName, const SFString& fiel
 			if ( fieldName % "data" ) { data = fieldValue; return TRUE; }
 			break;
 		case 'l':
-			if ( fieldName % "logIndex" ) { logIndex = thing(fieldValue); return TRUE; }
+			if ( fieldName % "logIndex" )
+{
+logIndex = thing(fieldValue);
+return TRUE;
+}
 			break;
 		case 't':
 			if ( fieldName % "topics" ) return TRUE;

@@ -25,8 +25,6 @@ SOFTWARE.
 --------------------------------------------------------------------------------*/
 #include "attribute.h"
 #include "sftime.h"
-#include "point.h"
-#include "rect.h"
 
 class CImportContext
 {
@@ -43,8 +41,8 @@ public:
 	virtual CImportContext& operator>>(SFString& str);
 	virtual CImportContext& operator>>(SFTime& tm);
 	virtual CImportContext& operator>>(SFAttribute& attr);
-	virtual CImportContext& operator>>(CDoublePoint& pt);
-	virtual CImportContext& operator>>(CDoubleRect& rect);
+//	virtual CImportContext& operator>>(CDoublePoint& pt);
+//	virtual CImportContext& operator>>(CDoubleRect& rect);
 
 	virtual SFString getNextToken(char delim) = 0;
 	virtual void     refreshBuffer(void) = 0;

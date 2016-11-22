@@ -92,6 +92,7 @@ SFArchive& SFArchive::operator<<(const SFAttribute& attr)
 	return *this;
 }
 
+#if 0
 SFArchive& SFArchive::operator<<(const CDoublePoint& pt)
 {
 	Write(pt);
@@ -103,6 +104,7 @@ SFArchive& SFArchive::operator<<(const CDoubleRect& rect)
 	Write(rect);
 	return *this;
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////
 SFArchive& SFArchive::operator>>(char& c)
@@ -165,6 +167,7 @@ SFArchive& SFArchive::operator>>(SFAttribute& attr)
 	return *this;
 }
 
+#if 0
 SFArchive& SFArchive::operator>>(CDoublePoint& pt)
 {
 	Read(pt);
@@ -176,6 +179,7 @@ SFArchive& SFArchive::operator>>(CDoubleRect& rect)
 	Read(rect);
 	return *this;
 }
+#endif
 
 SFArchive& operator<<(SFArchive& archive, SFStringArray& array)
 {

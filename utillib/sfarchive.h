@@ -72,8 +72,8 @@ public:
 	SFArchive& operator<<(const SFString& str);
 	SFArchive& operator<<(const SFTime& tm);
 	SFArchive& operator<<(const SFAttribute& attr);
-	SFArchive& operator<<(const CDoublePoint& pt);
-	SFArchive& operator<<(const CDoubleRect& rect);
+//	SFArchive& operator<<(const CDoublePoint& pt);
+//	SFArchive& operator<<(const CDoubleRect& rect);
 	SFArchive& operator<<(const char *str);
 
 	SFArchive& operator>>(char& c);
@@ -86,8 +86,8 @@ public:
 	SFArchive& operator>>(SFString& str);
 	SFArchive& operator>>(SFTime& tm);
 	SFArchive& operator>>(SFAttribute& attr);
-	SFArchive& operator>>(CDoublePoint& pt);
-	SFArchive& operator>>(CDoubleRect& rect);
+//	SFArchive& operator>>(CDoublePoint& pt);
+//	SFArchive& operator>>(CDoubleRect& rect);
 };
 
 extern SFArchive& operator<<(SFArchive& archive, SFStringArray& array);

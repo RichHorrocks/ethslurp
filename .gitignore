@@ -48,6 +48,7 @@ email/*
 *.app
 
 # Build directory
+junk/
 build/
 docs/_build
 docs/utils/__pycache__

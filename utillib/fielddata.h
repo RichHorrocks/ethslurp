@@ -24,10 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
 #include "list.h"
-#include "html.h"
+
 class CConfig;
 
 #define NOT_A_FIELD	1
+//typedef SFBool (*SELFUNC)(SFInt32& nVals, SFAttribute *attrs, CSelectionData *data);
 
 //-------------------------------------------------------------------------
 class CFieldData
@@ -60,7 +61,7 @@ private:
 	SFBool   m_showHidden;
 	SFInt32  m_extraInt;
 	SFString m_extraStr;
-	SELFUNC  m_selFunc;
+//	SELFUNC  m_selFunc;
 	void    *m_dataPtr;
 
 public:
@@ -110,7 +111,7 @@ public:
 			//ASSERT( m_script   == data.m_script   );
 			//ASSERT( m_extraInt == data.m_extraInt );
 			//ASSERT( m_extraStr == data.m_extraStr );
-			//ASSERT( m_selFunc  == data.m_selFunc  );
+//			//ASSERT( m_selFunc  == data.m_selFunc  );
 			//ASSERT( m_dataPtr  == data.m_dataPtr  );
 
 			return TRUE;
@@ -155,7 +156,7 @@ public:
 	SFInt32  getFieldID   (void) const { return m_fieldID;   }
 	SFBool   isResolved   (void) const { return m_resolved;  }
 	SFString getScript    (void) const { return m_script;    }
-	SELFUNC  getSelFunc   (void) const { return m_selFunc;   }
+//	SELFUNC  getSelFunc   (void) const { return m_selFunc;   }
 	void    *getDataPtr   (void) const { return m_dataPtr;   }
 	SFBool   getNoRow     (void) const { return m_noRow;     }
 	SFBool   getShowHidden(void) const { return m_showHidden;}
@@ -180,7 +181,7 @@ public:
 	void     setResolved  (SFBool on)                 { m_resolved  = on;           }
 	void     setDisabled  (SFBool disable)            { m_disabled  = disable;      }
 	void     setHidden    (SFBool hide)               { m_hidden    = hide;         }
-	void     setSelFunc   (SELFUNC func)              { m_selFunc   = func;         }
+//	void     setSelFunc   (SELFUNC func)              { m_selFunc   = func;         }
 	void     setDataPtr   (void *data)                { m_dataPtr   = data;         }
 	void     setNoRow     (SFBool noRow)              { m_noRow     = noRow;        }
 	void     setShowHidden(SFBool showHidden)         { m_showHidden= showHidden;   }
@@ -239,7 +240,7 @@ private:
 			m_hidden     = FALSE;
 //	SFString m_script;
 //  SFString m_problem;
-			m_selFunc    = NULL;
+//			m_selFunc    = NULL;
 			m_dataPtr    = NULL;
 			m_noRow      = FALSE;
 			m_showHidden = TRUE;
@@ -269,7 +270,7 @@ private:
 			m_disabled  = data.m_disabled;
 			m_problem   = data.m_problem;
 			m_hidden    = data.m_hidden;
-			m_selFunc   = data.m_selFunc;
+//			m_selFunc   = data.m_selFunc;
 			m_dataPtr   = data.m_dataPtr;
 			m_noRow     = data.m_noRow;
 			m_showHidden= data.m_showHidden;

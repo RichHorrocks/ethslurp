@@ -21,8 +21,6 @@ fielddata.cpp \
 fieldlist.cpp \
 options.cpp \
 paths.cpp \
-point.cpp \
-rect.cpp \
 runtimeclass.cpp \
 sfarchive.cpp \
 sfdate.cpp \
@@ -36,6 +34,12 @@ sftimespan.cpp \
 sha3.cpp \
 version.cpp \
 visitor.cpp
+
+#element.cpp \
+#html.cpp \
+#permission.cpp \
+#rect.cpp \
+#point.cpp \
 
 #-------------------------------------------------
 # probably don't have to change below this line

@@ -84,8 +84,8 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "logsBloom" ) return blo->logsBloom;
 			break;
 		case 'm':
-			if ( fieldIn % "mixHash" ) return blo->mixHash;
 			if ( fieldIn % "miner" ) return blo->miner;
+			if ( fieldIn % "mixHash" ) return blo->mixHash;
 			break;
 		case 'n':
 			if ( fieldIn % "nonce" ) return blo->nonce;
@@ -269,8 +269,8 @@ const char* STR_ZEROS=
 			if ( fieldName % "logsBloom" ) { logsBloom = fieldValue; return TRUE; }
 			break;
 		case 'm':
-			if ( fieldName % "mixHash" ) { mixHash = toLower(fieldValue); return TRUE; }
 			if ( fieldName % "miner" ) { miner = toLower(fieldValue); return TRUE; }
+			if ( fieldName % "mixHash" ) { mixHash = toLower(fieldValue); return TRUE; }
 			break;
 		case 'n':
 			if ( fieldName % "nonce" ) { nonce = fieldValue; return TRUE; }
@@ -326,8 +326,8 @@ void CBlock::Serialize(SFArchive& archive)
 		archive >> gasUsed;
 		archive >> hash;
 		archive >> logsBloom;
-		archive >> mixHash;
 		archive >> miner;
+		archive >> mixHash;
 		archive >> nonce;
 		archive >> number;
 		archive >> parentHash;
@@ -352,8 +352,8 @@ void CBlock::Serialize(SFArchive& archive)
 		archive << gasUsed;
 		archive << hash;
 		archive << logsBloom;
-		archive << mixHash;
 		archive << miner;
+		archive << mixHash;
 		archive << nonce;
 		archive << number;
 		archive << parentHash;
@@ -389,8 +389,8 @@ void CBlock::registerClass(void)
 	ADD_FIELD(CBlock, "gasUsed", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "hash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "logsBloom", T_TEXT, ++fieldNum);
-	ADD_FIELD(CBlock, "mixHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "miner", T_TEXT, ++fieldNum);
+	ADD_FIELD(CBlock, "mixHash", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "nonce", T_TEXT, ++fieldNum);
 	ADD_FIELD(CBlock, "number", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CBlock, "parentHash", T_TEXT, ++fieldNum);
@@ -411,6 +411,9 @@ void CBlock::registerClass(void)
 	HIDE_FIELD(CBlock, "deleted");
 
 	// EXISTING_CODE
+#ifdef CONVERT_TO_PARITY
+        HIDE_FIELD(CBlock, "nonce");
+#endif
 	// EXISTING_CODE
 }
 

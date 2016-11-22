@@ -1,5 +1,6 @@
 #ifndef _ETHER_LIB_
 #define _ETHER_LIB_
+//#define CONVERT_TO_PARITY
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -55,5 +56,18 @@ inline SFString outThing(SFUint32 n)
 //outErr << "outThing: " << n << " : " << "0x"+asHex8(n) << " : " << asStringU(n) << "\n";
 	return asStringU(n);
 }
+
+#ifdef CONVERT_TO_PARITY
+inline SFString lengthen(const SFString& strIn)
+{
+	static SFInt32 len = SFString("0x0b047f8d31897baaed7ac1bd3bd2576537cc7aec0c67bb054ac708599bf03a33").GetLength();
+	SFString ret = strIn;
+	while (ret.GetLength() < len)
+		ret.Replace("0x","0x0");
+	return ret;
+}
+#else
+#define lengthen(a) (a)
+#endif
 
 #endif

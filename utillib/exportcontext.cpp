@@ -144,6 +144,7 @@ CExportContext& CExportContext::operator<<(const SFAttribute& attr)
 	return *this;
 }
 
+#if 0
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(const CDoublePoint& pt)
 {
@@ -161,6 +162,7 @@ CExportContext& CExportContext::operator<<(const CDoubleRect& rect)
 	Output(val);
 	return *this;
 }
+#endif
 
 //-------------------------------------------------------------
 void CFileExportContext::setOutput(void *output)

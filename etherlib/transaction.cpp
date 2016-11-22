@@ -196,12 +196,12 @@ blockNumber = thing(fieldValue);
 			if ( fieldName % "nonce" ) { nonce = thing(fieldValue); return TRUE; }
 			break;
 		case 'r':
-			if ( fieldName % "r" ) { r = toLower(fieldValue); return TRUE; }
+			if ( fieldName % "r" ) { r = lengthen(toLower(fieldValue)); return TRUE; }
 			if ( fieldName % "raw" ) { raw = fieldValue; return TRUE; }
 //			if ( fieldName % "receipt" ) { receipt = fieldValue; return TRUE; }
 			break;
 		case 's':
-			if ( fieldName % "s" ) { s = toLower(fieldValue); return TRUE; }
+			if ( fieldName % "s" ) { s = lengthen(toLower(fieldValue)); return TRUE; }
 			break;
 		case 't':
 			if ( fieldName % "timeStamp" ) { timeStamp = toLong(fieldValue); return TRUE; }
@@ -210,7 +210,14 @@ blockNumber = thing(fieldValue);
 //			if ( fieldName % "trace" ) { trace = fieldValue; return TRUE; }
 			break;
 		case 'v':
-			if ( fieldName % "v" ) { v = toLower(fieldValue); return TRUE; }
+			if ( fieldName % "v" ) {
+v = toLower(fieldValue);
+#ifdef CONVERT_TO_PARITY
+if (v == "0x1c") v = "1";
+else if (v == "0x1b") v = "0";
+#endif
+return TRUE;
+}
 			if ( fieldName % "value" ) { value = fieldValue; return TRUE; }
 			break;
 		default:
@@ -570,6 +577,20 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 	{
 		//function approve(address _spender, uint256 _amount) returns (bool success) {  discuss
 		SFString items[] = { "address", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="transferWithoutReward")
+	{
+		//function transferWithoutReward(address _to, uint256 _value)
+		SFString items[] = { "address", "uint256", };
+		int nItems = sizeof(items) / sizeof(SFString);
+		return which + parse(params, nItems, items);
+
+	} else if (which=="retrieveDAOReward")
+	{
+		// function retrieveDAOReward(bool _toMembers)
+		SFString items[] = { "bool", };
 		int nItems = sizeof(items) / sizeof(SFString);
 		return which + parse(params, nItems, items);
 

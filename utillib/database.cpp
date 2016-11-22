@@ -370,6 +370,7 @@ SFInt32 CSharedResource::Read(SFAttribute&  val)
 	return FALSE;
 }
 
+#if 0
 //----------------------------------------------------------------------
 SFInt32 CSharedResource::Read(CDoublePoint& val)
 {
@@ -397,6 +398,7 @@ SFInt32 CSharedResource::Read(CDoubleRect& val)
 	}
 	return ret;
 }
+#endif
 
 //----------------------------------------------------------------------
 char *CSharedResource::ReadLine(char *buff, SFInt32 maxBuff)
@@ -442,6 +444,7 @@ SFInt32 CSharedResource::Write(const SFAttribute& val) const
 	return Write(val.getValue()) + ret;
 }
 
+#if 0
 //----------------------------------------------------------------------
 SFInt32 CSharedResource::Write(const CDoublePoint& val) const
 {
@@ -455,6 +458,7 @@ SFInt32 CSharedResource::Write(const CDoubleRect&  val) const
 	double arr[] = { val.left, val.top, val.right, val.bottom };
 	return Write(arr, sizeof(double), 4);
 }
+#endif
 
 //----------------------------------------------------------------------
 void CSharedResource::WriteLine(const SFString& str)

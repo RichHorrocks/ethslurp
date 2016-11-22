@@ -86,6 +86,7 @@ CImportContext& CImportContext::operator>>(SFAttribute& attr)
 	return *this;
 }
 
+#if 0
 CImportContext& CImportContext::operator>>(CDoublePoint& pt)
 {
 	*this >> pt.x;
@@ -101,6 +102,7 @@ CImportContext& CImportContext::operator>>(CDoubleRect& rect)
 	*this >> rect.right;
 	return *this;
 }
+#endif
 
 void CFileImportContext::refreshBuffer(void)
 {

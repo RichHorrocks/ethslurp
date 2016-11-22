@@ -237,6 +237,11 @@ void CReceipt::registerClass(void)
 	HIDE_FIELD(CReceipt, "deleted");
 
 	// EXISTING_CODE
+#ifdef CONVERT_TO_PARITY
+	HIDE_FIELD(CReceipt, "from");
+	HIDE_FIELD(CReceipt, "to");
+	HIDE_FIELD(CReceipt, "root");
+#endif
 	// EXISTING_CODE
 }
 
