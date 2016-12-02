@@ -421,11 +421,7 @@ SFString CBaseNode::toJson(void) const
 			ret += indent();
 			ret += "\"" + fld->getFieldName() + "\"";
 			ret += ": ";
-			if (fld->isArray() && val.IsEmpty())
-			{
-				ret += "[]";
-
-			} else if (fld->isArray())
+			if (fld->isArray())
 			{
 				ret += "[";
 				ret += (val.Contains("\n") ? "\n" + val + indent() : val);
@@ -441,8 +437,11 @@ SFString CBaseNode::toJson(void) const
 
 			} else if (fld->getFieldType() == T_NUMBER)
 			{
+#if 1 //def FULL_REPORT
 				ret += decBigNum(val);
-
+#else
+				ret += "\"" + decBigNum(val) + "\"";
+#endif
 			} else if (val == "null")
 			{
 				ret += val;

@@ -35,12 +35,6 @@ sha3.cpp \
 version.cpp \
 visitor.cpp
 
-#element.cpp \
-#html.cpp \
-#permission.cpp \
-#rect.cpp \
-#point.cpp \
-
 #-------------------------------------------------
 # probably don't have to change below this line
 

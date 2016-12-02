@@ -192,8 +192,6 @@ public:
 	SFInt32  Read          (         SFString&     val);
 	SFInt32  Read          (         SFTime&       val);
 	SFInt32  Read          (         SFAttribute&  val);
-//	SFInt32  Read          (         CDoublePoint& val);
-//	SFInt32  Read          (         CDoubleRect&  val);
 
 	SFInt32  Write         (         char       val) const;
 	SFInt32  Write         (         long       val) const;
@@ -205,8 +203,6 @@ public:
 	SFInt32  Write         (const SFString&     val) const;
 	SFInt32  Write         (const SFTime&       val) const;
 	SFInt32  Write         (const SFAttribute&  val) const;
-//	SFInt32  Write         (const CDoublePoint& val) const;
-//	SFInt32  Write         (const CDoubleRect&  val) const;
 
 private:
 	SFInt32  Read          (void *buff, SFInt32 size, SFInt32 cnt);

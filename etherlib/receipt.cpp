@@ -123,7 +123,12 @@ SFBool CReceipt::setValueByName(const SFString& fieldName, const SFString& field
 			CLogEntry log;SFInt32 nFields=0;
 			p = log.parseJson(p,nFields);
 			if (nFields)
+			{
+#ifdef CONVERT_TO_PARITY
+				log.logIndex = logs.getCount();
+#endif
 				logs[logs.getCount()] = log;
+			}
 		}
 		return TRUE;
 	}

@@ -144,26 +144,6 @@ CExportContext& CExportContext::operator<<(const SFAttribute& attr)
 	return *this;
 }
 
-#if 0
-//-------------------------------------------------------------
-CExportContext& CExportContext::operator<<(const CDoublePoint& pt)
-{
-	char val[20];
-	sprintf(val, "[%f,%f]", pt.x, pt.y);
-	Output(val);
-	return *this;
-}
-
-//-------------------------------------------------------------
-CExportContext& CExportContext::operator<<(const CDoubleRect& rect)
-{
-	char val[100];
-	sprintf(val, "[%f,%f,%f,%f]", rect.left, rect.top, rect.right, rect.bottom);
-	Output(val);
-	return *this;
-}
-#endif
-
 //-------------------------------------------------------------
 void CFileExportContext::setOutput(void *output)
 {

@@ -86,24 +86,6 @@ CImportContext& CImportContext::operator>>(SFAttribute& attr)
 	return *this;
 }
 
-#if 0
-CImportContext& CImportContext::operator>>(CDoublePoint& pt)
-{
-	*this >> pt.x;
-	*this >> pt.y;
-	return *this;
-}
-
-CImportContext& CImportContext::operator>>(CDoubleRect& rect)
-{
-	*this >> rect.top;
-	*this >> rect.left;
-	*this >> rect.bottom;
-	*this >> rect.right;
-	return *this;
-}
-#endif
-
 void CFileImportContext::refreshBuffer(void)
 {
 	if (countOf(((char)0x6), m_buffer) > 1)

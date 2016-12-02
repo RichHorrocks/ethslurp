@@ -1,6 +1,7 @@
 #ifndef _ETHER_LIB_
 #define _ETHER_LIB_
 //#define CONVERT_TO_PARITY
+//#define FULL_REPORT
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 

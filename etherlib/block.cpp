@@ -148,7 +148,6 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "uncles" )
 			{
 				SFInt32 cnt = blo->uncles.getCount();
-				if (cnt==1) return "\"" + blo->uncles[0] + "\"";
 				expContext().lev++;
 				for (int i=0;i<cnt;i++)
 				{
