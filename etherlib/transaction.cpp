@@ -425,7 +425,6 @@ SFString nextTransactionChunk_custom(const SFString& fieldIn, SFBool& force, con
 #if 1 //def NEW_CODE
 		case 's':
 			if ( fieldIn % "sh_date" ) return tra->m_transDate.Format("%m/%d/16 %H:%M");
-//			if ( fieldIn % "sh_function" ) { shortAddr=TRUE; SFString ret = tra->inputToFunction(); shortAddr=FALSE; return ret; }
 			if ( fieldIn % "sh_from" ) return fmtAddress(tra->from);
 			if ( fieldIn % "sh_to" ) return fmtAddress(tra->to);
 			break;

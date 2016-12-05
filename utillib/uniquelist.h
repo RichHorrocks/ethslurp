@@ -41,6 +41,10 @@ public:
 };
 
 //----------------------------------------------------------------------------------------
-typedef SFUniqueList<SFString*>  SFUniqueStringList;
+class SFUniqueStringList : public SFUniqueList<const SFString&>
+{
+public:
+	SFUniqueStringList(void) : SFUniqueList(sortByStringValue, compareStringValue) { }
+};
 
 #endif
