@@ -1,5 +1,5 @@
-#ifndef _ETH_WEB_API_
-#define _ETH_WEB_API_
+#ifndef _ABI_LIB_
+#define _ABI_LIB_
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -23,22 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
-#include "abilib.h"
-
-//---------------------------------------------------------------------------------------------------
-class CWebAPI
-{
-private:
-	SFString key;
-	SFString provider;
-	SFString url;
-
-public:
-              CWebAPI (void);
-             ~CWebAPI (void);
-
-	SFBool    checkKey (CConfig& config);
-	SFString  getKey   (void) const;
-};
+#include "utillib.h"
+#include "parameter.h"
+#include "function.h"
+#include "abi.h"
+#include "dapp.h"
 
 #endif

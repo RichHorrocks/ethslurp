@@ -1,8 +1,7 @@
 #ifndef _ETHER_LIB_
 #define _ETHER_LIB_
-//#define CONVERT_TO_PARITY
-//#define FULL_REPORT
-/*--------------------------------------------------------------------------------
+#define CONVERT_TO_PARITY
+ /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
 Copyright (c) 2016 Great Hill Corporation
@@ -26,19 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------*/
 #include "ethtypes.h"
-#include "parameter.h"
-#include "function.h"
+#include "abilib.h"
 #include "block.h"
-#include "abi.h"
 #include "transaction.h"
 #include "account.h"
 #include "blockchain.h"
 #include "receipt.h"
 #include "logentry.h"
 #include "webapi.h"
-#include "dapp.h"
 #include "pricequote.h"
 #include "trace.h"
+#include "nodelib.h"
 
 //------------------------------------------------------------------------------
 extern SFString compressHash  (const SFString& hashIn);

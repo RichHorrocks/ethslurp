@@ -66,7 +66,6 @@ SFString nextAccountChunk(const SFString& fieldIn, SFBool& force, const void *da
 	{
 		case 'a':
 			if ( fieldIn % "addr" ) return acc->addr;
-//			if ( fieldIn % "abi" ) return acc->abi;
 			break;
 		case 'd':
 			if ( fieldIn % "displayString" ) return acc->displayString;
@@ -117,7 +116,6 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 	{
 		case 'a':
 			if ( fieldName % "addr" ) { addr = toLower(fieldValue); return TRUE; }
-//			if ( fieldName % "abi" ) { abi = fieldValue; return TRUE; }
 			break;
 		case 'd':
 			if ( fieldName % "displayString" ) { displayString = fieldValue; return TRUE; }
@@ -148,6 +146,7 @@ SFBool CAccount::setValueByName(const SFString& fieldName, const SFString& field
 void CAccount::finishParse()
 {
 	// EXISTING_CODE
+	abi.loadABI(addr);
 	for (int i=0;i<transactions.getCount();i++)
 		transactions[i].funcPtr = abi.findFunctionByEncoding(transactions[i].input.Mid(2,8));
 	// EXISTING_CODE
@@ -168,7 +167,6 @@ void CAccount::Serialize(SFArchive& archive)
 		archive >> lastPage;
 		archive >> lastBlock;
 		archive >> nVisible;
-//		archive >> abi;
 		archive >> transactions;
 		finishParse();
 	} else
@@ -180,7 +178,6 @@ void CAccount::Serialize(SFArchive& archive)
 		archive << lastPage;
 		archive << lastBlock;
 		archive << nVisible;
-//		archive << abi;
 		archive << transactions;
 
 	}
@@ -203,7 +200,6 @@ void CAccount::registerClass(void)
 	ADD_FIELD(CAccount, "lastPage", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CAccount, "lastBlock", T_NUMBER, ++fieldNum);
 	ADD_FIELD(CAccount, "nVisible", T_NUMBER, ++fieldNum);
-//	ADD_FIELD(CAccount, "abi", T_TEXT, ++fieldNum);
 	ADD_FIELD(CAccount, "transactions", T_TEXT|TS_ARRAY, ++fieldNum);
 
 	// Hide our internal fields, user can turn them on if they like

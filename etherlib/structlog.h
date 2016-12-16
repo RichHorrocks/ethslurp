@@ -27,7 +27,7 @@
  * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
-#include "utillib.h"
+#include "abilib.h"
 #include "ethtypes.h"
 
 //--------------------------------------------------------------------------

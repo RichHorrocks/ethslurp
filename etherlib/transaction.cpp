@@ -699,8 +699,6 @@ SFString parseParams(const CTransaction* trans, const SFString& which, const SFS
 		int nItems = sizeof(items) / sizeof(SFString);
 
 		SFString type = (grabBigNum(trans->value,0)>0?" (non-split)":" (split)");
-//		if (trans && trans->pParent && ((CAccount*)trans->pParent)->addr == recipient)
-//			type.Replace(")", "-self)");
 		return which + type + parse(params, nItems, items);
 
 	} else if (which=="SendEmail")
@@ -803,17 +801,11 @@ SFString CTransaction::inputToFunction(void) const
 			break;
 	}
 
-	if (pParent)
+	if (pParent && pParent->isKindOf(GETRUNTIME_CLASS(CAccount)))
 	{
-#if 1 //NEW_CODE
 		for (int i=0;i<((CAccount*)pParent)->abi.abiByName.getCount();i++)
 			if (input.Mid(2,8) == ((CAccount*)pParent)->abi.abiByName[i].encoding)
 				return ((CAccount*)pParent)->abi.abiByName[i].Format("[{NAME}]");
-#else
-		for (int i=0;i<((CAccount*)pParent)->abi.abiByEncoding.getCount();i++)
-			if (input.Mid(2,8) == ((CAccount*)pParent)->abi.abiByEncoding[i].encoding)
-				return ((CAccount*)pParent)->abi.abiByEncoding[i].Format("[{NAME}]");
-#endif
 	}
 #endif
 
