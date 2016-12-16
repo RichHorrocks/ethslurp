@@ -200,7 +200,7 @@ string getLatestBlock(const string& id)
 bool getBlock(CBlock& block, const string& numIn, const string& id)
 {
 	SFString num = (const char*)numIn.c_str();
-	if (FALSE) //SFos::fileExists(getBinPath(num)))
+	if (SFos::fileExists(getBinPath(num)))
 	{
 		UNHIDE_FIELD(CTransaction, "receipt");
 		UNHIDE_FIELD(CTransaction, "traces");
