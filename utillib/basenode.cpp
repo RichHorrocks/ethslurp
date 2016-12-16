@@ -437,11 +437,8 @@ SFString CBaseNode::toJson(void) const
 
 			} else if (fld->getFieldType() == T_NUMBER)
 			{
-#if 1 //def FULL_REPORT
 				ret += decBigNum(val);
-#else
-				ret += "\"" + decBigNum(val) + "\"";
-#endif
+
 			} else if (val == "null")
 			{
 				ret += val;

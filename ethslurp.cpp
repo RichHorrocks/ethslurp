@@ -1,3 +1,149 @@
+//#define NEW_ABI
+#ifdef NEW_ABI
+#include "ethslurp.h"
+#include "slurp_options.h"
+extern int sortFuncTableByName(const void *ob1, const void *ob2);
+extern int sortFuncTableByEncoding(const void *ob1, const void *ob2);
+extern SFString configPath(const SFString& part);
+extern SFString findEncoding(const SFString& addr, CFunction& func);
+
+//---------------------------------------------------------------------------
+int findByEncoding(const void *rr1, const void *rr2)
+{
+        CFunction *f1 = (CFunction *)rr1;
+        CFunction *f2 = (CFunction *)rr2;
+        return (int)f2->encoding.Compare(f1->encoding);
+}
+
+//---------------------------------------------------------------------------
+CFunction *CAbi::findFunctionByEncoding(const SFString& enc)
+{
+        CFunction search;
+        search.encoding = enc;
+        return abiByEncoding.Find(&search,findByEncoding);
+}
+
+//---------------------------------------------------------------------------
+SFString abis[1000][2];
+SFInt32 nAbis=0;
+SFString findEncoding(const SFString& addr, CFunction& func)
+{
+        if (!nAbis)
+        {
+                SFString contents = asciiFileToString(configPath("abis/"+addr+".abi"));
+                while (!contents.IsEmpty())
+                {
+                        abis[nAbis][1] = nextTokenClear(contents,'\n');
+                        abis[nAbis][0] = nextTokenClear(abis[nAbis][1],'|');
+                        nAbis++;
+                }
+        }
+
+        for (int i=0;i<nAbis;i++)
+                if (abis[i][0] == func.name)
+                        return abis[i][1];
+        return EMPTY;
+}
+
+//---------------------------------------------------------------------------
+SFBool getEncoding(const SFString& abiFilename, const SFString& addr, CFunction& func)
+{
+        if (func.type != "function")
+                return FALSE;
+
+        SFString fullName = func.name; // we need the signature for ethabi
+        func.name     = nextTokenClear(func.name,'('); // Cleanup because we only need the name, not the signature
+        func.encoding = findEncoding(addr, func);
+        if (func.encoding.IsEmpty() && SFos::fileExists("/usr/local/bin/ethabi"))
+        {
+                // When we call ethabi, we want the full function declaration (if it's present)
+                SFString cmd = "/usr/local/bin/ethabi encode function \"" + abiFilename + "\" " + fullName.Substitute("(","\\(").Substitute(")","\\)");
+                func.encoding = SFos::doCommand(cmd);
+        }
+        return !func.encoding.IsEmpty();
+}
+
+//---------------------------------------------------------------------------
+void CAbi::loadABI(const SFString& addr)
+{
+        // Already loaded?
+        if (abiByName.getCount() && abiByEncoding.getCount())
+                return;
+
+        SFString abiFilename =  configPath("abis/"+addr+".json");
+        if (!SFos::fileExists(abiFilename))
+                return;
+
+        outErr << "\tLoading abi file: " << abiFilename << "...\n";
+        SFString contents = asciiFileToString(abiFilename);
+        ASSERT(!contents.IsEmpty());
+
+        SFString abis;
+        char *p = cleanUpJson((char *)(const char*)contents);
+        while (p && *p)
+        {
+                CFunction func;SFInt32 nFields=0;
+                p = func.parseJson(p,nFields);
+                if (nFields && getEncoding(abiFilename, addr, func))
+                {
+                        abiByName     [ abiByName.getCount     () ] = func;
+                        abiByEncoding [ abiByEncoding.getCount () ] = func;
+                        abis += func.Format("[{NAME}]|[{ENCODING}]\n");
+                }
+        }
+        if (!SFos::fileExists(configPath("abis/"+addr+".abi")))
+                stringToAsciiFile(configPath("abis/"+addr+".abi"),abis);
+
+        abiByName    .Sort( sortFuncTableByName     );
+        abiByEncoding.Sort( sortFuncTableByEncoding );
+        if (verbose)
+        {
+                for (int i=0;i<abiByName.getCount();i++)
+                {
+                        if (abiByName[i].type == "function")
+                        {
+                                outErr << abiByName[i].Format("[\"{NAME}|][{ENCODING}\"]").Substitute("\n"," ") << "\n";
+                        }
+                }
+        }
+}
+
+int main(int argc, const char *argv[])
+{
+	SFString acct = "0xbb9bc244d798123fde783fcc1c72d3bb8c189413";
+	CAbi abi;
+	abi.loadABI(acct);
+
+	SFInt32 n=0;
+	double start = vrNow();
+	SFString contents = asciiFileToString("file");
+	while (!contents.IsEmpty())
+	{
+		SFString line       = nextTokenClear(contents,'\n');
+		CTransaction trans;
+		trans.to    = nextTokenClear(line,'\t');
+		trans.from  = nextTokenClear(line,'\t');
+		trans.value = nextTokenClear(line,'\t');
+		trans.input = nextTokenClear(line,'\t');
+
+		for (int i=0;i<500;i++)
+		{
+			SFString encoding = SFString(trans.input).Mid(2,8);
+			const CFunction *func = abi.findFunctionByEncoding(encoding);
+//			outScreen << encoding << "\t" << (func?func->name:"None") << "\n";
+			SFString str = encoding + "\t" + (func?func->name:"None") + "\n";
+			str = EMPTY;
+			if (!(n%100))  { outScreen << ".";outScreen.Flush(); }
+			if (!(n%1000)) { outScreen << "+";outScreen.Flush(); }
+			n++;
+		}
+	}
+	double stop = vrNow();
+	double timeSpent = stop-start;
+	fprintf(stderr, "\nLoaded %ld total records in %f seconds\n", abi.abiByEncoding.getCount(), timeSpent);
+	fflush(stderr);
+}
+#else
 /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -164,7 +310,6 @@ extern SFInt32 nAbis;
 
 	// We are ready to slurp
 	theAccount.addr = addr;
-	theAccount.abi.loadABI(theAccount.addr);
 
 	outErr << "\t" << "Slurping " << theAccount.addr << "\n";
 
@@ -636,3 +781,4 @@ int sortReverseChron(const void *rr1, const void *rr2)
         ret = tr2->timeStamp - tr1->timeStamp;         if (ret!=0) return (int)ret;
         return sortTransactionsForWrite(rr1,rr2);
 }
+#endif

@@ -27,10 +27,9 @@
  * This file was generated with makeClass. Edit only those parts of the code inside
  * of 'EXISTING_CODE' tags.
  */
-#include "utillib.h"
-#include "transaction.h"
+#include "abilib.h"
 #include "etherlib.h"
-#include "abi.h"
+#include "transaction.h"
 
 //--------------------------------------------------------------------------
 class CAccount;
@@ -59,7 +58,6 @@ public:
 	SFInt32 lastPage;
 	SFInt32 lastBlock;
 	SFInt32 nVisible;
-	CAbi abi;
 	CTransactionArray transactions;
 
 public:
@@ -72,6 +70,7 @@ public:
 
 	// EXISTING_CODE
 	SFInt32 deleteNotShowing(void);
+	CAbi abi;
 	// EXISTING_CODE
 
 protected:
@@ -134,10 +133,10 @@ inline void CAccount::Init(void)
 	lastPage = 0;
 	lastBlock = -1;
 	nVisible = 0;
-//	abi = ??; /* unknown type: CAbi */
 //	transactions = ??; /* unknown type: CTransactionArray */
 
 	// EXISTING_CODE
+//	abi = ??; /* unknown type: CAbi */
 //	abi.abiByName.Clear();
 //	abi.abiByEncoding.Clear();
 	// EXISTING_CODE
@@ -156,10 +155,10 @@ inline void CAccount::Copy(const CAccount& ac)
 	lastPage = ac.lastPage;
 	lastBlock = ac.lastBlock;
 	nVisible = ac.nVisible;
-	abi = ac.abi;
 	transactions = ac.transactions;
 
 	// EXISTING_CODE
+	abi = ac.abi;
 	abi.abiByName = ac.abi.abiByName;
 	abi.abiByEncoding = ac.abi.abiByEncoding;
 	// EXISTING_CODE

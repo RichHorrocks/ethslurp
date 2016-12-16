@@ -1,4 +1,5 @@
-cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I./utillib -I./etherlib
+ethslurp=.
+cflags=-std=c++11 -Wall -O2 -DLINUX -I. -I$(ethslurp)/utillib -I$(ethslurp)/abilib -I$(ethslurp)/nodelib -I$(ethslurp)/etherlib
 
 # for mac builds
 libs=*/*.a /usr/lib/libcurl.dylib
@@ -18,6 +19,8 @@ objs=./objs
 
 all:
 	@cd utillib; make; cd ..
+	@cd abilib; make; cd ..
+	@cd nodelib; make; cd ..
 	@cd etherlib; make; cd ..
 	@echo "$(product) build started"
 	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -60,5 +63,7 @@ cleanall:
 
 clean:
 	@cd utillib; make clean; cd ..
+	@cd abilib; make clean; cd ..
+	@cd nodelib; make clean; cd ..
 	@cd etherlib; make clean; cd ..
 	-@$(RM) -f $(product) $(objs)/*.o $(objs)/*.a 2> /dev/null

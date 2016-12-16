@@ -25,6 +25,7 @@ SOFTWARE.
 --------------------------------------------------------------------------------*/
 class CPerson;
 
+#if 0
 //-----------------------------------------------------------------------------------------
 class CProtectedObject
 {
@@ -105,6 +106,7 @@ private:
 			m_hidden   = data.m_hidden;
 		}
 };
+#endif
 
 extern int sortByObjectName(const void *rr1, const void *rr2);
 

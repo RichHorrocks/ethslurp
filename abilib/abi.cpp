@@ -223,6 +223,8 @@ int sortFuncTableByEncoding(const void *ob1, const void *ob2)
 	return (int)p2->encoding.Compare(p1->encoding);
 }
 
+#define NEW_ABI
+#ifdef NEW_ABI
 //---------------------------------------------------------------------------
 #if 1 //NEW_CODE
 int findByName(const void *rr1, const void *rr2)
@@ -242,7 +244,6 @@ int findByEncoding(const void *rr1, const void *rr2)
 }
 
 //---------------------------------------------------------------------------
-#if 1 //NEW_CODE
 CFunction *CAbi::findFunctionByName(const SFString& name)
 {
 	CFunction search;
@@ -274,6 +275,7 @@ extern "C" {
 }
 #endif
 
+#ifdef NEW_ABI
 extern SFString configPath(const SFString& part);
 
 //---------------------------------------------------------------------------
@@ -360,4 +362,5 @@ void CAbi::loadABI(const SFString& addr)
 		}
 	}
 }
+#endif
 // EXISTING_CODE

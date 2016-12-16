@@ -1,23 +1,18 @@
-cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../ -I./
+cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../abilib -I../nodelib -I./
 
 product=etherlib.a
 
 src= \
-abi.cpp \
 account.cpp \
 blockchain.cpp \
 block.cpp \
-dapp.cpp \
-function.cpp \
 logentry.cpp \
-parameter.cpp \
 pricequote.cpp \
 receipt.cpp \
 transaction.cpp \
 trace.cpp \
 structlog.cpp \
 webapi.cpp \
-rpc.cpp \
 etherlib.cpp
 
 #-------------------------------------------------
