@@ -28,7 +28,17 @@ SOFTWARE.
 #include "sffile.h"
 #include "options.h"
 
+//--------------------------------------------------------------------------------
+static SFInt32 nP=0;
+static CParams ps[] = {};
+
+//--------------------------------------------------------------------------------
+SFInt32& nParamsRef = nP;
+CParams *paramsPtr  = &ps[0];
+
+//--------------------------------------------------------------------------------
 SFString programName="ethslurp";
+
 //--------------------------------------------------------------------------------
 SFBool COptions::prepareArguments(int argc, const char *argv[], const SFString& homeFolder)
 {
@@ -178,19 +188,19 @@ SFString options(void)
 
 	CStringExportContext ctx;
 	ctx << "[";
-	for (int i=0;i<nParams;i++)
+	for (int i=0;i<nParamsRef;i++)
 	{
-		if (params[i].shortName.startsWith('~'))
+		if (paramsPtr[i].shortName.startsWith('~'))
 		{
-			required += (" " + params[i].longName.Mid(1));
+			required += (" " + paramsPtr[i].longName.Mid(1));
 
-		} else if (params[i].shortName.startsWith('@'))
+		} else if (paramsPtr[i].shortName.startsWith('@'))
 		{
 			// invisible option
-			
-		} else if (!params[i].shortName.IsEmpty())
+
+		} else if (!paramsPtr[i].shortName.IsEmpty())
 		{
-			ctx << params[i].shortName << "|";
+			ctx << paramsPtr[i].shortName << "|";
 		}
 	}
 	if (COptions::useTesting)
@@ -207,9 +217,9 @@ SFString options(void)
 SFString purpose(void)
 {
 	SFString purpose;
-	for (int i=0;i<nParams;i++)
-		if (params[i].shortName.IsEmpty())
-			purpose += ("\n           " + params[i].description);
+	for (int i=0;i<nParamsRef;i++)
+		if (paramsPtr[i].shortName.IsEmpty())
+			purpose += ("\n           " + paramsPtr[i].description);
 
 	CStringExportContext ctx;
 	if (!purpose.IsEmpty())
@@ -227,19 +237,22 @@ SFString descriptions(void)
 	SFString required;
 
 	CStringExportContext ctx;
-	for (int i=0;i<nParams;i++)
+	for (int i=0;i<nParamsRef;i++)
 	{
-		if (params[i].shortName.startsWith('~'))
+		if (paramsPtr[i].shortName.startsWith('~'))
 		{
-			required += ("\t" + padRight(params[i].longName,22) + params[i].description).Substitute("~",EMPTY) + " (required)\n";
+			required += ("\t" + padRight(paramsPtr[i].longName.Substitute("!",""),22) + paramsPtr[i].description).Substitute("~",EMPTY);
+			if (!paramsPtr[i].longName.Contains("!"))
+				required += " (required)";
+			required += "\n";
 
-		} else if (params[i].shortName.startsWith('@'))
+		} else if (paramsPtr[i].shortName.startsWith('@'))
 		{
 			// invisible option
 
-		} else if (!params[i].shortName.IsEmpty())
+		} else if (!paramsPtr[i].shortName.IsEmpty())
 		{
-			ctx << "\t" << padRight(params[i].shortName,3) << padRight((params[i].longName.IsEmpty() ? "" : " (or "+params[i].longName+")"),18) << params[i].description << "\n";
+			ctx << "\t" << padRight(paramsPtr[i].shortName,3) << padRight((paramsPtr[i].longName.IsEmpty() ? "" : " (or "+paramsPtr[i].longName+")"),18) << paramsPtr[i].description << "\n";
 		}
 	}
 	ctx.str = (required + ctx.str);
@@ -279,7 +292,7 @@ SFString expandOption(SFString& arg)
 
 	// One of the range commands. These must be alone on
 	// the line (this is a bug for -rf:txt for example)
-	if (arg.Contains(":"))
+	if (arg.Contains(":")||arg.Contains("="))
 	{
 		arg=EMPTY;
 		return ret;

@@ -1,4 +1,4 @@
-cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../abilib -I../nodelib -I./
+cflags=-std=c++11 -Wall -O2 -DLINUX -I../utillib -I../abilib -I./
 
 product=etherlib.a
 
@@ -13,6 +13,7 @@ transaction.cpp \
 trace.cpp \
 structlog.cpp \
 webapi.cpp \
+node.cpp \
 etherlib.cpp
 
 #-------------------------------------------------
@@ -21,10 +22,8 @@ etherlib.cpp
 objects = $(patsubst %.cpp,objs/%.o,$(src))
 
 all:
-	@echo "$(product) build started"
-	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	@make $(product)
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo ""
 
 $(product): $(objects)
 	-@$(RM) -f $*.a

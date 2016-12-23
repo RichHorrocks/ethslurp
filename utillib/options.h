@@ -63,10 +63,6 @@ extern int      sortParams  (const void *c1, const void *c2);
 extern SFString expandOption(SFString& arg);
 
 //--------------------------------------------------------------------------------
-extern CParams params[];
-extern SFInt32 nParams;
-
-//--------------------------------------------------------------------------------
 extern SFBool verbose;
 extern SFBool isTesting;
 
@@ -77,5 +73,9 @@ extern CFileExportContext&  outErr;
 //--------------------------------------------------------------------------------
 extern SFString cachePath (const SFString& part=EMPTY);
 extern SFString configPath(const SFString& part=EMPTY);
+
+//--------------------------------------------------------------------------------
+extern CParams  *paramsPtr;
+extern SFInt32&  nParamsRef;
 
 #endif

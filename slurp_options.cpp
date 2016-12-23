@@ -233,6 +233,9 @@ SFInt32 CSlurpOptions::parseArguments(SFString& command)
 //---------------------------------------------------------------------------------------------------
 void CSlurpOptions::Init(void)
 {
+	paramsPtr       = params;
+	nParamsRef      = nParams;
+
 	prettyPrint     = FALSE;
 	rerun           = FALSE;
 	incomeOnly      = FALSE;

@@ -17,4 +17,35 @@ extern SFInt32  getFilesInFolder   (const SFString& path, SFInt32& nFiles, SFStr
 extern SFString listFilesInFolder  (const SFString& path,                                   SFInt32 options=F_DEFAULT);
 extern SFInt32  forAllItemsInFolder(const SFString& path, APPLYFUNC func, void *data, SFInt32 options);
 
+#include <glob.h>
+#include <iostream>
+#include <fstream>
+#include <curl/curl.h>
+
+//----------------------------------------------------------------------------------
+typedef SFBool (*VISITOR)(const SFString& str);
+
+//------------------------------------------------------------------
+inline int globErrFunc(const char *epath, int eerrno)
+{
+	perror(epath);
+	printf("%d:%s\n",eerrno,epath);
+	return 0;
+}
+
+//----------------------------------------------------------------------------------
+inline void forAllFiles(const SFString& mask, VISITOR func )
+{
+	glob_t globBuf;
+	glob( (const char *)mask, GLOB_MARK, globErrFunc, &globBuf);
+	SFBool done=FALSE;
+	for (int i=0;i<globBuf.gl_pathc&&!done;i++)
+		if (!(func)(globBuf.gl_pathv[i]))
+			done=TRUE;
+	globfree( &globBuf );
+}
+
+//-------------------------------------------------------------------------
+#define quote(a) (SFString("\"") + a + "\"")
+
 #endif

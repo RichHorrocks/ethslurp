@@ -6,8 +6,9 @@ src= \
 abi.cpp \
 dapp.cpp \
 function.cpp \
-parameter.cpp \
-abilib.cpp
+parameter.cpp
+
+#abilib.cpp
 
 #-------------------------------------------------
 # probably don't have to change below this line
@@ -15,10 +16,8 @@ abilib.cpp
 objects = $(patsubst %.cpp,objs/%.o,$(src))
 
 all:
-	@echo "$(product) build started"
-	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	@make $(product)
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo ""
 
 $(product): $(objects)
 	-@$(RM) -f $*.a

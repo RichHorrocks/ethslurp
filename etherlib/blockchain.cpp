@@ -42,7 +42,7 @@ void CBlockChain::Format(CExportContext& ctx, const SFString& fmtIn, void *data)
 		return;
 	}
 
-        SFString fmt = fmtIn;
+	SFString fmt = fmtIn;
 	if (handleCustomFormat(ctx, fmt, data))
 		return;
 

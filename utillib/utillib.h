@@ -41,7 +41,6 @@ SOFTWARE.
 #include "curl_code.h"
 #include "fielddata.h"
 #include "editableobject.h"
-#include "protectedobject.h"
 #include "colors.h"
 #include "sfarchive.h"
 #include "performance.h"

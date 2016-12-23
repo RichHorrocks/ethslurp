@@ -35,7 +35,7 @@ SOFTWARE.
 #include "webapi.h"
 #include "pricequote.h"
 #include "trace.h"
-#include "nodelib.h"
+#include "node.h"
 
 //------------------------------------------------------------------------------
 extern SFString compressHash  (const SFString& hashIn);

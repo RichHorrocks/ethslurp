@@ -41,10 +41,8 @@ visitor.cpp
 objects = $(patsubst %.cpp,objs/%.o,$(src))
 
 all:
-	@echo "$(product) build started"
-	@echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	@make $(product)
-	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo ""
 
 $(product): $(objects)
 	-@$(RM) -f $*.a

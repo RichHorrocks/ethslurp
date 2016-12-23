@@ -1006,10 +1006,12 @@ inline SFString padLeft(const SFString& str, SFInt32 len, char p=' ')
 
 	return str.Left(len);
 }
-#define padNum2(n) padLeft(asString((n)),2).Substitute(" ", "0")
-#define padNum3(n) padLeft(asString((n)),3).Substitute(" ", "0")
-#define padNum4(n) padLeft(asString((n)),4).Substitute(" ", "0")
-#define padNum5(n) padLeft(asString((n)),5).Substitute(" ", "0")
+
+#define padNum2(n) padLeft(asString((n)),2,'0')
+#define padNum3(n) padLeft(asString((n)),3,'0')
+#define padNum4(n) padLeft(asString((n)),4,'0')
+#define padNum5(n) padLeft(asString((n)),5,'0')
+#define padNum9(n) padLeft(asString((n)),9,'0')
 
 inline SFString padCenter(const SFString& str, SFInt32 len, char p=' ')
 {
@@ -1225,6 +1227,15 @@ inline SFString TrimAt(const SFString& str, const SFString& findStr)
 	if (!str.Contains(findStr))
 		return str;
 	return str.Left(str.Find(findStr));
+}
+
+//-----------------------------------------------------------------------------------------
+inline bool isNumber(const SFString& in)
+{
+	for (int i=0;i<in.GetLength();i++)
+		if (!isdigit(in[i]))
+			return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------------------
