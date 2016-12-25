@@ -38,6 +38,7 @@ SOFTWARE.
 #define binaryReadOnly    "rb"  // binary read - fails if not present
 #define binaryReadWrite   "rb+" // binary read/write - fails if not present
 #define binaryWriteCreate "wb"  // binary write - destroys previous contents or creates
+#define binaryWriteAppend "ab+" // binary read/writing - appends
 
 #define LOCK_NOWAIT       1 // read only - do not even check for a lock
 #define LOCK_WAIT         2 // Wait for lock to release return TRUE - if wait too long return FALSE
