@@ -25,7 +25,7 @@ public:
 
 //----------------------------------------------------------------------------------
 class CVisitor;
-typedef SFBool (*VISTORFUNC)(CVisitor& v, void *data);
+typedef SFBool (*VISITORFUNC)(CVisitor& v, void *data);
 
 //----------------------------------------------------------------------------------
 class CVisitor
@@ -37,12 +37,12 @@ public:
 	SFFile              curFile;
 	CVisitOptions       visitOpts;
 
-	VISTORFUNC          enterFolder;
-	VISTORFUNC          leaveFolder;
-	VISTORFUNC          fileFunc;
-	VISTORFUNC          fileCountFunc;
-	VISTORFUNC          folderCountFunc;
-	VISTORFUNC          statusFunc;
+	VISITORFUNC         enterFolder;
+	VISITORFUNC         leaveFolder;
+	VISITORFUNC         fileFunc;
+	VISITORFUNC         fileCountFunc;
+	VISITORFUNC         folderCountFunc;
+	VISITORFUNC         statusFunc;
 
 	SFInt32             nTouched;
 	void               *helperPtr;

@@ -9,6 +9,7 @@ block.cpp \
 logentry.cpp \
 pricequote.cpp \
 receipt.cpp \
+rpcresult.cpp \
 transaction.cpp \
 trace.cpp \
 structlog.cpp \

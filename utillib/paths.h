@@ -23,7 +23,7 @@ extern SFInt32  forAllItemsInFolder(const SFString& path, APPLYFUNC func, void *
 #include <curl/curl.h>
 
 //----------------------------------------------------------------------------------
-typedef SFBool (*VISITOR)(const SFString& str);
+typedef bool (*VISITOR)(const SFString& str, void *data);
 
 //------------------------------------------------------------------
 inline int globErrFunc(const char *epath, int eerrno)
@@ -34,13 +34,13 @@ inline int globErrFunc(const char *epath, int eerrno)
 }
 
 //----------------------------------------------------------------------------------
-inline void forAllFiles(const SFString& mask, VISITOR func )
+inline void forAllFiles(const SFString& mask, VISITOR func, void *data )
 {
 	glob_t globBuf;
 	glob( (const char *)mask, GLOB_MARK, globErrFunc, &globBuf);
 	SFBool done=FALSE;
 	for (int i=0;i<globBuf.gl_pathc&&!done;i++)
-		if (!(func)(globBuf.gl_pathv[i]))
+		if (!(func)(globBuf.gl_pathv[i], data))
 			done=TRUE;
 	globfree( &globBuf );
 }

@@ -64,8 +64,10 @@ public:
 	operator string() const;
 	BigUnsignedInABase(const string &s, unsigned short base);
 
-	/* Equality test.  For the purposes of this test, two BigUnsignedInABase
-	 * values must have the same base to be equal. */ 
+	/*
+	* Equality test.  For the purposes of this test, two BigUnsignedInABase
+	* values must have the same base to be equal.
+	*/
 	bool operator ==(const BigUnsignedInABase &x) const {
 		return base == x.base && BigNumStore<unsigned short>::operator ==(x);
 	}
@@ -322,9 +324,11 @@ static void exteuclidean(bigint_t m, bigint_t n, bigint_t &g, bigint_t &r, bigin
 	if (&g == &r || &g == &s || &r == &s)
 		throw "bigint_t exteuclidean: Outputs are aliased";
 	bigint_t r1(1), s1(0), r2(0), s2(1), q;
-	/* Invariants:
-	 * r1*m(orig) + s1*n(orig) == m(current)
-	 * r2*m(orig) + s2*n(orig) == n(current) */
+	/*
+	* Invariants:
+	* r1*m(orig) + s1*n(orig) == m(current)
+	* r2*m(orig) + s2*n(orig) == n(current)
+	*/
 	for (;;) {
 		if (n.sign==0) {
 			r = r1; s = s1; g = m;

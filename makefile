@@ -42,8 +42,12 @@ test: all
 
 back:
 	@rm -fR theData/backup
-	@cp -pR ~/.ethslurp theData/backup
-#	@rm -fR theData/backup/slurps
+	@mkdir theData/backup
+	@cp -pR ~/.ethslurp/abis          theData/backup/
+	@cp -pR ~/.ethslurp/configs       theData/backup/
+	@cp -pR ~/.ethslurp/slurps        theData/backup/
+	@cp -p  ~/.ethslurp/ethslurp.conf theData/backup/
+	@cp -p  ~/.ethslurp/prices.bin    theData/backup/
 
 $(product): $(objects) $(libs)
 	$(CXX) -o $(product) $(objects) $(libs)

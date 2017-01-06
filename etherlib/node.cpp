@@ -119,6 +119,11 @@ SFString callRPC(const SFString& method, const SFString& params, const SFString&
 		exit(0);
 	}
 
+//outScreen << "\n" << SFString('-',80) << "\n";
+//outScreen << thePost << "\n";
+//outScreen << SFString('-',60) << "\n";
+//outScreen << result << "\n";
+//outScreen.Flush();
 	if (isJson)
 	{
 		// The nodes return {jsonrpc:2.0,result:{...the block},id:1}, so if it's there, strip it off
@@ -133,11 +138,6 @@ SFString callRPC(const SFString& method, const SFString& params, const SFString&
 			outErr << "Invalid json result: " << result << ". Quitting...\n";outErr.Flush();
 			exit(0);
 		}
-//outScreen << "\n" << SFString('-',80) << "\n";
-//outScreen << thePost << "\n";
-//outScreen << SFString('-',60) << "\n";
-//outScreen << ret << "\n";
-//outScreen.Flush();
 	}
 	return result;
 }
@@ -162,47 +162,52 @@ SFUint32 getLatestBlock(const SFString& id)
 	return ret;
 }
 
-#define getBinPath(a) getBinaryPath("",num)
-#define getStorePath(a) getStoragePath("",num)
-
 //-------------------------------------------------------------------------
 bool getBlock(CBlock& block, SFUint32 num, const SFString& id)
 {
-	if ((source == "json" || source == "binary") && SFos::fileExists(getBinPath(num)))
+	if (source == "binary" || source == "nonemp")
 	{
 		UNHIDE_FIELD(CTransaction, "receipt");
 		UNHIDE_FIELD(CTransaction, "traces");
-		if (source == "json")
-			return readOneBlock_fromJson(block, getStorePath(num));
-		return readOneBlock_fromBinary(block, getBinPath(num));
-
-	} else
-	{
-		HIDE_FIELD(CTransaction, "receipt");
-		HIDE_FIELD(CTransaction, "traces");
-		getObjectViaRPC(block, "eth_getBlockByNumber", "["+quote(asString(num))+",true]", id);
-		// if there are no transactions, we're done
-		if (!block.transactions.getCount())
-		{
-			writeToBinary(block, getBinPath(num));
-			return true;
-		}
-
-		// There are transactions, but we only have the hashes. Pick up the rest of the transaction
-		for (int i=0;i<block.transactions.getCount();i++)
-		{
-			UNHIDE_FIELD(CTransaction, "receipt");
-			UNHIDE_FIELD(CTransaction, "traces");
-			CReceipt receipt;
-			getReceipt(receipt, SFString((const char*)block.transactions[i].hash), SFString((const char*)block.number) + "." + asString(i));
-			block.transactions[i].receipt = receipt;
-//			CTrace traces;
-//			getTraces(traces, string((const char*)block.transactions[i].hash), string((const char*)block.number) + "." + asString(i));
-//			block.transactions[i].trace = traces;
-		}
-		writeToBinary(block, getBinPath(num));
+		return readOneBlock_fromBinary(block, getBinaryFilename1(num));
 	}
 
+	if (source == "json")
+	{
+		UNHIDE_FIELD(CTransaction, "receipt");
+		UNHIDE_FIELD(CTransaction, "traces");
+		return readOneBlock_fromJson(block, getJsonFilename1(num));
+
+	}
+
+	HIDE_FIELD(CTransaction, "receipt");
+	HIDE_FIELD(CTransaction, "traces");
+	getObjectViaRPC(block, "eth_getBlockByNumber", "["+quote(asString(num))+",true]", id);
+
+	// If there are no transactions, we're done
+	if (!block.transactions.getCount())
+	{
+		// We only write binary if there are transactions
+		//writeToBinary(block, getBinaryFilename1(num));
+		writeToJson(block, getJsonFilename1(num)); //We've stopped writing JSON for now because of disc space
+		return true;
+	}
+
+	// We have the transactions, but we also want the receipts
+	for (int i=0;i<block.transactions.getCount();i++)
+	{
+		UNHIDE_FIELD(CTransaction, "receipt");
+		CReceipt receipt;
+		getReceipt(receipt, SFString((const char*)block.transactions[i].hash), SFString((const char*)block.number) + "." + asString(i));
+		block.transactions[i].receipt = receipt;
+//		UNHIDE_FIELD(CTransaction, "traces");
+//		CTrace traces;
+//		getTraces(traces, string((const char*)block.transactions[i].hash), string((const char*)block.number) + "." + asString(i));
+//		block.transactions[i].trace = traces;
+	}
+
+	writeToBinary(block, getBinaryFilename1(num));
+	writeToJson(block, getJsonFilename1(num)); //We've stopped writing JSON for now because of disc space
 	return true;
 }
 
@@ -233,7 +238,10 @@ bool getTraces(CTrace& traces, const SFString& hash, const SFString& id)
 //-------------------------------------------------------------------------
 SFString getClientVersion(const SFString& id)
 {
-	return callRPC("web3_clientVersion", "[]", id, false);
+	SFString ret = callRPC("web3_clientVersion", "[]", id, false);
+	CRPCResult generic;
+	generic.parseJson((char *)(const char*)ret);
+	return generic.result;
 }
 
 //-------------------------------------------------------------------------
@@ -265,21 +273,27 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 //-----------------------------------------------------------------------
 void writeToJson(const CBaseNode& node, const SFString& fileName)
 {
-	std::ofstream out(fileName);
-	SFString fmt = node.Format();
-	fmt.ReplaceAll("\"to\": \"0x\"","\"to\": null");
-	out << fmt << "\n";
-	out.close();
+	if (SFos::establishFolder(fileName))
+	{
+		std::ofstream out(fileName);
+		SFString fmt = node.Format();
+		fmt.ReplaceAll("\"to\": \"0x\"","\"to\": null");
+		out << fmt << "\n";
+		out.close();
+	}
 }
 
 //-----------------------------------------------------------------------
 void writeToBinary(const CBaseNode& node, const SFString& fileName)
 {
-	SFArchive archive(FALSE, curVersion);
-	if (archive.Lock(fileName, binaryWriteCreate, LOCK_CREATE))
+	if (SFos::establishFolder(fileName))
 	{
-		((CBlock *)&node)->Serialize(archive);
-		archive.Close();
+		SFArchive archive(FALSE, curVersion);
+		if (archive.Lock(fileName, binaryWriteCreate, LOCK_CREATE))
+		{
+			((CBlock *)&node)->Serialize(archive);
+			archive.Close();
+		}
 	}
 }
 
@@ -324,9 +338,9 @@ SFBool verifyBlock(const CBlock& block, const SFString& path, SFBool fail)
 	source.Replace(dest,"");
 	if (!source.IsEmpty() && fail)
 	{
-		outErr << "File: " << getStoragePath("",toLong(block.number)) << " file is different to " << path << "\n";
+		outErr << "File: " << getJsonFilename1(toLong(block.number)) << " file is different to " << path << "\n";
 		outErr << "---------source:\n";
-		outErr << getStoragePath("",toLong(block.number)) << "\n" << source.Substitute("\n"," ") << "\n";
+		outErr << getJsonFilename1(toLong(block.number)) << "\n" << source.Substitute("\n"," ") << "\n";
 		outErr.Flush();
 		stringToAsciiFile("./dir1/file.json", source);
 		outErr << "---------dest:\n";
@@ -349,37 +363,252 @@ SFBool verifyBlock(const CBlock& block, const SFString& path, SFBool fail)
 	return TRUE;
 }
 
+static SFString storagePath;
 //-------------------------------------------------------------------------
-SFString getStoragePath(const SFString& pathIn, SFUint32 num)
+void setStorageRoot(const SFString& path)
 {
-	static SFString lastPath;
-	SFString path = pathIn;
-	if (path.IsEmpty())
-		path = lastPath;
-	else
-		lastPath = path;
-
-	if (path.IsEmpty())
-	{
-		// If it's still empty, we're in trouble.
-		outScreen << "You must set a path first. Quitting...\n";
-		exit(0);
-	}
-
-	SFString loc = "%s/%s/%s/%s.json";
-	SFString full = padLeft(asString(num),9,'0');
-	char fileName[200];
-	bzero(fileName,sizeof(fileName));
-	sprintf(fileName, (const char*)(path+loc), (const char*)full.Left(2), (const char*)full.Mid(2,2), (const char*)full.Mid(4,2), (const char*)full);
-	return &fileName[0];
+	storagePath = path;
+	if (!storagePath.endsWith('/'))
+		storagePath += "/";
+	SFos::establishFolder(storagePath);
 }
 
 //-------------------------------------------------------------------------
-SFString getBinaryPath(const SFString& path, SFUint32 num)
+static SFString getFilename_local(SFUint32 numIn, bool asPath, bool asJson)
 {
-	SFString ret = getStoragePath(path,num);
-	ret.Replace(".json",".bin");
-	ret.Replace("/00.1/","/blocks/00/");
-	ret.Replace("/00/",  "/blocks/00/");
+	if (storagePath.IsEmpty())
+	{
+		outScreen << "You must set the storage path with setStorageRoot(path). Quitting...\n";
+		exit(0);
+	}
+
+	char ret[512];
+	bzero(ret,sizeof(ret));
+
+	SFString num = padLeft(asString(numIn),9,'0');
+	SFString fmt = (asPath ? "%s/%s/%s/" : "%s/%s/%s/%s");
+	SFString fn  = (asPath ? "" : num + (asJson ? ".json" : ".bin"));
+
+	sprintf(ret, (const char*)(storagePath+fmt), (const char*)num.Left(2), (const char*)num.Mid(2,2), (const char*)num.Mid(4,2), (const char*)fn);
 	return ret;
+}
+
+//-------------------------------------------------------------------------
+SFString getJsonFilename1(SFUint32 num)
+{
+	return getFilename_local(num, false, true);
+}
+
+//-------------------------------------------------------------------------
+SFString getBinaryFilename1(SFUint32 num)
+{
+	SFString ret = getFilename_local(num, false, false);
+	ret.Replace("/00/",  "/blocks/00/"); // can't use Substitute because it will change them all
+	return ret;
+}
+
+//-------------------------------------------------------------------------
+SFString getJsonPath1(SFUint32 num)
+{
+	return getFilename_local(num, true, true);
+}
+
+//-------------------------------------------------------------------------
+SFString getBinaryPath1(SFUint32 num)
+{
+	SFString ret = getFilename_local(num, true, false);
+	ret.Replace("/00/",  "/blocks/00/"); // can't use Substitute because it will change them all
+	return ret;
+}
+
+SFString fullBlockIndex = getHomeFolder()+".ethslurp/scraper/fullBlocks.bin";
+//-------------------------------------------------------------------------
+bool forEveryBlockOnDisc(BLOCKVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	if (!func)
+		return false;
+
+	// Read every block from number start to start+count
+	for (SFUint32 i=start;i<start+count;i++)
+	{
+		CBlock block;
+		if (getBlock(block,i+start))
+			if (!(*func)(block, data))
+				return false;
+	}
+	return true;
+}
+
+//-------------------------------------------------------------------------
+bool forEveryEmptyBlockOnDisc(BLOCKVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	if (!func)
+		return false;
+
+	// Read the non-empty block index file and spit it out only empty blocks
+	FILE *fp = fopen(fullBlockIndex, binaryReadOnly);
+	if (fp)
+	{
+		SFUint32 nItems = SFos::fileSize(fullBlockIndex) / sizeof(SFUint32) + 1;
+		SFUint32 *contents = new SFUint32[nItems];
+		fread(&contents[1], nItems-1, sizeof(SFUint32), fp);
+		contents[0]=0;
+		SFUint32 cnt=start;
+		for (int i=1;i<nItems;i++)
+		{
+			while (cnt<contents[i])
+			{
+				CBlock block;
+				if (getBlock(block,cnt))
+					if (!(*func)(block, data))
+						return false;
+				cnt++;
+			}
+			cnt++;
+		}
+	}
+	return true;
+}
+
+//-------------------------------------------------------------------------
+bool forEveryNonEmptyBlockOnDisc(BLOCKVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	if (!func)
+		return false;
+
+	// Read the non-empty block index file and spit it out only non-empty blocks
+	FILE *fp = fopen(fullBlockIndex, binaryReadOnly);
+	if (fp)
+	{
+		SFUint32 nItems = SFos::fileSize(fullBlockIndex) / sizeof(SFUint32);
+		SFUint32 *contents = new SFUint32[nItems];
+		fread(contents, nItems, sizeof(SFUint32), fp);
+		for (int i=0;i<nItems;i++)
+		{
+			if (inRange(contents[i], start, start+count-1))
+			{
+				CBlock block;
+				if (getBlock(block,contents[i]))
+					if (!(*func)(block, data))
+						return false;
+			}
+		}
+		delete [] contents;
+		fclose(fp);
+	}
+	return true;
+}
+
+#define CLEANUP(ret) { if (blocks) delete [] blocks; if (trans) delete [] trans; if (fpBlocks) fclose(fpBlocks); if (fpTrans) fclose(fpTrans); return ret; }
+
+//--------------------------------------------------------------------------
+bool forEveryNonEmptyBlockInMemory(BLOCKVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	CMiniBlock *blocks    = NULL;
+	FILE       *fpBlocks  = NULL;
+	SFString    blockFile = getHomeFolder() + ".ethslurp/scraper/allBlocks.bin";
+
+	CMiniTrans *trans     = NULL;
+	FILE       *fpTrans   = NULL;
+	SFString    transFile = getHomeFolder() + ".ethslurp/scraper/allTrans.bin";
+
+	// First, we see if we can allocation enough space for the mini-block database
+	SFUint32 nBlocks   = SFos::fileSize(blockFile) / sizeof(CMiniBlock);
+	blocks = new CMiniBlock[nBlocks];
+	if (!blocks)
+	{
+		cerr << "Could not allocate memory for the blocks (size needed: " << nBlocks << ").\n";
+		CLEANUP(false);
+	}
+	bzero(blocks, sizeof(CMiniBlock)*(nBlocks));
+
+	// Next, we try to open the mini-block database
+	fpBlocks = fopen((const char*)blockFile, binaryReadOnly);
+	if (!fpBlocks)
+	{
+		cerr << "Could not open the mini-block database: " << blockFile << ".\n";
+		CLEANUP(false);
+	}
+
+	// Read the entire mini-block database into memory in one chunk
+	size_t nRead = fread(blocks, sizeof(CMiniBlock), nBlocks, fpBlocks);
+	if (nRead != nBlocks)
+	{
+		cerr << "Error encountered reading mini-blocks database.\n Quitting...";
+		CLEANUP(false);
+	}
+
+	// Now, we see if we can allocation enough space for the mini-transaction database
+	SFUint32 nTrans   = SFos::fileSize(transFile) / sizeof(CMiniTrans);
+	trans = new CMiniTrans[nTrans];
+	if (!trans)
+	{
+		cerr << "Could not allocate memory for the transactions (size needed: " << nTrans << ").\n";
+		CLEANUP(false);
+	}
+	bzero(trans, sizeof(CMiniTrans)*(nTrans));
+
+	// Next, we try to open the mini-transaction database
+	fpTrans = fopen((const char*)transFile, binaryReadOnly);
+	if (!fpTrans)
+	{
+		cerr << "Could not open the mini-transaction database: " << transFile << ".\n";
+		CLEANUP(false);
+	}
+
+	// Read the entire mini-transaction database into memory in one chunk
+	nRead = fread(trans, sizeof(CMiniTrans), nTrans, fpTrans);
+	if (nRead != nTrans)
+	{
+		cerr << "Error encountered reading mini-transactions database.\n Quitting...";
+		CLEANUP(false);
+	}
+
+	bool done=false;
+	for (int i=0;i<nBlocks&&!done;i++)
+	{
+		if (inRange(blocks[i].number, start, start+count-1))
+		{
+			CBlock block;
+			blocks[i].toBlock(block);
+			for (SFUint32 tr=block.firstTrans;tr< block.firstTrans+block.nTrans; tr++)
+			{
+				CTransaction tt;
+				trans[tr].toTrans(tt);
+				block.transactions[block.transactions.getCount()] = tt;
+			}
+			if (!(*func)(block, data))
+				CLEANUP(false);
+
+		} else if (blocks[i].number >= start+count)
+		{
+			done=true;
+		}
+	}
+
+	CLEANUP(true);
+}
+
+//-------------------------------------------------------------------------
+bool forEveryTransaction(TRANSVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	if (!func)
+		return false;
+	return true;
+}
+
+//-------------------------------------------------------------------------
+bool forEveryTransactionTo(TRANSVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	if (!func)
+		return false;
+	return true;
+}
+
+//-------------------------------------------------------------------------
+bool forEveryTransactionFrom(TRANSVISITFUNC func, void *data, SFUint32 start, SFUint32 count)
+{
+	if (!func)
+		return false;
+	return true;
 }

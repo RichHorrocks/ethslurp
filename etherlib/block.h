@@ -75,21 +75,23 @@ public:
 	SFStringArray uncles;
 
 public:
-					CBlock  (void);
-					CBlock  (const CBlock& bl);
-				   ~CBlock  (void);
-	CBlock&	operator= 		(const CBlock& bl);
+			CBlock  (void);
+			CBlock  (const CBlock& bl);
+			~CBlock  (void);
+	CBlock&		operator=(const CBlock& bl);
 
 	DECLARE_NODE (CBlock);
 
 	// EXISTING_CODE
+	SFUint32 firstTrans;
+	SFUint32 nTrans;
 	// EXISTING_CODE
 
 protected:
-	void			Clear      		(void);
-	void			Init      		(void);
-	void			Copy      		(const CBlock& bl);
-	SFBool                  readBackLevel           (SFArchive& archive);
+	void			Clear		(void);
+	void			Init		(void);
+	void			Copy		(const CBlock& bl);
+	SFBool                  readBackLevel	(SFArchive& archive);
 
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -159,6 +161,8 @@ inline void CBlock::Init(void)
 //	uncles = ??; /* unknown type: SFStringArray */
 
 	// EXISTING_CODE
+	firstTrans = 0;
+	nTrans = 0;
 	// EXISTING_CODE
 }
 
@@ -193,6 +197,8 @@ inline void CBlock::Copy(const CBlock& bl)
 	uncles = bl.uncles;
 
 	// EXISTING_CODE
+	firstTrans = bl.firstTrans;
+	nTrans = bl.nTrans;
 	// EXISTING_CODE
 	finishParse();
 }

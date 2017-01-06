@@ -1381,3 +1381,21 @@ SFString string2Hex(const SFString& inAscii)
 		ret += asHex(inAscii[i]);
 	return ret;
 }
+
+#include "biglib.h"
+//--------------------------------------------------------------------------------
+biguint_t exp2BigUint(const string &s)
+{
+	SFString exponent = s.c_str();
+	SFString decimals = nextTokenClear(exponent,'e');
+	SFString num = nextTokenClear(decimals,'.');
+	SFInt32 nD = decimals.GetLength();
+	SFUint32 e = toLong(exponent);
+	biguint_t ee = 1;
+	SFUint32 power = e-nD;
+	for (SFUint32 i=0;i<power;i++)
+		ee *= 10;
+	num += decimals;
+	return str2BigUint((const char*)num) * ee;
+}
+

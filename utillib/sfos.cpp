@@ -617,16 +617,15 @@ int SFos::establishFolder(const SFString& fileName)
 
 	SFInt32 find = targetFolder.ReverseFind('/');
 	targetFolder = targetFolder.Left(find) + "/";
-	if (targetFolder.startsWith("/Users/jrush/"))
+	SFString folder = targetFolder;
+	SFString curFolder = "/";
+	while (!folder.IsEmpty())
 	{
-		SFString folder = targetFolder;
-		folder.Replace("/Users/jrush/", EMPTY);
-		SFString curFolder = "/Users/jrush/";
-		while (!folder.IsEmpty())
+		curFolder += nextTokenClear(folder, '/') + "/";
+		if (!SFos::folderExists(curFolder))
 		{
-			curFolder += nextTokenClear(folder, '/') + "/";
-			if (!SFos::folderExists(curFolder))
-				SFos::mkdir(curFolder);
+			SFos::mkdir(curFolder);
+			cerr << "mkdir(" << curFolder << ")\n";
 		}
 	}
 	return SFos::folderExists(targetFolder);
@@ -642,11 +641,11 @@ SFString unEscapeString(const char *in)
 	int j;
 	for(i=0, j=0; dup[j]; ++i, ++j)
 	{
-	    if((dup[i] = dup[j]) == '%')
-	    {
-		dup[i] = hex2Ascii(&dup[j+1]);
-		j+=2;
-	    }
+		if((dup[i] = dup[j]) == '%')
+		{
+			dup[i] = hex2Ascii(&dup[j+1]);
+			j+=2;
+		}
 	}
 	dup[i] = '\0';
 	SFString ret = dup;

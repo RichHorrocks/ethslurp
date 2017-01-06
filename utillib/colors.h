@@ -44,4 +44,21 @@ inline SFString cc(SFInt32 w, SFInt32 c) { return "\033[" + asString(w) + ( (c==
 #define conWhiteB   cc(1,37)
 #define conOff      cc(0,-1)
 
+#define asBlack(a)    conBlack << a << conOff
+#define asRed(a)      conRed << a << conOff
+#define asGreen(a)    conGreen << a << conOff
+#define asYellow(a)   conYellow << a << conOff
+#define asBlue(a)     conBlue << a << conOff
+#define asMagenta(a)  conMagenta << a << conOff
+#define asTeal(a)     conTeal << a << conOff
+#define asWhite(a)    conWhite << a << conOff
+#define asBlackB(a)   conBlackB << a << conOff
+#define asRedB(a)     conRedB << a << conOff
+#define asGreenB(a)   conGreenB << a << conOff
+#define asYellowB(a)  conYellowB << a << conOff
+#define asBlueB(a)    conBlueB << a << conOff
+#define asMagentaB(a) conMagentaB << a << conOff
+#define asTealB(a)    conTealB << a << conOff
+#define asWhiteB(a)   conWhiteB << a << conOff
+
 #endif

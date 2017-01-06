@@ -27,6 +27,7 @@
  */
 #include "block.h"
 #include "etherlib.h"
+
 //---------------------------------------------------------------------------
 IMPLEMENT_NODE(CBlock, CBaseNode, curVersion);
 
@@ -81,7 +82,7 @@ SFString nextBlockChunk(const SFString& fieldIn, SFBool& force, const void *data
 			if ( fieldIn % "hash" ) return blo->hash;
 			break;
 		case 'l':
-			if ( fieldIn % "logsBloom" ) return blo->logsBloom;
+			if ( fieldIn % "logsBloom" ) return shrinkLogBloom(blo->logsBloom);
 			break;
 		case 'm':
 			if ( fieldIn % "miner" ) return blo->miner;
@@ -318,6 +319,7 @@ void CBlock::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
+#ifdef FULL_DATA
 		archive >> author;
 		archive >> difficulty;
 		archive >> extraData;
@@ -341,9 +343,18 @@ void CBlock::Serialize(SFArchive& archive)
 		archive >> transactions;
 		archive >> transactionsRoot;
 		archive >> uncles;
+#else
+		archive >> logsBloom;
+		archive >> miner;
+		archive >> number;
+		archive >> size;
+		archive >> timestamp;
+		archive >> transactions;
+#endif
 		finishParse();
 	} else
 	{
+#ifdef FULL_DATA
 		archive << author;
 		archive << difficulty;
 		archive << extraData;
@@ -367,6 +378,14 @@ void CBlock::Serialize(SFArchive& archive)
 		archive << transactions;
 		archive << transactionsRoot;
 		archive << uncles;
+#else
+		archive << shrinkLogBloom(logsBloom);
+		archive << miner;
+		archive << number;
+		archive << size;
+		archive << timestamp;
+		archive << transactions;
+#endif
 
 	}
 }

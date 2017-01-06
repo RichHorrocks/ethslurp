@@ -246,6 +246,7 @@ void CTransaction::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
+#ifdef FULL_DATA
 		archive >> blockHash;
 		archive >> blockNumber;
 		archive >> creates;
@@ -271,9 +272,25 @@ void CTransaction::Serialize(SFArchive& archive)
 		archive >> value;
 		receipt.Serialize(archive);
 		trace.Serialize(archive);
+#else
+		archive >> contractAddress;
+		archive >> from;
+		archive >> gas;
+		archive >> gasPrice;
+		archive >> gasUsed;
+		archive >> input;
+		archive >> isError;
+		archive >> isInternalTx;
+		archive >> nonce;
+		archive >> to;
+		archive >> transactionIndex;
+		archive >> value;
+		receipt.Serialize(archive);
+#endif
 		finishParse();
 	} else
 	{
+#ifdef FULL_DATA
 		archive << blockHash;
 		archive << blockNumber;
 		archive << creates;
@@ -299,6 +316,21 @@ void CTransaction::Serialize(SFArchive& archive)
 		archive << value;
 		receipt.Serialize(archive);
 		trace.Serialize(archive);
+#else
+		archive << contractAddress;
+		archive << from;
+		archive << gas;
+		archive << gasPrice;
+		archive << gasUsed;
+		archive << input;
+		archive << isError;
+		archive << isInternalTx;
+		archive << nonce;
+		archive << to;
+		archive << transactionIndex;
+		archive << value;
+		receipt.Serialize(archive);
+#endif
 
 	}
 }
@@ -727,12 +759,13 @@ SFString CTransaction::inputToFunction(void) const
 	if (input.GetLength()<10)
 		return " ";
 #if 1
+	// This is needed here because we only check the abi of the asked for account. We should load and check both from and to addresses' abi
 	switch (input[2])
 	{
 		case '0':
 			if      (input.startsWith( "0x095ea7b3" )) return parseParams(this, "approve",                   input.Mid(10,input.GetLength()));
-		     	else if (input.startsWith( "0x0221038a" )) return parseParams(this, "payOut",                    input.Mid(10,input.GetLength()));
-		     	break;
+			else if (input.startsWith( "0x0221038a" )) return parseParams(this, "payOut",                    input.Mid(10,input.GetLength()));
+			break;
 
 		case '1':
 			if      (input.startsWith( "0x1a7a98e2" )) return parseParams(this, "getDomain",                 input.Mid(10,input.GetLength()));
@@ -740,10 +773,10 @@ SFString CTransaction::inputToFunction(void) const
 
 		case '2':
 			if      (input.startsWith( "0x237e9492" )) return parseParams(this, "executeProposal",           input.Mid(10,input.GetLength()));
-		     	else if (input.startsWith( "0x24fc65ed" )) return parseParams(this, "getId",                     input.Mid(10,input.GetLength()));
-		     	else if (input.startsWith( "0x23b872dd" )) return parseParams(this, "transferFrom",              input.Mid(10,input.GetLength()));
-		     	else if (input.startsWith( "0x2632bf20" )) return parseParams(this, "unblockMe",                 input.Mid(10,input.GetLength()));
-		     	break;
+			else if (input.startsWith( "0x24fc65ed" )) return parseParams(this, "getId",                     input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0x23b872dd" )) return parseParams(this, "transferFrom",              input.Mid(10,input.GetLength()));
+			else if (input.startsWith( "0x2632bf20" )) return parseParams(this, "unblockMe",                 input.Mid(10,input.GetLength()));
+			break;
 
 		case '3':
 			break;
@@ -776,8 +809,8 @@ SFString CTransaction::inputToFunction(void) const
 		case 'a':
 			if      (input.startsWith( "0xa1da2fb9" )) return parseParams(this, "retrieveDAOReward",         input.Mid(10,input.GetLength()));
 			else if (input.startsWith( "0xa3912ec8" )) return parseParams(this, "receiveEther",              input.Mid(10,input.GetLength()));
-		     	else if (input.startsWith( "0xa9059cbb" )) return parseParams(this, "transfer",                  input.Mid(10,input.GetLength()));
-		     	break;
+			else if (input.startsWith( "0xa9059cbb" )) return parseParams(this, "transfer",                  input.Mid(10,input.GetLength()));
+			break;
 
 		case 'b':
 			if      (input.startsWith( "0xbaac5300" )) return parseParams(this, "createTokenProxy",          input.Mid(10,input.GetLength()));
@@ -786,7 +819,7 @@ SFString CTransaction::inputToFunction(void) const
 		case 'c':
 			if      (input.startsWith( "0xc9d27afe" )) return parseParams(this, "vote",                      input.Mid(10,input.GetLength()));
 			else if (input.startsWith( "0xcc9ae3f6" )) return parseParams(this, "getMyReward",               input.Mid(10,input.GetLength()));
-		     	break;
+			break;
 
 		case 'd':
 			if      (input.startsWith( "0xdbde1988" )) return parseParams(this, "transferFromWithoutReward", input.Mid(10,input.GetLength()));
@@ -795,7 +828,7 @@ SFString CTransaction::inputToFunction(void) const
 		case 'e':
 			if      (input.startsWith( "0xeceb2945" )) return parseParams(this, "checkProposalCode",         input.Mid(10,input.GetLength()));
 			else if (input.startsWith( "0xeb1ff845" )) return parseParams(this, "changeId",                  input.Mid(10,input.GetLength()));
-		     	break;
+			break;
 
 		case 'f':
 			break;

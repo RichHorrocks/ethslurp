@@ -69,7 +69,7 @@ int main(int argc, const char * argv[])
 //---------------------------------------------------------------------------------------------------
 SFBool CSlurperApp::Initialize(CSlurpOptions& options, SFString& message)
 {
-	// This allows us to spin through these classes' list of fields
+	// This allows us to spin through these classes' lists of fields without explicit display strings
 	CFunction::registerClass();
 	CParameter::registerClass();
 	CAccount::registerClass();
@@ -578,7 +578,6 @@ SFBool establishFolders(CConfig& config, const SFString& vers)
 	}
 
 	SFString configFilename = configPath("ethslurp.conf");
-
 	config.setFilename(configFilename);
 	if (SFos::folderExists(cachePath()) && SFos::fileExists(configFilename))
 	{
@@ -617,9 +616,9 @@ SFBool establishFolders(CConfig& config, const SFString& vers)
 	config.SetProfileString("DISPLAY_STR",  "fmt_json_record",   "\\n        {\\n[{FIELDS}]        },");
 	config.SetProfileString("DISPLAY_STR",  "fmt_json_field",    "\"[{p:FIELD}]\":\"[{FIELD}]\",");
 
-	config.SetProfileString("DISPLAY_STR",  "fmt_custom_file",	 "file:custom_format_file.html");
+	config.SetProfileString("DISPLAY_STR",  "fmt_custom_file",   "file:custom_format_file.html");
 	config.SetProfileString("DISPLAY_STR",  "fmt_custom_record", "fmt_html_record");
-	config.SetProfileString("DISPLAY_STR",  "fmt_custom_field",	 "fmt_html_field");
+	config.SetProfileString("DISPLAY_STR",  "fmt_custom_field",  "fmt_html_field");
 
 	config.writeFile(vers);
 	return SFos::fileExists(config.getFilename());

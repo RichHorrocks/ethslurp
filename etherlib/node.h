@@ -26,13 +26,39 @@ extern bool     getLogEntry             (CLogEntry& log,      const SFString& ha
 extern bool     getTraces               (CTrace& traces,      const SFString& hash, const SFString& id="");
 
 //-------------------------------------------------------------------------
-extern SFString getStoragePath          (const SFString& path, SFUint32 num);
-extern SFString getBinaryPath           (const SFString& path, SFUint32 num);
-inline void     setStoragePath          (const SFString& path) { getStoragePath(path,0); }
+extern void     etherlib_init           (const SFString& client);
+extern void     etherlib_cleanup        (void);
+
+//-------------------------------------------------------------------------
 extern void     setDataSource           (const SFString& source);
 
 //-------------------------------------------------------------------------
-extern void     etherlib_init           (const SFString& client);
-extern void     etherlib_cleanup        (void);
+extern void     setStorageRoot          (const SFString& path);
+extern SFString getJsonFilename1        (SFUint32 num);
+extern SFString getBinaryFilename1      (SFUint32 num);
+extern SFString getJsonPath1            (SFUint32 num);
+extern SFString getBinaryPath1          (SFUint32 num);
+
+//-------------------------------------------------------------------------
+typedef bool (*BLOCKVISITFUNC)(CBlock& block, void *data);
+typedef bool (*TRANSVISITFUNC)(CTransaction& trans, void *data);
+
+//-------------------------------------------------------------------------
+extern bool forEveryBlockOnDisc          (BLOCKVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+extern bool forEveryEmptyBlockOnDisc     (BLOCKVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+extern bool forEveryNonEmptyBlockOnDisc  (BLOCKVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+extern bool forEveryNonEmptyBlockInMemory(BLOCKVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+
+//-------------------------------------------------------------------------
+extern bool forEveryTransaction          (TRANSVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+extern bool forEveryTransactionTo        (TRANSVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+extern bool forEveryTransactionFrom      (TRANSVISITFUNC func, void *data, SFUint32 start=0, SFUint32 count=(SFUint32)-1);
+
+//-----------------------------------------------------------------------
+inline SFUint32 numFromFilename(const SFString& fileNameIn)
+{
+        SFString str = fileNameIn.Substitute(".bin","");
+        return toLong(nextTokenClearReverse(str,'/'));
+}
 
 #endif

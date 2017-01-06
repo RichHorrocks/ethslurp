@@ -51,6 +51,7 @@ SOFTWARE.
 #include "visitor.h"
 #include "sha3.h"
 #include "codeWriter.h"
+#include "biglib.h"
 
 #define curVersion ((long)0x00000201)
 

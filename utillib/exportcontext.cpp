@@ -35,7 +35,7 @@ CExportContext::CExportContext(void) : tCh('\t')
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(bool b)
 {
-	char val[10];
+	char val[32];
 	sprintf(val, "%c", b ? '1' : '0');
 	Output(val);
 	return *this;
@@ -44,7 +44,7 @@ CExportContext& CExportContext::operator<<(bool b)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(char c)
 {
-	char val[10];
+	char val[32];
 	sprintf(val, "%c", c);
 	Output(val);
 	return *this;
@@ -53,7 +53,7 @@ CExportContext& CExportContext::operator<<(char c)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(long dw)
 {
-	char val[10];
+	char val[32];
 	sprintf(val, (fmt.IsEmpty() ? "%ld" : (const char*)fmt), dw);
 	Output(val);
 	return *this;
@@ -62,7 +62,7 @@ CExportContext& CExportContext::operator<<(long dw)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(unsigned int ui)
 {
-	char val[10];
+	char val[32];
 	sprintf(val, (fmt.IsEmpty() ? "%d" : (const char*)fmt), ui);
 	Output(val);
 	return *this;
@@ -71,7 +71,7 @@ CExportContext& CExportContext::operator<<(unsigned int ui)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(unsigned long ul)
 {
-	char val[10];
+	char val[32];
 	sprintf(val, (fmt.IsEmpty() ? "%ld" : (const char*)fmt), ul);
 	Output(val);
 	return *this;
@@ -80,7 +80,7 @@ CExportContext& CExportContext::operator<<(unsigned long ul)
 //-------------------------------------------------------------
 CExportContext& CExportContext::operator<<(int i)
 {
-	char val[10];
+	char val[32];
 	sprintf(val, (fmt.IsEmpty() ? "%d" : (const char*)fmt), i);
 	Output(val);
 	return *this;

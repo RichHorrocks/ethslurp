@@ -18,6 +18,9 @@ extern       bigint_t   str2BigInt        (const string& s);
 extern       biguint_t  hex2BigUint       (const string& s);
 extern       bigint_t   hex2BigInt        (const string& s);
 
+extern       biguint_t  exp2BigUint       (const string& s);
+extern       bigint_t   exp2BigInt        (const string& s);
+
 extern       ostream&   operator<<        (ostream& os, const biguint_t& x);
 extern       ostream&   operator<<        (ostream& os, const bigint_t& x);
 

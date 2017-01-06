@@ -1,6 +1,9 @@
 #ifndef _ETHER_LIB_
 #define _ETHER_LIB_
+
 #define CONVERT_TO_PARITY
+//#define FULL_DATA
+
  /*--------------------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -35,7 +38,9 @@ SOFTWARE.
 #include "webapi.h"
 #include "pricequote.h"
 #include "trace.h"
+#include "rpcresult.h"
 #include "node.h"
+#include "miniblock.h"
 
 //------------------------------------------------------------------------------
 extern SFString compressHash  (const SFString& hashIn);
@@ -67,5 +72,6 @@ inline SFString lengthen(const SFString& strIn)
 #else
 #define lengthen(a) (a)
 #endif
+extern SFString shrinkLogBloom(const SFString& lbIn);
 
 #endif

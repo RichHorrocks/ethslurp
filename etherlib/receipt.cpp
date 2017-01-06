@@ -91,7 +91,7 @@ SFString nextReceiptChunk(const SFString& fieldIn, SFBool& force, const void *da
 				}
 				return ret;
 			}
-			if ( fieldIn % "logsBloom" ) return rec->logsBloom;
+			if ( fieldIn % "logsBloom" ) return shrinkLogBloom(rec->logsBloom);
 			break;
 		case 'r':
 			if ( fieldIn % "root" ) return rec->root;
@@ -183,6 +183,7 @@ void CReceipt::Serialize(SFArchive& archive)
 
 	if (archive.isReading())
 	{
+#ifdef FULL_DATA
 		archive >> blockHash;
 		archive >> blockNumber;
 		archive >> contractAddress;
@@ -195,9 +196,18 @@ void CReceipt::Serialize(SFArchive& archive)
 		archive >> to;
 		archive >> transactionHash;
 		archive >> transactionIndex;
+#else
+		archive >> contractAddress;
+		archive >> from;
+		archive >> gasUsed;
+		archive >> logsBloom;
+		archive >> to;
+		archive >> transactionIndex;
+#endif
 		finishParse();
 	} else
 	{
+#ifdef FULL_DATA
 		archive << blockHash;
 		archive << blockNumber;
 		archive << contractAddress;
@@ -210,6 +220,14 @@ void CReceipt::Serialize(SFArchive& archive)
 		archive << to;
 		archive << transactionHash;
 		archive << transactionIndex;
+#else
+		archive << contractAddress;
+		archive << from;
+		archive << gasUsed;
+		archive << shrinkLogBloom(logsBloom);
+		archive << to;
+		archive << transactionIndex;
+#endif
 
 	}
 }
