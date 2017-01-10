@@ -178,8 +178,12 @@ int sortRpcresultByID  (const void *rr1, const void *rr2) { return sortRpcresult
 //---------------------------------------------------------------------------
 SFString nextRpcresultChunk_custom(const SFString& fieldIn, SFBool& force, const void *data)
 {
-	CRPCResultNotify *rp = (CRPCResultNotify*)data;
-	const CRPCResult *rpc = rp->getDataPtr();
+	/*
+	 * Temporary deletion of unused code to curtail compiler warnings.
+	 *
+	 * CRPCResultNotify *rp = (CRPCResultNotify*)data;
+	 * const CRPCResult *rpc = rp->getDataPtr();
+	 */
 	switch (tolower(fieldIn[0]))
 	{
 		// EXISTING_CODE
@@ -187,9 +191,6 @@ SFString nextRpcresultChunk_custom(const SFString& fieldIn, SFBool& force, const
 		default:
 			break;
 	}
-
-#pragma unused(rp)
-#pragma unused(rpc)
 
 	return EMPTY;
 }

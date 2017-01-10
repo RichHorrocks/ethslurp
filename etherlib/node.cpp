@@ -451,10 +451,14 @@ bool forEveryEmptyBlockOnDisc(BLOCKVISITFUNC func, void *data, SFUint32 start, S
 	{
 		SFUint32 nItems = SFos::fileSize(fullBlockIndex) / sizeof(SFUint32) + 1;
 		SFUint32 *contents = new SFUint32[nItems];
-		fread(&contents[1], nItems-1, sizeof(SFUint32), fp);
+		size_t nRead = fread(&contents[1], nItems-1, sizeof(SFUint32), fp);
+		if (nRead != sizeof(SFUint32)) {
+			cerr << "Error encountered reading block index file.\n";
+		}
+
 		contents[0]=0;
 		SFUint32 cnt=start;
-		for (int i=1;i<nItems;i++)
+		for (uint i=1;i<nItems;i++)
 		{
 			while (cnt<contents[i])
 			{
@@ -482,8 +486,12 @@ bool forEveryNonEmptyBlockOnDisc(BLOCKVISITFUNC func, void *data, SFUint32 start
 	{
 		SFUint32 nItems = SFos::fileSize(fullBlockIndex) / sizeof(SFUint32);
 		SFUint32 *contents = new SFUint32[nItems];
-		fread(contents, nItems, sizeof(SFUint32), fp);
-		for (int i=0;i<nItems;i++)
+		size_t nRead = fread(contents, nItems, sizeof(SFUint32), fp);
+		if (nRead != sizeof(SFUint32)) {
+			cerr << "Error encountered reading block index file.\n";
+		}
+
+		for (uint i=0;i<nItems;i++)
 		{
 			if (inRange(contents[i], start, start+count-1))
 			{
@@ -565,7 +573,7 @@ bool forEveryNonEmptyBlockInMemory(BLOCKVISITFUNC func, void *data, SFUint32 sta
 	}
 
 	bool done=false;
-	for (int i=0;i<nBlocks&&!done;i++)
+	for (uint i=0;i<nBlocks&&!done;i++)
 	{
 		if (inRange(blocks[i].number, start, start+count-1))
 		{

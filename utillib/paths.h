@@ -39,7 +39,7 @@ inline void forAllFiles(const SFString& mask, VISITOR func, void *data )
 	glob_t globBuf;
 	glob( (const char *)mask, GLOB_MARK, globErrFunc, &globBuf);
 	SFBool done=FALSE;
-	for (int i=0;i<globBuf.gl_pathc&&!done;i++)
+	for (uint i=0;i<globBuf.gl_pathc&&!done;i++)
 		if (!(func)(globBuf.gl_pathv[i], data))
 			done=TRUE;
 	globfree( &globBuf );
